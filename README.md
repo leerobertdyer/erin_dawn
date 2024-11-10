@@ -1,5 +1,6 @@
 A React E-Commerce website for my wife's clothing business
 
+
 Will focus on availability of products first
 
 Adding authenticated administation site for her to use
