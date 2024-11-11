@@ -1,0 +1,12 @@
+:root {
+color: black;
+}
+
+.pinkText {
+color: rgb(255, 133, 153);
+}
+
+@font-face {
+    font-family: 'RetromaVibesRegular';
+    src: local('RetromaVibesRegular.ttf'), url('../fonts/RetromaVibesRegular.ttf') format('truetype');
+}
