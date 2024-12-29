@@ -15,3 +15,7 @@ color: rgb(255, 133, 153);
     font-family: 'RetromaVibesRegular';
     src: local('RetromaVibesRegular.ttf'), url('../fonts/RetromaVibesRegular.ttf') format('truetype');
 }
+
+* {
+    transition: all 0.3s;
+}
