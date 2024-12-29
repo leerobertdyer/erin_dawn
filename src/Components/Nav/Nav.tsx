@@ -16,13 +16,3 @@ export default function Nav() {
     )
 }
 
-/* 
- width: 100vw;
-height: 13vh;
-display: flex;
-justify-content: space-between;
-align-items: center;
-padding: 0 4rem;
-background-color: white;
-
-*/
