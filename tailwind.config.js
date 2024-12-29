@@ -4,6 +4,9 @@
   './src/**/**/*.{js,jsx,ts,tsx}',
 ];
 export const theme = {
+  fontFamily: {
+    retro: ['RetromaVibesRegular']
+  },
   extend: {},
 };
 export const plugins = [];
