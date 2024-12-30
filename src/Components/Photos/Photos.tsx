@@ -6,6 +6,7 @@ import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 
 export default function Photos() {
     const [photos, setPhotos] = useState<FlickrPhoto[]>([])
+    const [mySwitch, setMySwitch] = useState<boolean>(false)
 
     useEffect(() => {
         async function fetchPhotos() {
@@ -16,15 +17,16 @@ export default function Photos() {
             }
         }
         fetchPhotos();
-    }, [])
+    }, [mySwitch])
 
     return (
         <div className="relative">
-            <div className="bg-white absolute left-0 top-1/2 w-[4rem] flex justify-center hover: cursor-pointer z-10"><IoIosArrowBack size={40}  /></div>
+            <div className="bg-white absolute left-0 top-1/2 w-[4rem] flex justify-center hover: cursor-pointer z-10"
+            onClick={() => getPhotos()}><IoIosArrowBack size={40}  /></div>
         <div className="
         bg-yellow-500 bg-opacity-50 
         m-auto overflow-hidden 
-        w-[80vw] h-[80vw] max-h-[45rem] max-w-[45rem]
+        w-[60vw] h-[60vw] max-h-[45rem] max-w-[45rem]
         flex justify-center items-center
         rounded-full">
             {
@@ -43,7 +45,8 @@ export default function Photos() {
                 })
             }
         </div>
-            <div className="bg-white absolute right-0 top-1/2 w-[4rem] flex justify-center hover: cursor-pointer z-10"><IoIosArrowForward size={40}  /></div>
+            <div className="bg-white absolute right-0 top-1/2 w-[4rem] flex justify-center hover: cursor-pointer z-10"
+            onClick={() => setMySwitch(!mySwitch)}><IoIosArrowForward size={40}  /></div>
             </div>
     )
 }

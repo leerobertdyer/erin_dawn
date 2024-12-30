@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { IoIosCart, IoIosMenu } from "react-icons/io";
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
 
 export default function Nav() {
     const [isOpen, setIsOpen] = useState(false);
+    const location = useLocation()
 
+    const path = location.pathname
+    console.log('path', path)
     return (
         <>
         {isOpen && <div className="w-full h-screen bg-black bg-opacity-50 fixed top-0 left-0 z-50"
@@ -12,15 +15,16 @@ export default function Nav() {
             
             <div className="flex justify-center items-center h-full">
                 <div className="flex flex-col 
-                justify-evenly items-center 
+                justify-center items-center 
                 bg-black bg-opacity-35 
                 w-[80vw] h-[80vh]
                 md:w-[40vw] md:h-[60vh]
-                rounded-md">
-                    <button className="text-white text-[2rem]">X</button>
-                    <Link to="/" className="text-white text-[2rem]">Home</Link>
-                    <Link to="/shop" className="text-white text-[2rem]">Shop</Link>
-                    <Link to="/about" className="text-white text-[2rem]">About</Link>
+                border-2 border-white
+                rounded-md gap-8">
+                    <button className="text-pink-300 text-[4rem]">X</button>
+                    <Link to="/" style={{ color: path === "/" ? 'skyblue' : 'white' }}className="text-[2rem]">Home</Link>
+                    <Link to="/shop" style={{ color: path === "/shop" ? 'skyblue' : 'white' }}className="text-[2rem]">Shop</Link>
+                    <Link to="/about" style={{ color: path === "/about" ? 'skyblue' : 'white' }}className="text-[2rem]">About</Link>
                 </div>
             </div>
             </div>}
