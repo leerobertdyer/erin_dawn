@@ -1,14 +1,20 @@
-import Hero from './Components/Hero/Hero'
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import Nav from './Components/Nav/Nav'
 import './App.css'
-import Photos from './Components/Photos/Photos'
+import Shop from './Views/Shop/Shop'
+import { Home } from './Views/Home/Home'
 
 function App() {
   return (
     <>
-    <Nav />
-     {/* <Hero /> */}
-     <Photos />
+      <Router>
+        <Nav />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/shop" element={<Shop />} />
+          <Route path="/about" element={<Shop />} />
+        </Routes>
+      </Router>
     </>
   )
 }

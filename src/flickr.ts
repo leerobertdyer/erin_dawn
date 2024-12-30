@@ -1,5 +1,8 @@
 // import { createFlickr } from "flickr-sdk";
 
+// TODO:
+// Stash the photos in window.localStorage or alt cache and check for them before calling this api...
+
 const API_KEY = import.meta.env.VITE_FLICKR_API_KEY
 const user_id = import.meta.env.VITE_FLICKR_USER_ID
 

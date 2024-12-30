@@ -10,7 +10,7 @@ export default function Frame({ src, alt, size, name }: { src: string, alt: stri
 
         <div 
         className="
-        hover:transform hover:scale-110
+        hover:transform hover:scale-110 hover: cursor-pointer
         rounded-[5px] 
         flex justify-center items-center 
         bg-white p-2 
