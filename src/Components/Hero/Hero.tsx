@@ -1,29 +1,30 @@
-import { IoIosHeart, IoIosLeaf, IoIosThumbsUp } from "react-icons/io";
+import { IoIosHeart, } from "react-icons/io";
+import { PiLeaf, PiFlowerTulip, PiShootingStarLight } from "react-icons/pi";
+import { GiSewingNeedle } from "react-icons/gi";
+import {  } from "react-icons/pi";
+
+
 import Photos from "../Photos/Photos";
 
 export default function Hero() {
     return (
         <div
             className="w-full h-fit 
-        bg-white bg-opacity-45 my-20 py-8
-        border-y-4 border-yellow-400 border-double border-opacity-40
-        flex flex-col-reverse md:flex-row justify-around items-center"        >
-            <div className="bg-pink-300 bg-opacity-20 p-4 w-fit h-fit rounded-full">
-                <Photos />
-            </div>
-            <div className="
-            w-[60vw] h-[60vw]
-            max-w-[30rem] max-h-[40rem]
-            bg-white bg-opacity-80 rounded-lg px-8 
-            flex flex-col justify-center items-center">
-                <div className="w-full 
-                flex flex-col justify-center items-center gap-2">
-                    <h3 className="text-sm md:text-xl md:w-[100%] m-auto flex justify-between gap-4 border-y-2 border-y-black py-2"><IoIosLeaf size={30} className="inline"/> Sustainably Sourced</h3>
-                    <h3 className="text-sm md:text-xl md:w-[100%] m-auto flex justify-between gap-4"><IoIosThumbsUp size={30} className="inline"/> Handcrafted</h3>
-                    <h3 className="text-sm md:text-xl md:w-[100%] m-auto flex justify-between gap-4 border-y-2 border-y-black py-2"><IoIosHeart size={30} className="inline"/> Made With Love</h3>
-                    <img src="images/erin.jpg" alt="Erin Campbell" className="rounded-full w-[30%] md:w-[45%] h-auto" />
+            bg-white bg-opacity-80 
+            my-10  pt-8
+            border-y-4 border-yellow-400 border-double border-opacity-40
+            flex flex-col justify-center items-center gap-[4rem]">
+            <Photos />
+
+            <div className="p-2 w-full bg-white">
+                <div className="w-full flex justify-end items-start gap-2 h-17" >
+                    <div className="text-sm md:text-xl m-auto w-fit flex flex-col md:flex-row justify-start items-center gap-4 py-2"><PiLeaf size={30} strokeWidth={1} className="inline" /> Sustainably Sourced</div>
+                    <div className="text-sm md:text-xl m-auto w-fit flex flex-col md:flex-row justify-start items-center gap-4"><GiSewingNeedle size={30} strokeWidth={2} className="inline" /> Handcrafted</div>
+                    <div className="text-sm md:text-xl m-auto w-fit flex flex-col md:flex-row justify-start items-center gap-4 py-2"><PiShootingStarLight strokeWidth={2} size={30} className="inline" /> One-of-a-kind</div>
                 </div>
             </div>
+
         </div>
+
     )
 }
