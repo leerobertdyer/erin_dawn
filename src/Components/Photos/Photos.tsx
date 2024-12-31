@@ -30,8 +30,8 @@ export default function Photos() {
                     return (
                         <div key={photo.id} className="
                         flex-grow-0 flex-shrink-0
-                        w-[9rem] md:w-[12rem] lg:w-[14rem] ">
-                            <Frame src={photo.url_l} alt={photo.title}  />
+                        w-[10rem] md:w-[12rem] lg:w-[14rem]">
+                            <Frame src={photo.url_l} alt={photo.title} size="w-[10rem] md:w-[12rem]" />
                         </div>
                     )
                 })

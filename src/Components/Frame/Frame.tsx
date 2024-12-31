@@ -1,7 +1,21 @@
-export default function Frame({ src, alt, name }: { src: string, alt: string, name?: string }) {
+export default function Frame({ src, alt, name, size }: { src: string, alt: string, name?: string, size? : string }) {
+    const calculateSize = (sizeMap: string) => {
+        if (sizeMap.split(" ").length === 1) return { default: sizeMap, md: sizeMap, lg: sizeMap };
+        else {
+            return {
+                default: sizeMap.split(" ")[0],
+                md: sizeMap.split(" ")[1],
+                lg: sizeMap.split(" ")[2]
+            }
+        }
+    }
+
+    size && console.log("md size: ", calculateSize(size).md)
 
     return (
-        <div className="flex-grow">
+        <div className={`
+            ${size && calculateSize(size).default}
+        ${size && calculateSize(size).md} ${size && calculateSize(size).lg}`}>
             <div
                 className="
         rounded-[5px] 

@@ -1,8 +1,5 @@
-import { IoIosHeart, } from "react-icons/io";
-import { PiLeaf, PiFlowerTulip, PiShootingStarLight } from "react-icons/pi";
+import { PiLeaf, PiShootingStarLight } from "react-icons/pi";
 import { GiSewingNeedle } from "react-icons/gi";
-import {  } from "react-icons/pi";
-
 
 import Photos from "../Photos/Photos";
 

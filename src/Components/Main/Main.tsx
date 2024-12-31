@@ -1,7 +1,16 @@
+import Frame from "../Frame/Frame";
+
+
 export default function Main() {
     return (
-        <div className="bg-white bg-opacity-45 w-full h-[25rem] flex flex-col items-center justify-center rounded-lg p-4">
-            <h1>Main Content</h1>
+        <div
+            className="w-full h-fit 
+            bg-white bg-opacity-80 
+            py-8 px-4 flex-wrap
+            border-y-4 border-yellow-400 border-double border-opacity-40
+            flex flex-col sm:flex-row justify-center items-center gap-[4rem]">
+            <Frame src="images/inventory/baroqueBlazer.jpg" alt="Curtain Dress" name="Embellished Vintage" size="w-[19rem] md:flex-grow" />
+            <Frame src="images/inventory/curtainDress.jpg" alt="Baroque Blazer" name="Hand-Made Originals" size="w-[19rem] md:flex-grow" />
         </div>
     )
 }
