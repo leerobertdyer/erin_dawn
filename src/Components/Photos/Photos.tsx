@@ -10,10 +10,12 @@ export default function Photos() {
 
     useEffect(() => {
         async function fetchPhotos() {
-            const resp = await getPhotos();
+            const resp = await getPhotos('edc', false);
             if (resp) {
                 setPhotos(resp)
-                setIsLoading(false)
+                if (resp.length > 0) {
+                    setIsLoading(false)
+                }
             }
         }
         fetchPhotos();
@@ -24,8 +26,8 @@ export default function Photos() {
         w-[100vw] h-fit
         overflow-hidden
         flex justify-center items-center">
-            {isLoading ? <LoadPhotos /> 
-            : photos.length > 0 &&
+            {isLoading ? <LoadPhotos />
+                : photos.length > 0 &&
                 photos.map((photo) => {
                     return (
                         <div key={photo.id} className="
