@@ -1,4 +1,4 @@
-export default function Frame({ src, alt, name, size }: { src: string, alt: string, name?: string, size? : string }) {
+export default function Frame({ src, alt, name, size, hover }: { src: string, alt: string, name?: string, size? : string, hover?: boolean }) {
     const calculateSize = (sizeMap: string) => {
         if (sizeMap.split(" ").length === 1) return { default: sizeMap, md: sizeMap, lg: sizeMap };
         else {
@@ -13,7 +13,7 @@ export default function Frame({ src, alt, name, size }: { src: string, alt: stri
     size && console.log("md size: ", calculateSize(size).md)
 
     return (
-        <div className={`
+        <div className={`${hover && "cursor-pointer transition-all duration-1000 hover:[transform:rotateY(180deg)]"}
             ${size && calculateSize(size).default}
         ${size && calculateSize(size).md} ${size && calculateSize(size).lg}`}>
             <div

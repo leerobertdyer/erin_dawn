@@ -9,8 +9,8 @@ export default function About() {
                     <p className="text-white text-[1rem] leading-2">~</p>
                     <p className="text-white text-lg">I always loved playing dress up.</p>
                     <p className="text-white text-2xl">Especially when I get to make the dress.</p>
-                    <p className="text-white text-4xl">Even more when I am
-                        <span className="text-pink-300"> saving material from the landfill.</span></p>
+                    <p className="text-white text-3xl">Even more when I am
+                        <span className="text-pink-300"> saving that dress from the landfill.</span></p>
                 </div>
             </div>
         </div>
