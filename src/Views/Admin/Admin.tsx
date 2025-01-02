@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { auth } from "../../firebase";
+import { auth } from "../../firebase/firebaseConfig";
 import { setPersistence, signInWithEmailAndPassword, User, browserSessionPersistence } from "@firebase/auth";
 import AdminPanel from "../../Components/AdminPanel/AdminPanel";
 
@@ -29,7 +29,7 @@ export default function Admin({ u, setUser }: { u: User | null, setUser: (user: 
     };
 
     return (
-            u
+        u
             ?
             <AdminPanel />
             :
@@ -37,8 +37,8 @@ export default function Admin({ u, setUser }: { u: User | null, setUser: (user: 
                 <div className="border-2 border-black rounded-xl p-4 bg-blue-300 w-[35vw] h-[25vw] flex justify-center items-center mb-20">
                     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                         <h1 className="text-3xl">Backdoor Login</h1>
-                        <input type="email" required placeholder="Email" className="p-2" onChange={(e) => setEmail(e.target.value)}/>
-                        <input type="password" required placeholder="Password" className="p-2" onChange={(e) => setPassword(e.target.value)}/>
+                        <input type="email" required placeholder="Email" className="p-2" onChange={(e) => setEmail(e.target.value)} />
+                        <input type="password" required placeholder="Password" className="p-2" onChange={(e) => setPassword(e.target.value)} />
                         <button type="submit" className="p-2 bg-blue-500 text-white">Login</button>
                     </form>
                 </div>

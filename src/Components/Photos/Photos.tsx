@@ -10,7 +10,7 @@ export default function Photos() {
 
     useEffect(() => {
         async function fetchPhotos() {
-            const resp = await getPhotos('edc', false);
+            const resp = await getPhotos('edc', true);
             if (resp) {
                 setPhotos(resp)
                 if (resp.length > 0) {

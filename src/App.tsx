@@ -7,7 +7,7 @@ import About from './Views/About/About'
 import Admin from './Views/Admin/Admin'
 import { onAuthStateChanged, User } from 'firebase/auth'
 import { useEffect, useState } from 'react'
-import { auth } from './firebase'
+import { auth } from './firebase/firebaseConfig'
 
 
 function App() {
@@ -34,7 +34,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/about" element={<About />} />
-          <Route path="/admin" element={<Admin  u={user} setUser={setUser}/>} />
+          <Route path="/admin" element={<Admin u={user} setUser={setUser} />} />
         </Routes>
       </Router>
     </>
