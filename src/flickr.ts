@@ -91,13 +91,12 @@ function generateUUID() {
      return `${method.toUpperCase()}&${encodeURIComponent(url)}&${encodeURIComponent(encodedParams)}`;
  }
  
- export async function uploadPhoto(file: File, title: string, description: string, tags: string): Promise<any> {
-    console.log('inside upload photo function')
+ export async function uploadPhoto(file: File, title: string, description: string, tags: string[]): Promise<any> {
      const formData = new FormData();
      formData.append('photo', file);
      formData.append('title', title);
      formData.append('description', description);
-     formData.append('tags', tags);
+     formData.append('tags', tags.join(' '));
      formData.append('is_public', '1');
  
      console.log("formData: ", formData)

@@ -44,7 +44,7 @@ uploadTask.on('state_changed',
     // Store the URL and metadata in Firestore
     try {
         await addDoc(collection(db, "photos"), {
-            url: downloadURL,
+            imageUrl: downloadURL,
             title: title,
             description: description,
             price: price,

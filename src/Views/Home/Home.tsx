@@ -12,7 +12,7 @@ export function Home() {
             <BackgroundDiv image="images/background.jpg">
                 <Main />
             </BackgroundDiv> */}
-            <PhotosByTag tag="edc" />
+            <PhotosByTag tags={["edc"]} />
         </>
     )
 }
