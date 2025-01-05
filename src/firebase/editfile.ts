@@ -15,10 +15,12 @@ interface Iparams {
     price: number;
     tags: string[];
     url: string;
+    series?: string;
+    seriesOrder?: number;  
     onProgress?: (progress: number) => void;
 }
 
-export default async function editFile({ url, id, title, description, price, tags, file, onProgress }: Iparams): Promise<string> {
+export default async function editFile({ url, id, title, description, price, tags, file, onProgress, series, seriesOrder }: Iparams): Promise<string> {
 
     try {
 
@@ -36,7 +38,7 @@ export default async function editFile({ url, id, title, description, price, tag
 
         // update doc with new file url
         try {
-            await editDoc({ id, title, description, price, tags, imageUrl });
+            await editDoc({ id, title, description, price, tags, imageUrl, series, seriesOrder });
         } catch (error) {
             throw new Error("Issue updating document: " + error);
         }

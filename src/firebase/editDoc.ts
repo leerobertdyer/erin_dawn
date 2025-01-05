@@ -8,9 +8,11 @@ interface IParams {
     price: number;
     tags: string[];
     imageUrl?: string;
+    series?: string;
+    seriesOrder?: number;
 }
 
-export default async function editDoc({ id, title, description, price, tags, imageUrl }: IParams) {
+export default async function editDoc({ id, title, description, price, tags, imageUrl, series, seriesOrder }: IParams) {
     try {
         const docRef = doc(db, "photos", id);
         console.log('editing doc', docRef.path);
@@ -23,6 +25,8 @@ export default async function editDoc({ id, title, description, price, tags, ima
                 price: price,
                 tags: tags,
                 imageUrl: imageUrl,
+                series: series,
+                seriesOrder: seriesOrder
             });
             return;
 
@@ -33,6 +37,8 @@ export default async function editDoc({ id, title, description, price, tags, ima
                 description: description,
                 price: price,
                 tags: tags,
+                series: series,
+                seriesOrder: seriesOrder
             });
             
         }

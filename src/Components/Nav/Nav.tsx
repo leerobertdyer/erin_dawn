@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IoIosMenu, IoLogoInstagram } from "react-icons/io";
 import { Link, useLocation } from "react-router";
 import { HiOutlineShoppingCart } from "react-icons/hi2";
@@ -6,10 +6,28 @@ import { User } from "firebase/auth";
 
 export default function Nav({ u }: { u: User | null }) {
     const [isOpen, setIsOpen] = useState(false);
+    const [iconSize, setIconSize] = useState(60)
     const location = useLocation()
-
     const path = location.pathname
-    console.log('path', path)
+
+    //TODO: update menu to appear on left of screen when screen is big, and top if not
+
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth < 768) {
+                setIconSize(40); 
+            } else {
+                setIconSize(60); 
+            }
+        };
+
+        window.addEventListener('resize', handleResize);
+        handleResize(); 
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+
     return (
         <>
             {isOpen && <div className="w-full h-screen bg-black bg-opacity-50 fixed top-0 left-0 z-50"
@@ -37,15 +55,15 @@ export default function Nav({ u }: { u: User | null }) {
         flex justify-between items-center 
         py-0 px-[1rem] md:px-[7rem] 
         bg-white">
-                <IoIosMenu size={60}
+                <IoIosMenu size={iconSize - 5}
                     onClick={() => setIsOpen(true)}
                     className="
                 hover:cursor-pointer
                 border-2 border-black rounded-md" />
                 <a href="https://www.instagram.com/erindawn_campbell" target="_blank" >
-                    <IoLogoInstagram size={60} /></a>
+                    <IoLogoInstagram size={iconSize} /></a>
                 <Link to="/shop">
-                    <HiOutlineShoppingCart size={60}
+                    <HiOutlineShoppingCart size={iconSize}
                         onClick={() => console.log('cart!')}
                     />
                 </Link>

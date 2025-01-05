@@ -7,6 +7,16 @@ export const theme = {
   fontFamily: {
     retro: ['RetromaVibesRegular']
   },
-  extend: {},
+
+  extend: {
+    colors: {
+      edcPurple: {
+        LIGHTER: '#c5a3c5',
+        LIGHT: '#7a047a',
+        BASE: '#470247',
+        DARK: '#2b022b'
+      }
+    },
+  },
 };
 export const plugins = [];

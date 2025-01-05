@@ -1,35 +1,58 @@
 import { User } from "firebase/auth";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ProductForm from "../ProductForm/ProductForm";
 import { getPhoto } from "../../firebase/getPhotos";
 import removeProduct from "../../firebase/removeProduct";
 import removeFile from "../../firebase/removeFile";
 import AdminButtons from "./AdminButtons";
-import { IProductToEdit } from "../../Interfaces/IProduct";
+import { IProductInfo, IProductToEdit } from "../../Interfaces/IProduct";
 import ShoppingButtons from "./ShoppingButtons";
 
 interface IFrameProps {
-    src: string;
-    alt: string;
+    src?: string;
+    alt?: string;
     name?: string;
     additionalClass?: string;
     hover?: boolean;
+    spin?: boolean;
+    series?: string;
+    seriesOrder?: number;
     u: User | null;
-    id: string
+    id?: string
     onDelete?: (id: string) => void;
     isInventory?: boolean;
+    photos?: IProductInfo[];
 }
 
-interface IUpdatedProduct {
-    title: string;
-    src: string;
-}
-export default function Frame({ src, alt, name, additionalClass, hover, u, id, onDelete, isInventory }: IFrameProps) {
+export default function Frame({ src, alt, name, additionalClass, hover, u, id, onDelete, isInventory, spin, photos }: IFrameProps) {
     const [isEditing, setIsEditing] = useState(false);
     const [product, setProduct] = useState<IProductToEdit | null>(null);
-    const [updatedProduct, setUpdatedProduct] = useState<IUpdatedProduct | null>(null);
+    const [updatedProduct, setUpdatedProduct] = useState<IProductInfo | null>(null);
+    const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+    const [isCarousel, setIsCarousel] = useState(false);
 
-    function updateProduct(newProduct: { title: string, src: string }) {
+    useEffect(() => {
+        if (isCarousel && photos) {
+            setCurrentPhotoIndex(1);
+            const interval = setInterval(() => {
+                setCurrentPhotoIndex((prev) => (prev + 1) % photos.length);
+            }, 1000);
+            return () => clearInterval(interval);
+        }
+    }, [isCarousel, photos]);
+
+    function handleMouseEnter() {
+        if (photos && photos.length > 1) {
+            setIsCarousel(true);
+        }
+    }
+
+    function handleMouseLeave() {
+        setCurrentPhotoIndex(0);
+        setIsCarousel(false);
+    }
+
+    function updateProduct(newProduct: IProductInfo ) {
         console.log("Finalizing Edit")
         setUpdatedProduct(newProduct);
         setProduct(null);
@@ -37,6 +60,14 @@ export default function Frame({ src, alt, name, additionalClass, hover, u, id, o
     }
 
     async function handleDelete(url: string) {
+        if (!url || !id) {
+            if (photos && photos[0].id && photos[0].imageUrl) {
+                url = photos[0].imageUrl;
+                id = photos[0].id;
+            } else {
+                return;
+            }
+        }
         const success = await removeProduct({ url, id });
         onDelete && onDelete(id);
         setIsEditing(false);
@@ -65,6 +96,13 @@ export default function Frame({ src, alt, name, additionalClass, hover, u, id, o
     }
 
     async function handleEdit() {
+        if (!id) {
+            if (photos && photos[0].id) {
+                id = photos[0].id;
+            } else {
+                return;
+            }
+        }
         setIsEditing(true);
         const photoData = await getPhoto({ id });
         setProduct({
@@ -75,6 +113,8 @@ export default function Frame({ src, alt, name, additionalClass, hover, u, id, o
             disabled: false,
             url: photoData.imageUrl,
             id: id,
+            series: photoData.series,
+            seriesOrder: photoData.seriesOrder,
             onProductUpdate: updateProduct,
             onPruductDelete: handleDelete
         })
@@ -87,20 +127,24 @@ export default function Frame({ src, alt, name, additionalClass, hover, u, id, o
                 <ProductForm product={product} />
             </div>
             :
-            <div className={`${hover && "cursor-pointer transition-all duration-1000 hover:[transform:rotateY(180deg)]"}
-            ${additionalClass && additionalClass} flex-col h-full w-full`}>
+            <div className={`
+                ${hover && "cursor-pointer transition-all duration-1000"} 
+                ${spin && "hover:[transform:rotateY(180deg)]"}
+            ${additionalClass && additionalClass} flex-col h-full w-full`}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}>
                 <div
                     className="
             rounded-[5px] 
             flex justify-center items-center 
             bg-white p-2 
             border-2 border-black
-            w-full h-full flex-grow">
+            w-full h-full flex-grow relative">
                     <div className="flex flex-col justify-between items-center h-full w-full">
-                        <img src={updatedProduct ? updatedProduct.src : src} alt={updatedProduct ? updatedProduct.title : alt} className="rounded-sm object-cover flex-grow w-full min-h-[40vh]" />
-                        {name && <h2 className="text-[1.5rem] text-center bg-white p-2  w-full" >"{name}"</h2>}
+                        <img src={updatedProduct ? updatedProduct.imageUrl : photos ? photos[currentPhotoIndex].imageUrl : src} alt={updatedProduct ? updatedProduct.title : photos ? photos[currentPhotoIndex].title : alt} className="rounded-sm object-cover flex-grow w-full min-h-[40vh]" />
+                        {name && <h2 className="text-[1.5rem] text-center bg-white p-2  w-full" >{updatedProduct ? updatedProduct.title : photos ? photos[currentPhotoIndex].title : name}</h2>}
                         {u && <AdminButtons handleEdit={handleEdit} />}
-                        {isInventory && <ShoppingButtons />}
+                        {isInventory && photos && <ShoppingButtons product={updatedProduct ?? photos[0]}/>}
                     </div>
                 </div>
             </div>

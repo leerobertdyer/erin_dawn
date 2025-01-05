@@ -5,6 +5,7 @@ import newDoc from "../../firebase/newDoc";
 import { IoIosArrowBack, IoIosRefresh, IoIosTrash } from "react-icons/io";
 import editDoc from "../../firebase/editDoc";
 import { IProductToEdit } from "../../Interfaces/IProduct";
+import Info from "../Info/Info";
 
 export default function ProductForm({ product }: { product?: IProductToEdit }) {
     const [title, setTitle] = useState<string>(product?.title || "");
@@ -17,6 +18,8 @@ export default function ProductForm({ product }: { product?: IProductToEdit }) {
     const [progress, setProgress] = useState(0)
     const [isEditing, setIsEditing] = useState<boolean>(false)
     const [background, setBackground] = useState<string>(product?.url || "")
+    const [series, setSeries] = useState<string>(product?.series || "")
+    const [seriesOrder, setSeriesOrder] = useState<number>(product?.seriesOrder || 1)
 
     function onProgress(percent: number) {
         setProgress(percent)
@@ -36,7 +39,7 @@ export default function ProductForm({ product }: { product?: IProductToEdit }) {
                 setDisabled(true);
             }
         }
-    }, [title, description, tags, price, file])
+    }, [title, description, tags, price, file, isEditing])
 
     useEffect(() => {
         if (product) {
@@ -73,6 +76,8 @@ export default function ProductForm({ product }: { product?: IProductToEdit }) {
             tags: tags,
             file: file as File,
             price: price,
+            series: series,
+            seriesOrder: seriesOrder,
             onProgress: onProgress,
         }
 
@@ -87,11 +92,13 @@ export default function ProductForm({ product }: { product?: IProductToEdit }) {
                 file: file,
                 price: price,
                 url: product.url,
+                series: series,
+                seriesOrder: seriesOrder,
                 onProgress: onProgress,
             })
         } else if (isEditing && product) {
             downloadURL = product.url
-            await editDoc({ id: product.id, title, description, tags, price })
+            await editDoc({ id: product.id, title, description, tags, price, series, seriesOrder })
         }
         else {
             downloadURL = await uploadFile(fileToUpload)
@@ -101,8 +108,9 @@ export default function ProductForm({ product }: { product?: IProductToEdit }) {
         if (downloadURL) {
             console.log("Product uploaded successfully: ", downloadURL)
             setIsEditing(false)
-            product && product.onProductUpdate({ src: downloadURL, title });
+            product && product.onProductUpdate({ imageUrl: downloadURL, title, price, description, tags });
             resetState();
+            
             // Update the db with new url, if necessary
             if (!isEditing) {
                 newDoc({ ...fileToUpload, downloadURL })
@@ -124,6 +132,8 @@ export default function ProductForm({ product }: { product?: IProductToEdit }) {
         setFile(null)
         setNextTag("")
         setBackground("")
+        setSeries("")
+        setSeriesOrder(1)
         setProgress(0)
     }
 
@@ -146,15 +156,23 @@ export default function ProductForm({ product }: { product?: IProductToEdit }) {
                 style={{ backgroundImage: `url(${background})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
 
                 <h2 className="text-2xl">Add Product</h2>
+
                 <input type="text" placeholder="Product Name" value={title}
                     className=" border-2 border-black rounded-md p-2 w-[80%]" onChange={(e) => setTitle(e.target.value)} />
-                <input type="text" placeholder="Product Description" value={description}
-                    className=" border-2 border-black rounded-md p-2 w-[80%]" onChange={(e) => setDescription(e.target.value)} />
 
-                <div className="flex flex-col items-between w-[80%]">
-                    <input type="text" placeholder="Product Tags" value={nextTag}
-                        className=" border-2 border-black rounded-md p-2 w-[100%]" onChange={(e) => setNextTag(e.target.value.trim())} />
 
+                <div className="w-[80%] relative">
+                    <input type="text" placeholder="Product Description" value={description}
+                        className=" border-2 border-black rounded-md p-2 w-full" onChange={(e) => setDescription(e.target.value)} />
+                    <Info information="Product Description. This is displayed when user clicks 'more info' on any product." />
+                </div>
+
+                <div className="flex flex-col items-between w-[80%] ">
+                    <div className="w-full relative">
+                        <input type="text" placeholder="Product Tags" value={nextTag}
+                            className=" border-2 border-black rounded-md p-2 w-[100%]" onChange={(e) => setNextTag(e.target.value.trim())} />
+                        <Info information="Product Tags. These are used to group products together. 'hero' adds this to the top of the main page, 'inventory' makes this appear in the store! 'vintage' updates the 'Embellished Vintage' category, and 'handmade' updates the 'Hand-Made Originals' category" />
+                    </div>
                     <div className="w-full flex flex-wrap justify-start items-start">
                         {tags.map((tag, index) => tag === "edc" ? null : (
                             <div
@@ -174,8 +192,18 @@ export default function ProductForm({ product }: { product?: IProductToEdit }) {
                         onClick={handleAddTag} >Add Tag+</button>
                 </div>
 
-                <input type="number" min={0} step="0.01" placeholder="Product Price" value={price || ""}
-                    className=" border-2 border-black rounded-md p-2 w-[80%]" onChange={(e) => setPrice(parseFloat(e.target.value))} />
+                <div className="w-[80%] flex relative">
+                    <Info information="Product Series are used to group products together. Series Order is used to determine the order in which products are displayed in a series." />
+                    <input placeholder="Product Series" value={series} className=" border-2 border-black rounded-md p-2 w-[60%] inline" onChange={(e) => setSeries(e.target.value)} />
+                    <div className="w-[40%] relative">
+                        <input value={seriesOrder} type="number" min={1} step="1" className="border-2 border-black rounded-md p-2 w-full z-4" onChange={(e) => setSeriesOrder(parseInt(e.target.value))} />
+                        <label htmlFor="seriesOrder" className="text-xs text-gray-400 absolute top-1/3 right-4 md:right-10">Order</label>
+                    </div>
+                </div>
+
+                <input type="number" min={0} step="1" placeholder="Product Price" value={price || ""}
+                    className=" border-2 border-black rounded-md p-2 w-[80%]" onChange={(e) => setPrice(Number(Number((e.target.value)).toFixed(0)))} />
+
                 <div className="flex flex-col gap-2">
                     <label htmlFor="file"
                         className="p-4 bg-green-500 text-white cursor-pointer rounded-md text-center">Upload Image+
@@ -184,14 +212,16 @@ export default function ProductForm({ product }: { product?: IProductToEdit }) {
                         className="hidden" onChange={(e) => handleFileChange(e)} />
                     {file ? <p className="text-center w-full m-auto py-1 px-2 rounded-md text-xs text-gray-400 bg-white">{file.name}</p> : <p className="text-xs text-gray-400">No file selected</p>}
                 </div>
-                    <button type="submit" disabled={disabled} className={`p-2 ${disabled ? 'bg-gray-400' : 'bg-blue-500'} text-white w-[90%] h-full rounded-md p-2 max-w-[75%]`}>{isEditing ? "Edit" : "Add"} Product</button>
+
+                <button type="submit" disabled={disabled} className={`p-2 ${disabled ? 'bg-gray-400' : 'bg-blue-500'} text-white w-[90%] h-full rounded-md p-2 max-w-[75%]`}>{isEditing ? "Edit" : "Add"} Product</button>
                 <div className="w-[100%] h-10 m-auto flex justify-between items-center gap-4">
-                  {product && <button type="button" onClick={() => product.onProductUpdate({src: product.url, title: product.title})} className="p-2 bg-blue-500 h-full text-white rounded-md flex justify-around items-center w-[20%]"><IoIosArrowBack /></button>}
+                    {product && <button type="button" onClick={() => product.onProductUpdate({ imageUrl: product.url, title: product.title, price: product.price, description: product.description, tags: product.tags })} className="p-2 bg-blue-500 h-full text-white rounded-md flex justify-around items-center w-[20%]"><IoIosArrowBack /></button>}
                     <button type="button" onClick={resetState} className={'bg-yellow-400 $p-2 text-black w-[20%] h-full rounded-md flex p-2 flex-col justify-center items-center flex-grow max-w-[50%] m-auto'}><IoIosRefresh />Refresh</button>
-                  {product && <button type="button" onClick={() => product.onPruductDelete(product.url)} className="p-2 bg-red-600 h-full text-white rounded-md flex justify-around items-center w-[20%] "><IoIosTrash /></button>}
+                    {product && <button type="button" onClick={() => product.onPruductDelete(product.url)} className="p-2 bg-red-600 h-full text-white rounded-md flex justify-around items-center w-[20%] "><IoIosTrash /></button>}
                 </div>
             </form>
 
+            {/* TODO: Update this progress bar */}
             {progress > 0 &&
                 <div className="absolute bottom-0 w-full p-2 text-center"
                     style={{ background: `linear-gradient(to right, #4CAF50 ${progress}%, #f1f1f1 ${progress}%)` }}>

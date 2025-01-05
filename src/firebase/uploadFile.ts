@@ -10,7 +10,7 @@ interface Iparams {
 export default async function uploadFile({ reference, file, onProgress }: Iparams): Promise<string> {
   return new Promise((resolve, reject) => {
     try {
-      const storageRef = ref(storage, reference);
+      const storageRef = ref(storage, `photos/${reference}`);
 
       const uploadTask = uploadBytesResumable(storageRef, file);
 
