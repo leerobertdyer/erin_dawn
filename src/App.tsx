@@ -29,10 +29,10 @@ function App() {
   return (
     <>
       <Router>
-        <Nav />
+        <Nav u={user}/>
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/shop" element={<Shop />} />
+          <Route path="/" element={<Home u={user}/>} />
+          <Route path="/shop" element={<Shop u={user}/>} />
           <Route path="/about" element={<About />} />
           <Route path="/admin" element={<Admin u={user} setUser={setUser} />} />
         </Routes>

@@ -4,5 +4,6 @@ export interface IProductInfo {
     description: string;
     price: number;
     tags: string[];
+    id: string;
 }
 

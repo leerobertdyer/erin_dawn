@@ -1,9 +1,9 @@
 import { PiLeaf, PiShootingStarLight } from "react-icons/pi";
 import { GiSewingNeedle } from "react-icons/gi";
 
-import Photos from "../Photos/Photos";
 
-export default function Hero() {
+
+export default function Hero( { children }: { children: React.ReactNode }) {
     return (
         <div
             className="w-full h-fit 
@@ -11,7 +11,7 @@ export default function Hero() {
             my-10  pt-8
             border-y-4 border-yellow-400 border-double border-opacity-40
             flex flex-col justify-center items-center gap-[4rem]">
-            <Photos />
+            {children}
 
             <div className="p-2 w-full bg-white">
                 <div className="w-full flex justify-end items-start gap-2 h-17" >
