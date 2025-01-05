@@ -1,6 +1,6 @@
 import { collection, doc, getDoc, getDocs, query, where } from "firebase/firestore";
 import { db } from "./firebaseConfig";
-import { IProductInfo } from "../Interfaces/ProductImage";
+import { IProductInfo } from "../Interfaces/IProduct";
 import shuffleArray from "../util/shuffle";
 
 export async function getPhotos({ tags, shuffle }: { tags: string[], shuffle?: boolean }): Promise<IProductInfo[]> {

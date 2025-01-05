@@ -1,26 +1,30 @@
 import { User } from "firebase/auth";
 import { useState } from "react";
-import ProductForm, { IProductToEdit } from "../ProductForm/ProductForm";
+import ProductForm from "../ProductForm/ProductForm";
 import { getPhoto } from "../../firebase/getPhotos";
 import removeProduct from "../../firebase/removeProduct";
 import removeFile from "../../firebase/removeFile";
+import AdminButtons from "./AdminButtons";
+import { IProductToEdit } from "../../Interfaces/IProduct";
+import ShoppingButtons from "./ShoppingButtons";
 
 interface IFrameProps {
     src: string;
     alt: string;
     name?: string;
-    size?: string;
+    additionalClass?: string;
     hover?: boolean;
     u: User | null;
     id: string
     onDelete?: (id: string) => void;
+    isInventory?: boolean;
 }
 
 interface IUpdatedProduct {
     title: string;
     src: string;
 }
-export default function Frame({ src, alt, name, size, hover, u, id, onDelete }: IFrameProps) {
+export default function Frame({ src, alt, name, additionalClass, hover, u, id, onDelete, isInventory }: IFrameProps) {
     const [isEditing, setIsEditing] = useState(false);
     const [product, setProduct] = useState<IProductToEdit | null>(null);
     const [updatedProduct, setUpdatedProduct] = useState<IUpdatedProduct | null>(null);
@@ -76,17 +80,6 @@ export default function Frame({ src, alt, name, size, hover, u, id, onDelete }: 
         })
     }
 
-    function calculateSize(sizeMap: string) {
-        if (sizeMap.split(" ").length === 1) return { default: sizeMap, md: sizeMap, lg: sizeMap };
-        else {
-            return {
-                default: sizeMap.split(" ")[0],
-                md: sizeMap.split(" ")[1],
-                lg: sizeMap.split(" ")[2]
-            }
-        }
-    }
-
     return (
         (isEditing && product)
             ?
@@ -95,25 +88,19 @@ export default function Frame({ src, alt, name, size, hover, u, id, onDelete }: 
             </div>
             :
             <div className={`${hover && "cursor-pointer transition-all duration-1000 hover:[transform:rotateY(180deg)]"}
-            ${size && calculateSize(size).default}
-        ${size && calculateSize(size).md} ${size && calculateSize(size).lg}`}>
+            ${additionalClass && additionalClass} flex-col h-full w-full`}>
                 <div
                     className="
             rounded-[5px] 
             flex justify-center items-center 
             bg-white p-2 
             border-2 border-black
-            w-[100%] flex-grow">
+            w-full h-full flex-grow">
                     <div className="flex flex-col justify-between items-center h-full w-full">
                         <img src={updatedProduct ? updatedProduct.src : src} alt={updatedProduct ? updatedProduct.title : alt} className="rounded-sm object-cover flex-grow w-full min-h-[40vh]" />
                         {name && <h2 className="text-[1.5rem] text-center bg-white p-2  w-full" >"{name}"</h2>}
-                        {u && <div className="flex justify-center items-center w-full p-2 gap-4">
-                            <button
-                                className="
-                            transition:all duration-[10ms]
-                            hover:bg-yellow-500 hover:text-black
-                            bg-green-500 text-white px-2 rounded-md w-[100%]" onClick={handleEdit}>Edit</button>
-                        </div>}
+                        {u && <AdminButtons handleEdit={handleEdit} />}
+                        {isInventory && <ShoppingButtons />}
                     </div>
                 </div>
             </div>

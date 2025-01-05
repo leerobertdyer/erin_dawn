@@ -4,18 +4,7 @@ import editFile from "../../firebase/editfile";
 import newDoc from "../../firebase/newDoc";
 import { IoIosArrowBack, IoIosRefresh, IoIosTrash } from "react-icons/io";
 import editDoc from "../../firebase/editDoc";
-
-export interface IProductToEdit {
-    title: string;
-    description: string;
-    price: number;
-    tags: string[];
-    disabled: boolean;
-    url: string;
-    id: string;
-    onProductUpdate: (product: {src: string, title: string}) => void;
-    onPruductDelete: (url: string) => void;
-}
+import { IProductToEdit } from "../../Interfaces/IProduct";
 
 export default function ProductForm({ product }: { product?: IProductToEdit }) {
     const [title, setTitle] = useState<string>(product?.title || "");

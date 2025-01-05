@@ -2,7 +2,7 @@ import { User } from "firebase/auth";
 import Frame from "../../Components/Frame/Frame";
 import { useEffect, useState } from "react";
 import { getPhotos } from "../../firebase/getPhotos";
-import { IProductInfo } from "../../Interfaces/ProductImage";
+import { IProductInfo } from "../../Interfaces/IProduct";
 import LoadPhotos from "../../Components/Photos/LoadPhotos";
 
 export default function Shop({ u }: { u: User | null }) {
@@ -26,10 +26,10 @@ export default function Shop({ u }: { u: User | null }) {
         <div className="w-full h-screen p-4 flex flex-col md:flex-row flex-wrap justify-center items-center gap-[1rem]">
             {isLoading && <LoadPhotos />}
             {inventory.length > 0 && inventory.map((photo) => (
-                    <div key={photo.id} >
-                        <Frame src={photo.imageUrl} alt={photo.title} name={photo.title} size="w-[19rem] md:flex-grow" hover={false} u={u} id={photo.id} />
-                    </div>
-                ))}
+                <div key={photo.id} className="h-[40vw] w-[19rem] bg-red-200 ">
+                    <Frame src={photo.imageUrl} alt={photo.title} name={photo.title} additionalClass="w-[19rem] md:flex-grow" hover={false} u={u} id={photo.id} isInventory/>
                 </div>
+            ))}
+        </div>
     )
 }
