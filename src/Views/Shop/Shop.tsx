@@ -41,11 +41,11 @@ export default function Shop({ u }: { u: User | null }) {
     }, [])
 
     return (
-        <div className="w-full h-screen p-4 flex flex-col md:flex-row flex-wrap justify-center items-center gap-[1rem] ">
+        <div className="w-screen h-fit p-4 flex flex-col md:flex-wrap md:flex-row justify-center items-center gap-[1rem] overflow:hidden">
             {isLoading && <LoadPhotos />}
             {inventory.length > 0 && inventory.map((photos, key) => (
-                <div key={key} className="h-fit w-[19rem] bg-red-200">
-                    <Frame photos={photos} additionalClass="w-[19rem] md:flex-grow" hover u={u} isInventory/>
+                <div key={key} className="h-fit w-screen flex-wrap flex md:w-[19rem] p-4">
+                    <Frame photos={photos} additionalClass="w-[19rem]" hover u={u} name={photos[0].title} isInventory/>
                 </div>
             ))}
         </div>

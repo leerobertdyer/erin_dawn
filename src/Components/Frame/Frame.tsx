@@ -7,6 +7,7 @@ import removeFile from "../../firebase/removeFile";
 import AdminButtons from "./AdminButtons";
 import { IProductInfo, IProductToEdit } from "../../Interfaces/IProduct";
 import ShoppingButtons from "./ShoppingButtons";
+import BatchEdit from "../BatchEdit/BatchEdit";
 
 interface IFrameProps {
     src?: string;
@@ -26,19 +27,28 @@ interface IFrameProps {
 
 export default function Frame({ src, alt, name, additionalClass, hover, u, id, onDelete, isInventory, spin, photos }: IFrameProps) {
     const [isEditing, setIsEditing] = useState(false);
+    const [isBatchEdit, setIsBatchEdit] = useState(false);
     const [product, setProduct] = useState<IProductToEdit | null>(null);
     const [updatedProduct, setUpdatedProduct] = useState<IProductInfo | null>(null);
     const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
     const [isCarousel, setIsCarousel] = useState(false);
 
     useEffect(() => {
+        let interval: NodeJS.Timeout;
         if (isCarousel && photos) {
             setCurrentPhotoIndex(1);
-            const interval = setInterval(() => {
+            interval = setInterval(() => {
                 setCurrentPhotoIndex((prev) => (prev + 1) % photos.length);
             }, 1000);
             return () => clearInterval(interval);
         }
+        return () => {
+            if (interval) {
+                clearInterval(interval);
+                setCurrentPhotoIndex(0);
+                setIsCarousel(false);
+            }
+        };
     }, [isCarousel, photos]);
 
     function handleMouseEnter() {
@@ -52,7 +62,7 @@ export default function Frame({ src, alt, name, additionalClass, hover, u, id, o
         setIsCarousel(false);
     }
 
-    function updateProduct(newProduct: IProductInfo ) {
+    function updateProduct(newProduct: IProductInfo) {
         console.log("Finalizing Edit")
         setUpdatedProduct(newProduct);
         setProduct(null);
@@ -97,56 +107,73 @@ export default function Frame({ src, alt, name, additionalClass, hover, u, id, o
 
     async function handleEdit() {
         if (!id) {
-            if (photos && photos[0].id) {
+            // Early return if no valid photos
+            if (!photos || !photos?.[0]?.id) return;
+            // Single photo case
+            if (photos.length === 1) {
                 id = photos[0].id;
             } else {
-                return;
+                // Batch edit case
+                id = photos[0].id;
+                setIsBatchEdit(true);
             }
+        } 
+        if (id) {
+            // Single photo case
+            setIsEditing(true);
+            const photoData = await getPhoto({ id });
+            setProduct({
+                title: photoData.title,
+                description: photoData.description,
+                price: photoData.price,
+                tags: photoData.tags,
+                disabled: false,
+                url: photoData.imageUrl,
+                id: id,
+                series: photoData.series,
+                seriesOrder: photoData.seriesOrder,
+                onProductUpdate: updateProduct,
+                onPruductDelete: handleDelete
+            })
         }
-        setIsEditing(true);
-        const photoData = await getPhoto({ id });
-        setProduct({
-            title: photoData.title,
-            description: photoData.description,
-            price: photoData.price,
-            tags: photoData.tags,
-            disabled: false,
-            url: photoData.imageUrl,
-            id: id,
-            series: photoData.series,
-            seriesOrder: photoData.seriesOrder,
-            onProductUpdate: updateProduct,
-            onPruductDelete: handleDelete
-        })
+    }
+
+    function handleDetails() {
+
+    }
+
+    function handleBack() {
+        setIsBatchEdit(false);
+        setIsEditing(false);
     }
 
     return (
-        (isEditing && product)
-            ?
-            <div className="w-screen h-screen bg-white fixed top-0 left-0 z-50 flex justify-center items-center">
-                <ProductForm product={product} />
-            </div>
-            :
-            <div className={`
+        (isBatchEdit) ? <BatchEdit products={photos ?? []} u={u} handleBack={handleBack} />
+            : (isEditing && product)
+                ?
+                <div className="w-screen h-screen bg-white fixed top-0 left-0 z-50 flex justify-center items-center">
+                    <ProductForm product={product} />
+                </div>
+                :
+                <div className={`
                 ${hover && "cursor-pointer transition-all duration-1000"} 
                 ${spin && "hover:[transform:rotateY(180deg)]"}
             ${additionalClass && additionalClass} flex-col h-full w-full`}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}>
-                <div
-                    className="
-            rounded-[5px] 
-            flex justify-center items-center 
-            bg-white p-2 
-            border-2 border-black
-            w-full h-full flex-grow relative">
-                    <div className="flex flex-col justify-between items-center h-full w-full">
-                        <img src={updatedProduct ? updatedProduct.imageUrl : photos ? photos[currentPhotoIndex].imageUrl : src} alt={updatedProduct ? updatedProduct.title : photos ? photos[currentPhotoIndex].title : alt} className="rounded-sm object-cover flex-grow w-full min-h-[40vh]" />
-                        {name && <h2 className="text-[1.5rem] text-center bg-white p-2  w-full" >{updatedProduct ? updatedProduct.title : photos ? photos[currentPhotoIndex].title : name}</h2>}
-                        {u && <AdminButtons handleEdit={handleEdit} />}
-                        {isInventory && photos && <ShoppingButtons product={updatedProduct ?? photos[0]}/>}
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}>
+                    <div className="
+                        rounded-[5px] 
+                        flex justify-center items-center 
+                        bg-white p-2 
+                        border-2 border-black
+                        w-full h-full flex-grow relative">
+                        <div className="flex flex-col justify-between items-center h-full w-full">
+                            <img src={updatedProduct ? updatedProduct.imageUrl : photos ? photos[currentPhotoIndex].imageUrl : src} alt={updatedProduct ? updatedProduct.title : photos ? photos[currentPhotoIndex].title : alt} className="rounded-sm object-cover flex-grow w-full min-h-[40vh]" />
+                            {name && <h2 className="text-[1.5rem] text-center bg-white p-2  w-full" >{updatedProduct ? updatedProduct.title : name}</h2>}
+                            {u && <AdminButtons handleEdit={handleEdit} />}
+                            {isInventory && photos && <ShoppingButtons product={updatedProduct ?? photos[0]} handleDetails={handleDetails} />}
+                        </div>
                     </div>
                 </div>
-            </div>
     )
 }

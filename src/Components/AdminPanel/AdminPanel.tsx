@@ -31,9 +31,8 @@ export default function AdminPanel() {
 
             <div className="bg-white flex flex-col fustify-center items-center w-[85vw] rounded-xl p-4 mt-4 gap-4">
                 <p>Hello {name},</p>
-                <p>Welcome back to the shop.</p>
                 <div className="w-full flex justify-center items-center gap-4">
-                    <p>Not {name.split(' ')[0]}? Please</p>
+                    <p>If you'd like to see the site as a normal user: </p>
                     <button onClick={logout}
                         className="p-2 bg-red-500 rounded-md text-white">Log Out</button>
                 </div>

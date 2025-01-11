@@ -7,7 +7,7 @@ import editDoc from "../../firebase/editDoc";
 import { IProductToEdit } from "../../Interfaces/IProduct";
 import Info from "../Info/Info";
 
-export default function ProductForm({ product }: { product?: IProductToEdit }) {
+export default function ProductForm({ product }: { product?: IProductToEdit}) {
     const [title, setTitle] = useState<string>(product?.title || "");
     const [description, setDescription] = useState<string>(product?.description || "");
     const [price, setPrice] = useState<number | null>(product?.price || null);
@@ -20,6 +20,10 @@ export default function ProductForm({ product }: { product?: IProductToEdit }) {
     const [background, setBackground] = useState<string>(product?.url || "")
     const [series, setSeries] = useState<string>(product?.series || "")
     const [seriesOrder, setSeriesOrder] = useState<number>(product?.seriesOrder || 1)
+
+    //TODO: Simplify this form. 
+    //Remove the tags in favor of a dropdown to select where the product should be displayed (ie hero, inventory, vintageCard, handmadeCard)
+
 
     function onProgress(percent: number) {
         setProgress(percent)
