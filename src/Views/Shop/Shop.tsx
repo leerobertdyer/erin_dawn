@@ -4,12 +4,13 @@ import { useEffect, useState } from "react";
 import { getPhotos } from "../../firebase/getPhotos";
 import { IProductInfo } from "../../Interfaces/IProduct";
 import LoadPhotos from "../../Components/Photos/LoadPhotos";
+import ProductDetails from "../../Components/ProductDetails/ProductDetails";
 
 export default function Shop({ u }: { u: User | null }) {
     const [inventory, setInventory] = useState<IProductInfo[][]>([])
     const [isLoading, setIsLoading] = useState(true)
-
-    //TODO: when clicking edit button on a collection of photos, open a view with all the photos selected, to allow choice of photo edit...
+    const [showDetails, setShowDetails] = useState(false)
+    const [productDetailsIndex, setProductDetailsIndex] = useState(0)
 
     useEffect(() => {
         async function fetchPhotos() {
@@ -17,10 +18,8 @@ export default function Shop({ u }: { u: User | null }) {
             if (resp) {
                 const groupedPhotos: IProductInfo[][] = []
                 const photoMap: { [key: string]: IProductInfo[] } = {};
-
                 resp.forEach(photo => {
                     const key = photo.series ?? "uncategorized";
-                    console.log(photo)
                     if (!photoMap[key]) {
                         photoMap[key] = [];
                     }
@@ -34,20 +33,34 @@ export default function Shop({ u }: { u: User | null }) {
                 if (resp.length > 0) {
                     setIsLoading(false)
                 }
-                console.log(groupedPhotos)
             }
         }
         fetchPhotos();
     }, [])
 
+    function handleClickProductDetails (index: number) {
+        setProductDetailsIndex(index)
+        setShowDetails(true)
+    }
+
+    function handleCloseProductDetails() {
+        setShowDetails(false)
+    }
+
     return (
         <div className="w-screen h-fit p-4 flex flex-col md:flex-wrap md:flex-row justify-center items-center gap-[1rem] overflow:hidden">
-            {isLoading && <LoadPhotos />}
-            {inventory.length > 0 && inventory.map((photos, key) => (
-                <div key={key} className="h-fit w-screen flex-wrap flex md:w-[19rem] p-4">
-                    <Frame photos={photos} additionalClass="w-[19rem]" hover u={u} name={photos[0].title} isInventory/>
-                </div>
-            ))}
+            {
+                showDetails
+                    ? <ProductDetails product={inventory[productDetailsIndex]} handleCloseProductDetails={handleCloseProductDetails} />
+                    : isLoading ? <LoadPhotos /> :
+                        <>
+                            {inventory.length > 0 && inventory.map((photos, index) => (
+                                <div key={index} className="h-fit w-screen flex-wrap flex md:w-[19rem] p-4">
+                                    <Frame photos={photos} arrayIndex={index} additionalClass="w-[19rem]" hover u={u} name={photos[0].title} isInventory handleClickProductDetails={handleClickProductDetails}/>
+                                </div>
+                            ))}
+                        </>
+            }
         </div>
     )
 }

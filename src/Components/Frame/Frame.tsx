@@ -23,9 +23,11 @@ interface IFrameProps {
     onDelete?: (id: string) => void;
     isInventory?: boolean;
     photos?: IProductInfo[];
+    handleClickProductDetails?: (index: number) => void;
+    arrayIndex?: number;
 }
 
-export default function Frame({ src, alt, name, additionalClass, hover, u, id, onDelete, isInventory, spin, photos }: IFrameProps) {
+export default function Frame({ src, alt, name, additionalClass, hover, u, id, onDelete, isInventory, spin, photos, handleClickProductDetails, arrayIndex }: IFrameProps) {
     const [isEditing, setIsEditing] = useState(false);
     const [isBatchEdit, setIsBatchEdit] = useState(false);
     const [product, setProduct] = useState<IProductToEdit | null>(null);
@@ -138,10 +140,6 @@ export default function Frame({ src, alt, name, additionalClass, hover, u, id, o
         }
     }
 
-    function handleDetails() {
-
-    }
-
     function handleBack() {
         setIsBatchEdit(false);
         setIsEditing(false);
@@ -171,7 +169,7 @@ export default function Frame({ src, alt, name, additionalClass, hover, u, id, o
                             <img src={updatedProduct ? updatedProduct.imageUrl : photos ? photos[currentPhotoIndex].imageUrl : src} alt={updatedProduct ? updatedProduct.title : photos ? photos[currentPhotoIndex].title : alt} className="rounded-sm object-cover flex-grow w-full min-h-[40vh]" />
                             {name && <h2 className="text-[1.5rem] text-center bg-white p-2  w-full" >{updatedProduct ? updatedProduct.title : name}</h2>}
                             {u && <AdminButtons handleEdit={handleEdit} />}
-                            {isInventory && photos && <ShoppingButtons product={updatedProduct ?? photos[0]} handleDetails={handleDetails} />}
+                            {isInventory && photos && <ShoppingButtons product={updatedProduct ?? photos[0]} handleDetails={handleClickProductDetails ? () => handleClickProductDetails(arrayIndex ?? 0) : () => {}} />}
                         </div>
                     </div>
                 </div>
