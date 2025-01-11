@@ -25,9 +25,10 @@ interface IFrameProps {
     photos?: IProductInfo[];
     handleClickProductDetails?: (index: number) => void;
     arrayIndex?: number;
+    children?: React.ReactNode;
 }
 
-export default function Frame({ src, alt, name, additionalClass, hover, u, id, onDelete, isInventory, spin, photos, handleClickProductDetails, arrayIndex }: IFrameProps) {
+export default function Frame({ src, alt, name, additionalClass, hover, u, id, onDelete, isInventory, spin, photos, handleClickProductDetails, arrayIndex, children }: IFrameProps) {
     const [isEditing, setIsEditing] = useState(false);
     const [isBatchEdit, setIsBatchEdit] = useState(false);
     const [product, setProduct] = useState<IProductToEdit | null>(null);

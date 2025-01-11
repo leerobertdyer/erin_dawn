@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
 import { IoIosMenu, IoLogoInstagram } from "react-icons/io";
 import { Link, useLocation } from "react-router";
-import { HiOutlineShoppingCart } from "react-icons/hi2";
 import { User } from "firebase/auth";
+import CartIconAndNumber from "../cartIconAndNumber/CartIconAndNumber";
 
-export default function Nav({ u }: { u: User | null }) {
+interface iParams {
+    u: User | null
+    cartIds: string[]
+}
+export default function Nav({ u, cartIds }: iParams) {
     const [isOpen, setIsOpen] = useState(false);
     const [iconSize, setIconSize] = useState(60)
     const location = useLocation()
@@ -62,14 +66,10 @@ export default function Nav({ u }: { u: User | null }) {
                 border-2 border-black rounded-md" />
                 <a href="https://www.instagram.com/erindawn_campbell" target="_blank" >
                     <IoLogoInstagram size={iconSize} /></a>
-                <Link to="/shop">
-                    <HiOutlineShoppingCart size={iconSize}
-                        onClick={() => console.log('cart!')}
-                    />
-                </Link>
+                <CartIconAndNumber cartIds={cartIds} iconSize={iconSize} />
                 <div className="text-right">
                     <Link to="/">
-                        <h1 className="font-retro text-[1.5rem] md:text-[2.5rem] m-0 p-0">ERIn DaWn cAmPbELl</h1>
+                        <h1 className="font-retro text-[1.25rem] md:text-[2.5rem] m-0 p-0">ERIn DaWn cAmPbELl</h1>
                     </Link>
                     <h2 className="text-[.5rem] md:text-[1rem] text-gray-400 m-0 md:pb-4">Handmade Clothing & Upcycled Vintage</h2>
                 </div>
