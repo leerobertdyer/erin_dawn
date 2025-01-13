@@ -1,32 +1,37 @@
 import { useEffect, useState } from "react";
-import { IoIosMenu, IoLogoInstagram } from "react-icons/io";
+import { IoIosClose, IoIosMenu, IoLogoInstagram } from "react-icons/io";
 import { Link, useLocation } from "react-router";
 import { User } from "firebase/auth";
 import CartIconAndNumber from "../cartIconAndNumber/CartIconAndNumber";
+import { useProductManagementContext } from "../../Context/ProductMgmtContext";
 
-interface iParams {
+interface INav {
     u: User | null
-    cartIds: string[]
 }
-export default function Nav({ u, cartIds }: iParams) {
+export default function Nav({ u }: INav) {
+    const { cartProducts } = useProductManagementContext();
+    const cartLength = cartProducts.length;
     const [isOpen, setIsOpen] = useState(false);
     const [iconSize, setIconSize] = useState(60)
+    const [isSmallScreen, setIsSmallScreen] = useState(false)
     const location = useLocation()
     const path = location.pathname
 
-    //TODO: update menu to appear on left of screen when screen is big, and top if not
+    //TODO: update menu so that it slowly accordsions open and closed for both mobile and desktop
 
     useEffect(() => {
         const handleResize = () => {
             if (window.innerWidth < 768) {
-                setIconSize(40); 
+                setIconSize(40);
+                setIsSmallScreen(true);
             } else {
-                setIconSize(60); 
+                setIconSize(60);
+                setIsSmallScreen(false);
             }
         };
 
         window.addEventListener('resize', handleResize);
-        handleResize(); 
+        handleResize();
         return () => {
             window.removeEventListener('resize', handleResize);
         };
@@ -34,25 +39,33 @@ export default function Nav({ u, cartIds }: iParams) {
 
     return (
         <>
-            {isOpen && <div className="w-full h-screen bg-black bg-opacity-50 fixed top-0 left-0 z-50"
-                onClick={() => setIsOpen(false)}>
-
-                <div className="flex justify-center items-center h-full">
-                    <div className="flex flex-col 
-                justify-center items-center 
-                bg-black bg-opacity-35 
-                w-[80vw] h-[80vh]
-                md:w-[40vw] md:h-[60vh]
-                border-2 border-white
-                rounded-md gap-8">
-                        <button className="text-pink-300 text-[4rem]">X</button>
-                        <Link to="/" style={{ color: path === "/" ? 'skyblue' : 'white' }} className="text-[2rem]">Home</Link>
-                        <Link to="/shop" style={{ color: path === "/shop" ? 'skyblue' : 'white' }} className="text-[2rem]">Shop</Link>
-                        <Link to="/about" style={{ color: path === "/about" ? 'skyblue' : 'white' }} className="text-[2rem]">About</Link>
-                        {u && <Link to="/admin" style={{ color: path === "/admin" ? 'skyblue' : 'white' }} className="text-[2rem]">Admin</Link>}
-                    </div>
-                </div>
-            </div>}
+            {isOpen && <div className="
+            w-full h-[30vh] md:w-[40vh] md:h-full
+            bg-white 
+            border-b-2 border-black 
+            fixed top-0 left-0 z-50 
+            flex flex-col justify-center md:justify-between items-center gap-4 md:gap-0">
+                {!isSmallScreen && <IoIosMenu size={iconSize - 5} className="hover: cursor-pointer bg-edcPurple-20 w-full h-20"
+                 onClick={() => setIsOpen(false)}  />}
+                <Link to="/"
+                    className={`text-[2rem] text-center select-none ${path === "/" ? "w-full bg-edcBlue-20" : ""} `}
+                    onClick={() => setIsOpen(false)}
+                >Home</Link>
+                <Link to="/shop"
+                    className={`text-[2rem] text-center select-none ${path === "/shop" ? "w-full bg-edcBlue-20" : ""} `}
+                    onClick={() => setIsOpen(false)}
+                >Shop</Link>
+                <Link to="/about"
+                    className={`text-[2rem] text-center select-none ${path === "/about" ? "w-full bg-edcBlue-20" : ""} `}
+                    onClick={() => setIsOpen(false)}>
+                    About</Link>
+                {u && <Link to="/admin"
+                    className={`text-[2rem] text-center select-none ${path === "/admin" ? "w-full bg-edcBlue-20" : ""} `}
+                    onClick={() => setIsOpen(false)}>
+                    Admin</Link>}
+                <IoIosClose fill={"purple"} size={iconSize} className="hover: cursor-pointer" onClick={() => setIsOpen(false)} />
+            </div>
+            }
 
             <div className="
         w-full h-[13vh] md:h-[15vh] 
@@ -66,7 +79,7 @@ export default function Nav({ u, cartIds }: iParams) {
                 border-2 border-black rounded-md" />
                 <a href="https://www.instagram.com/erindawn_campbell" target="_blank" >
                     <IoLogoInstagram size={iconSize} /></a>
-                <CartIconAndNumber cartIds={cartIds} iconSize={iconSize} />
+                <CartIconAndNumber cartLength={cartLength} iconSize={iconSize} />
                 <div className="text-right">
                     <Link to="/">
                         <h1 className="font-retro text-[1.25rem] md:text-[2.5rem] m-0 p-0">ERIn DaWn cAmPbELl</h1>

@@ -3,14 +3,15 @@ import { GiSewingNeedle } from "react-icons/gi";
 
 
 
-export default function Hero( { children }: { children: React.ReactNode }) {
+export default function Hero({ children }: { children: React.ReactNode }) {
     return (
         <div
-            className="w-full h-fit 
+            className="w-full  
             bg-white bg-opacity-80 
-            my-10  pt-8
+            my-10  
             border-y-4 border-yellow-400 border-double border-opacity-40
-            flex flex-col justify-center items-center gap-[4rem]">
+            flex flex-col justify-center items-center gap-[1rem]">
+
             {children}
 
             <div className="p-2 w-full bg-white">

@@ -1,7 +1,7 @@
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "./firebaseConfig";
 
-interface IParams {
+interface IEditDoc {
     id: string;
     title: string;
     description: string;
@@ -12,7 +12,7 @@ interface IParams {
     seriesOrder?: number;
 }
 
-export default async function editDoc({ id, title, description, price, tags, imageUrl, series, seriesOrder }: IParams) {
+export default async function editDoc({ id, title, description, price, tags, imageUrl, series, seriesOrder }: IEditDoc) {
     try {
         const docRef = doc(db, "photos", id);
         console.log('editing doc', docRef.path);

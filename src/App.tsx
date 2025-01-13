@@ -9,10 +9,11 @@ import { onAuthStateChanged, User } from 'firebase/auth'
 import { useEffect, useState } from 'react'
 import { auth } from './firebase/firebaseConfig'
 import Cart from './Views/Cart/Cart'
+import { ProductManagementProvider } from './Context/ProductMgmtContext'
+import { PhotosProvider } from './Context/PhotosContext'
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
-  const [cartIds, setCartIds] = useState<string[]>([]);
 
   useEffect(() => {
     function unsubscribe() {
@@ -27,23 +28,21 @@ function App() {
     return unsubscribe();
   }, []);
 
-function handleAddToCart(id: string) { 
-  setCartIds([...cartIds, id])
-}
-
   return (
-    <>
-      <Router>
-        <Nav u={user} cartIds={cartIds}/>
-        <Routes>
-          <Route path="/" element={<Home u={user}/>} />
-          <Route path="/shop" element={<Shop u={user} handleAddToCart={handleAddToCart}/>} />
-          <Route path="/cart" element={<Cart u={user} cartIds={cartIds}/>} />
-          <Route path="/about" element={<About />} />
-          <Route path="/admin" element={<Admin u={user} setUser={setUser} />} />
-        </Routes>
-      </Router>
-    </>
+    <ProductManagementProvider>
+      <PhotosProvider>
+        <Router>
+          <Nav u={user} />
+          <Routes>
+            <Route path="/" element={<Home u={user}  />} />
+            <Route path="/shop" element={<Shop u={user} />} />
+            <Route path="/cart" element={<Cart/>} />
+            <Route path="/about" element={<About />} />
+            <Route path="/admin" element={<Admin u={user} setUser={setUser} />} />
+          </Routes>
+        </Router>
+      </PhotosProvider>
+    </ProductManagementProvider>
   )
 }
 

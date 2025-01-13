@@ -1,13 +1,13 @@
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { storage } from "./firebaseConfig";
 
-interface Iparams {
+interface IUploadFile {
   reference: string;
   file: File;
   onProgress?: (progress: number) => void;
 }
 
-export default async function uploadFile({ reference, file, onProgress }: Iparams): Promise<string> {
+export default async function uploadFile({ reference, file, onProgress }: IUploadFile): Promise<string> {
   return new Promise((resolve, reject) => {
     try {
       const storageRef = ref(storage, `photos/${reference}`);

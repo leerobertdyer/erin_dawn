@@ -7,7 +7,7 @@ import editDoc from "./editDoc";
 //  2. upload new file
 //  3. update doc with new file reference
 
-interface Iparams {
+interface IEditFile {
     id: string;
     file: File;
     title: string;
@@ -20,7 +20,7 @@ interface Iparams {
     onProgress?: (progress: number) => void;
 }
 
-export default async function editFile({ url, id, title, description, price, tags, file, onProgress, series, seriesOrder }: Iparams): Promise<string> {
+export default async function editFile({ url, id, title, description, price, tags, file, onProgress, series, seriesOrder }: IEditFile): Promise<string> {
 
     try {
 

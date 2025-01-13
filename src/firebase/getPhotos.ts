@@ -3,12 +3,12 @@ import { db } from "./firebaseConfig";
 import { IProductInfo } from "../Interfaces/IProduct";
 import shuffleArray from "../util/shuffle";
 
-interface iParams {
+interface IGetPhotos {
     tags?: string[],
     ids?: string[],
     shuffle?: boolean
 }
-export async function getPhotos({ tags, ids, shuffle }: iParams ): Promise<IProductInfo[]> {
+export async function getPhotos({ tags, ids, shuffle }: IGetPhotos ): Promise<IProductInfo[]> {
     const c = collection(db, "photos");
     let q: Query<DocumentData> | null = null;
     if (tags) {
@@ -24,7 +24,6 @@ export async function getPhotos({ tags, ids, shuffle }: iParams ): Promise<IProd
         id: doc.id,
         ...doc.data()
     }));
-    console.log("photosData", photosData);
     shuffle && shuffleArray(photosData);
     return photosData as IProductInfo[];
 }

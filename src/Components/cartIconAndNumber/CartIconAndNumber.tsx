@@ -1,11 +1,11 @@
 import { HiOutlineShoppingCart } from "react-icons/hi2";
 import { Link } from "react-router-dom";
 
-interface iParams {
+interface ICartAndNumber {
     iconSize: number
-    cartIds: string[]
+    cartLength: number
 }
-export default function CartIconAndNumber({ iconSize, cartIds }: iParams) {
+export default function CartIconAndNumber({ iconSize, cartLength }: ICartAndNumber) {
 
     return (
         <div className="relative w-fit h-fit">
@@ -13,9 +13,9 @@ export default function CartIconAndNumber({ iconSize, cartIds }: iParams) {
 
                 <HiOutlineShoppingCart size={iconSize} className="absolute w-fit inline"
                     onClick={() => console.log('cart!')} />
-                {cartIds.length > 0 && <span className="absolute bottom-0 
+                {cartLength > 0 && <span className="absolute bottom-0 
                     text-white bg-black p-[2px] 
-                    rounded-full w-[25px] h-[25px] flex justify-center items-center">{cartIds.length}</span>}
+                    rounded-full w-[25px] h-[25px] flex justify-center items-center">{cartLength}</span>}
             </Link>
         </div>
     )

@@ -4,7 +4,7 @@ export interface IProductInfo {
     description: string;
     price: number;
     tags: string[];
-    id?: string;
+    id: string;
     order?: number;
     series?: string;
     seriesOrder?: number;
@@ -15,12 +15,9 @@ export interface IProductToEdit {
     description: string;
     price: number;
     tags: string[];
-    disabled: boolean;
     url: string;
     id: string;
     series?: string;
     seriesOrder?: number;
-    onProductUpdate: (product: IProductInfo ) => void;
-    onPruductDelete: (url: string) => void;
 }
 

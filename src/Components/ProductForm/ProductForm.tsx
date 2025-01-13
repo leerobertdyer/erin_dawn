@@ -4,10 +4,18 @@ import editFile from "../../firebase/editfile";
 import newDoc from "../../firebase/newDoc";
 import { IoIosArrowBack, IoIosRefresh, IoIosTrash } from "react-icons/io";
 import editDoc from "../../firebase/editDoc";
-import { IProductToEdit } from "../../Interfaces/IProduct";
 import Info from "../Info/Info";
+import { IProductToEdit } from "../../Interfaces/IProduct";
 
-export default function ProductForm({ product }: { product?: IProductToEdit}) {
+interface IProductFormProps {
+    isEditing?: boolean;
+    product?: IProductToEdit | null;
+    handleEdit: (status: string, isEditing: boolean) => void;
+    handleFinishEdit: () => void;
+    handleDelete: (url: string, id: string) => void;
+    updateProduct: (product: { url: string, title: string, price: number, description: string, tags: string[], id: string }) => void;
+}
+export default function ProductForm({ isEditing, product, handleFinishEdit, handleDelete, updateProduct }: IProductFormProps) {
     const [title, setTitle] = useState<string>(product?.title || "");
     const [description, setDescription] = useState<string>(product?.description || "");
     const [price, setPrice] = useState<number | null>(product?.price || null);
@@ -16,13 +24,27 @@ export default function ProductForm({ product }: { product?: IProductToEdit}) {
     const [file, setFile] = useState<File | null>(null);
     const [disabled, setDisabled] = useState<boolean>(true);
     const [progress, setProgress] = useState(0)
-    const [isEditing, setIsEditing] = useState<boolean>(false)
     const [background, setBackground] = useState<string>(product?.url || "")
-    const [series, setSeries] = useState<string>(product?.series || "")
-    const [seriesOrder, setSeriesOrder] = useState<number>(product?.seriesOrder || 1)
+    const [series, setSeries] = useState<string | undefined>(product?.series || "")
+    const [seriesOrder, setSeriesOrder] = useState<number | undefined>(product?.seriesOrder || 1)
 
-    //TODO: Simplify this form. 
-    //Remove the tags in favor of a dropdown to select where the product should be displayed (ie hero, inventory, vintageCard, handmadeCard)
+    useEffect(() => {
+        console.log("State from useProductManagement: ", product, isEditing); // Debug 
+        if (product) {
+            setTitle(product.title);
+            setDescription(product.description);
+            setPrice(product.price);
+            setTags(product.tags);
+            setBackground(product.url);
+            setSeries(product.series);
+            setSeriesOrder(product.seriesOrder);
+        }
+        console.log("Product in form:", product); // Debug
+    }, [product, isEditing]);
+
+    // TODO:
+    // Remove the tags in favor of a dropdown to select where the product should be displayed 
+    // (ie hero, inventory, vintageCard, handmadeCard)
 
 
     function onProgress(percent: number) {
@@ -44,13 +66,6 @@ export default function ProductForm({ product }: { product?: IProductToEdit}) {
             }
         }
     }, [title, description, tags, price, file, isEditing])
-
-    useEffect(() => {
-        if (product) {
-            setIsEditing(true)
-        }
-    }, [product])
-
 
     function handleKeyDown(event: React.KeyboardEvent<HTMLFormElement>) {
         if (event.key === 'Enter') {
@@ -111,14 +126,16 @@ export default function ProductForm({ product }: { product?: IProductToEdit}) {
         // Handle success or error dependant on downloadURLd
         if (downloadURL) {
             console.log("Product uploaded successfully: ", downloadURL)
-            setIsEditing(false)
-            product && product.onProductUpdate({ imageUrl: downloadURL, title, price, description, tags });
-            resetState();
-            
+
             // Update the db with new url, if necessary
             if (!isEditing) {
-                newDoc({ ...fileToUpload, downloadURL })
+                newDoc({ ...fileToUpload, downloadURL, series: series ?? "", seriesOrder: seriesOrder ?? 1 })
             }
+
+            // update UI to show updated product
+            if (product) updateProduct({ url: downloadURL, title, price, description, tags, id: product.id });
+            resetState();
+            handleFinishEdit;
 
             // TODO: show success message with image and option to edit...
         }
@@ -219,9 +236,9 @@ export default function ProductForm({ product }: { product?: IProductToEdit}) {
 
                 <button type="submit" disabled={disabled} className={`p-2 ${disabled ? 'bg-gray-400' : 'bg-blue-500'} text-white w-[90%] h-full rounded-md p-2 max-w-[75%]`}>{isEditing ? "Edit" : "Add"} Product</button>
                 <div className="w-[100%] h-10 m-auto flex justify-between items-center gap-4">
-                    {product && <button type="button" onClick={() => product.onProductUpdate({ imageUrl: product.url, title: product.title, price: product.price, description: product.description, tags: product.tags })} className="p-2 bg-blue-500 h-full text-white rounded-md flex justify-around items-center w-[20%]"><IoIosArrowBack /></button>}
+                    {product && <button type="button" onClick={() => updateProduct({ url: product.url, title: product.title, price: product.price, description: product.description, tags: product.tags, id: product.id })} className="p-2 bg-blue-500 h-full text-white rounded-md flex justify-around items-center w-[20%]"><IoIosArrowBack /></button>}
                     <button type="button" onClick={resetState} className={'bg-yellow-400 $p-2 text-black w-[20%] h-full rounded-md flex p-2 flex-col justify-center items-center flex-grow max-w-[50%] m-auto'}><IoIosRefresh />Refresh</button>
-                    {product && <button type="button" onClick={() => product.onPruductDelete(product.url)} className="p-2 bg-red-600 h-full text-white rounded-md flex justify-around items-center w-[20%] "><IoIosTrash /></button>}
+                    {product && <button type="button" onClick={() => handleDelete(product.url, product.id)} className="p-2 bg-red-600 h-full text-white rounded-md flex justify-around items-center w-[20%] "><IoIosTrash /></button>}
                 </div>
             </form>
 

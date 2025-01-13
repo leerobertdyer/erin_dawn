@@ -1,7 +1,7 @@
 import { addDoc, collection, DocumentReference } from "firebase/firestore";
 import { db } from "./firebaseConfig";
 
-interface IParams {
+interface INewDoc {
   downloadURL: string;
   title: string;
   description: string;
@@ -11,7 +11,7 @@ interface IParams {
   seriesOrder: number;
 }
 
-export default async function newDoc({ downloadURL, title, description, price, tags, series, seriesOrder }: IParams): Promise<string | null> {
+export default async function newDoc({ downloadURL, title, description, price, tags, series, seriesOrder }: INewDoc): Promise<string | null> {
   try {
     const docRef: DocumentReference = await addDoc(collection(db, "photos", title), {
       imageUrl: downloadURL,
