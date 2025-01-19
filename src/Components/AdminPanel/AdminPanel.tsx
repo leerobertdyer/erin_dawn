@@ -24,7 +24,7 @@ export default function AdminPanel() {
     }
 
     return (
-        <div className="bg-blue-200 flex flex-col justify-start items-center w-screen h-screen">
+        <div className="bg-edcBlue-20 flex flex-col justify-start items-center w-screen h-fit pb-[2rem]">
             <h1 className="text-3xl border-b-2 border-black p-4">
                 Admin Panel
             </h1>

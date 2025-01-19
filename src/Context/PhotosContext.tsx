@@ -1,13 +1,16 @@
 import { createContext, useContext, ReactNode } from 'react';
 import { usePhotos } from '../Hooks/usePhotos';
+import { IProductInfo } from '../Interfaces/IProduct';
 
 interface PhotosContextType {
-    allPhotos: any[];
+    allPhotos: IProductInfo[];
+    setAllPhotos: (photos: IProductInfo[]) => void;
     isLoading: boolean;
 }
 
 const defaultValue: PhotosContextType = {
     allPhotos: [],
+    setAllPhotos: (_: IProductInfo[]) => {},
     isLoading: true,
 };
 

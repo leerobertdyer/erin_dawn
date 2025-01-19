@@ -12,7 +12,7 @@ interface IEditDoc {
     seriesOrder?: number;
 }
 
-export default async function editDoc({ id, title, description, price, tags, imageUrl, series, seriesOrder }: IEditDoc) {
+export default async function editDoc({ id, title, description, price, tags, imageUrl, series, seriesOrder=0 }: IEditDoc) {
     try {
         const docRef = doc(db, "photos", id);
         console.log('editing doc', docRef.path);

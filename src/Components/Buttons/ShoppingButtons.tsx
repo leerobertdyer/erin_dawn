@@ -29,9 +29,9 @@ export default function ShoppingButtons({ product, handleDetails }: IShoppingBut
 
     return (
         <div className="flex flex-col justify-center items-center w-full p-2 gap-2">
-            <div className="flex justify-around w-full bg-edcPurple-40 p-2 rounded-md text-edcPurple-80">
+            <div className="flex justify-around w-full bg-white p-2 rounded-md text-edcPurple-80">
                 <p>{product.series}</p>
-                <p>${product.price}</p>
+                <p className="font-retro rotate-6 text-2xl">${product.price}<span className="text-xs">.00</span></p>
             </div>
             <button
                 className="

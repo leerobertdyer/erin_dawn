@@ -1,8 +1,6 @@
 import { PiLeaf, PiShootingStarLight } from "react-icons/pi";
 import { GiSewingNeedle } from "react-icons/gi";
 
-
-
 export default function Hero({ children }: { children: React.ReactNode }) {
     return (
         <div

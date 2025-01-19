@@ -1,6 +1,51 @@
+import { User } from "firebase/auth";
 import Frame from "../Frame/Frame";
+import AdminButtons from "../Buttons/AdminButtons";
+import { useProductManagementContext } from "../../Context/ProductMgmtContext";
+import { usePhotosContext } from "../../Context/PhotosContext";
+import { useEffect, useState } from "react";
+import { IProductInfo } from "../../Interfaces/IProduct";
+import ProductForm from "../ProductForm/ProductForm";
 
-export default function Main() {
+export default function Main({ u }: { u: User | null }) {
+    const { handleEdit, isEditing } = useProductManagementContext();
+    const { allPhotos } = usePhotosContext();
+    const [vintage, setVintage] = useState<IProductInfo>(
+        {
+            id: 'M2vdKSAHYtloXP15ahpd',
+            imageUrl: "images/inventory/baroqueBlazer.jpg",
+            title: "Embellished Vintage",
+            tags: ["edc", "mainPageVintage"],
+            series: "mainPageVintage",
+            price: 0,
+            description: "Embellished Vintage",
+        });
+    const [handMade, setHandMade] = useState<IProductInfo>(
+        {
+            imageUrl: "images/inventory/curtainDress.jpg",
+            title: "Hand-Made Originals",
+            tags: ["edc", "mainPageHandMade"],
+            series: "mainPageHandMade",
+            price: 0,
+            description: "Hand-Made Originals",
+            id: 'PegS4j5IeJtNS3hlDkjp',
+        });
+
+    useEffect(() => {
+        const vintagePhoto = allPhotos.find(photo => photo.series === "mainPageVintage");
+        const handMadePhoto = allPhotos.find(photo => photo.series === "mainPageHandMade");
+        if (vintagePhoto) {
+            console.log('Vintage photo: ', vintagePhoto) 
+            setVintage(vintagePhoto)
+        }
+        if (handMadePhoto) {
+            console.log('handmade photo: ', handMadePhoto)
+            setHandMade(handMadePhoto)
+        }
+    }, [allPhotos])
+
+    if (isEditing) { return <ProductForm /> }
+
     return (
         <div
             className="w-full h-fit
@@ -10,14 +55,16 @@ export default function Main() {
             flex flex-col sm:flex-row justify-center items-center gap-[4rem] ">
             <div className="w-fit">
                 <Frame additionalClass="w-[95vw] md:w-[45vw] lg:w-[35vw]" hover={true} >
-                    <img src="images/inventory/baroqueBlazer.jpg" alt="Curtain Dress" className="rounded-md" />
-                    <button className="text-center text-lg">Embellished Vintage</button>
+                    <img src={vintage.imageUrl} alt="Embellished Vintage" className="rounded-md" />
+                    <button className="text-center text-lg">{vintage.description}</button>
+                    {u && <AdminButtons handleEdit={() => handleEdit(vintage.id)} />}
                 </Frame>
             </div>
             <div className="w-fit">
                 <Frame additionalClass="w-[95vw] md:w-[45vw] lg:w-[35vw]" hover={true} >
-                    <img src="images/inventory/curtainDress.jpg" alt="Baroque Blazer" className="rounded-md"/>
-                    <button className="text-center text-lg">Hand-Made Originals</button>
+                    <img src={handMade.imageUrl} alt="Hand Made Clothing" className="rounded-md" />
+                    <button className="text-center text-lg">{handMade.description}</button>
+                    {u && <AdminButtons handleEdit={() => handleEdit(handMade.id)} />}
                 </Frame>
             </div>
         </div>

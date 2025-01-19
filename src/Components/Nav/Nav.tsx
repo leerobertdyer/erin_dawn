@@ -40,30 +40,32 @@ export default function Nav({ u }: INav) {
     return (
         <>
             {isOpen && <div className="
-            w-full h-[30vh] md:w-[40vh] md:h-full
-            bg-white 
-            border-b-2 border-black 
+            w-full h-[35vh] md:w-[40vh] md:h-full
+            bg-white
+            border-b-2 border-black border-r-2
             fixed top-0 left-0 z-50 
-            flex flex-col justify-center md:justify-between items-center gap-4 md:gap-0">
-                {!isSmallScreen && <IoIosMenu size={iconSize - 5} className="hover: cursor-pointer bg-edcPurple-20 w-full h-20"
+            text-[1rem] md:text-[2rem]
+            flex flex-col justify-center md:justify-between items-center gap-2 md:gap-0">
+                {!isSmallScreen && <IoIosMenu size={iconSize - 5} className="hover: cursor-pointer w-full h-20"
                  onClick={() => setIsOpen(false)}  />}
+                 <div className="flex flex-col h-full w-full justify-center items-center gap-4 border-y-2 border-black">
                 <Link to="/"
-                    className={`text-[2rem] text-center select-none ${path === "/" ? "w-full bg-edcBlue-20" : ""} `}
+                    className={`text-center select-none ${path === "/" ? "w-full bg-edcBlue-20" : ""} `}
                     onClick={() => setIsOpen(false)}
                 >Home</Link>
                 <Link to="/shop"
-                    className={`text-[2rem] text-center select-none ${path === "/shop" ? "w-full bg-edcBlue-20" : ""} `}
+                    className={`text-center select-none ${path === "/shop" ? "w-full bg-edcBlue-20" : ""} `}
                     onClick={() => setIsOpen(false)}
                 >Shop</Link>
                 <Link to="/about"
-                    className={`text-[2rem] text-center select-none ${path === "/about" ? "w-full bg-edcBlue-20" : ""} `}
+                    className={`text-center select-none ${path === "/about" ? "w-full bg-edcBlue-20" : ""} `}
                     onClick={() => setIsOpen(false)}>
                     About</Link>
                 {u && <Link to="/admin"
-                    className={`text-[2rem] text-center select-none ${path === "/admin" ? "w-full bg-edcBlue-20" : ""} `}
+                    className={`text-center select-none ${path === "/admin" ? "w-full bg-edcBlue-20" : ""} `}
                     onClick={() => setIsOpen(false)}>
                     Admin</Link>}
-                <IoIosClose fill={"purple"} size={iconSize} className="hover: cursor-pointer" onClick={() => setIsOpen(false)} />
+                    </div>
             </div>
             }
 

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { IProductInfo, IProductToEdit } from '../Interfaces/IProduct';
+import { IProductInfo } from '../Interfaces/IProduct';
 import removeProduct from '../firebase/removeProduct';
 import removeFile from '../firebase/removeFile';
 import { getPhoto } from '../firebase/getPhotos';
@@ -7,14 +7,8 @@ import { getPhoto } from '../firebase/getPhotos';
 export function useProductManagement() {
     const [isEditing, setIsEditing] = useState(false);
     const [isBatchEdit, setIsBatchEdit] = useState(false);
-    const [product, setProduct] = useState<IProductToEdit | null>(null);
-    const [updatedProduct, setUpdatedProduct] = useState<IProductToEdit | null>(null);
+    const [product, setProduct] = useState<IProductInfo | null>(null);
     const [cartProducts, setCartProducts] = useState<IProductInfo[]>([]);
-  
-
-    const handleFinishEdit = () => {
-        setIsEditing(false);
-    }
 
     const handleEdit = async (id: string) => {
         const photoData = await getPhoto({ id });
@@ -25,7 +19,7 @@ export function useProductManagement() {
             description: photoData.description,
             price: photoData.price,
             tags: photoData.tags,
-            url: photoData.imageUrl,
+            imageUrl: photoData.imageUrl,
             id: id,
             series: photoData.series,
             seriesOrder: photoData.seriesOrder,
@@ -58,12 +52,6 @@ export function useProductManagement() {
         setIsEditing(false);
     }
 
-    const updateProduct = (newProduct: IProductToEdit) => {
-        setUpdatedProduct(newProduct);
-        setProduct(null);
-        setIsEditing(false);
-    };
-
     const handleAddToCart = (product: IProductInfo) => {
         //TODO: implement add to cart
         console.log(product)
@@ -83,18 +71,15 @@ export function useProductManagement() {
     }
 
     return {
-        isEditing,
+        isEditing, setIsEditing,
         isBatchEdit,
-        product,
+        product, setProduct,
         cartProducts, setCartProducts,
-        updateProduct,
-        updatedProduct,
         handleEdit,
         handleDelete,
         handleBack,
         handleAddToCart,
         handleRemoveFromCart,
-        handleFinishEdit,
         handleBatchEdit,
         handleSetCartProducts
     };

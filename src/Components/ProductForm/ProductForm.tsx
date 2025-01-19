@@ -5,41 +5,46 @@ import newDoc from "../../firebase/newDoc";
 import { IoIosArrowBack, IoIosRefresh, IoIosTrash } from "react-icons/io";
 import editDoc from "../../firebase/editDoc";
 import Info from "../Info/Info";
-import { IProductToEdit } from "../../Interfaces/IProduct";
+import { useProductManagementContext } from "../../Context/ProductMgmtContext";
+import { usePhotosContext } from "../../Context/PhotosContext";
 
-interface IProductFormProps {
-    isEditing?: boolean;
-    product?: IProductToEdit | null;
-    handleEdit: (status: string, isEditing: boolean) => void;
-    handleFinishEdit: () => void;
-    handleDelete: (url: string, id: string) => void;
-    updateProduct: (product: { url: string, title: string, price: number, description: string, tags: string[], id: string }) => void;
-}
-export default function ProductForm({ isEditing, product, handleFinishEdit, handleDelete, updateProduct }: IProductFormProps) {
+
+export default function ProductForm() {
+    const { product, isEditing, setIsEditing, handleDelete } = useProductManagementContext();
+    const { allPhotos, setAllPhotos } = usePhotosContext();
     const [title, setTitle] = useState<string>(product?.title || "");
     const [description, setDescription] = useState<string>(product?.description || "");
-    const [price, setPrice] = useState<number | null>(product?.price || null);
+    const [price, setPrice] = useState<number>(product?.price || 0);
     const [nextTag, setNextTag] = useState<string>("");
     const [tags, setTags] = useState<string[]>(product?.tags || ["edc"]);
     const [file, setFile] = useState<File | null>(null);
     const [disabled, setDisabled] = useState<boolean>(true);
     const [progress, setProgress] = useState(0)
-    const [background, setBackground] = useState<string>(product?.url || "")
+    const [background, setBackground] = useState<string>(product?.imageUrl || "")
     const [series, setSeries] = useState<string | undefined>(product?.series || "")
     const [seriesOrder, setSeriesOrder] = useState<number | undefined>(product?.seriesOrder || 1)
+    const [isInventory, setIsInventory] = useState<boolean>(true)
+    const [isHero, setIsHero] = useState<boolean>(false)
 
     useEffect(() => {
-        console.log("State from useProductManagement: ", product, isEditing); // Debug 
         if (product) {
             setTitle(product.title);
             setDescription(product.description);
             setPrice(product.price);
             setTags(product.tags);
-            setBackground(product.url);
+            setBackground(product.imageUrl);
             setSeries(product.series);
             setSeriesOrder(product.seriesOrder);
+            if (product.tags.includes('hero')) {
+                setIsHero(true)
+                setIsInventory(false)
+            }
+            if (
+                product.tags.includes('mainPageVintage') ||
+                product.tags.includes('mainPageHandMade')) {
+                setIsInventory(false)
+            }
         }
-        console.log("Product in form:", product); // Debug
     }, [product, isEditing]);
 
     // TODO:
@@ -53,7 +58,12 @@ export default function ProductForm({ isEditing, product, handleFinishEdit, hand
 
     useEffect(() => {
         if (isEditing) {
-            if (title && description && tags.length > 0 && price && price >= 0) {
+            if (!isInventory && product && isEditing) {
+                if (product.title !== title || product.description !== description || file) {
+                    setDisabled(false);
+                }
+            }
+            else if (title && description && tags.length > 0 && price && price >= 0) {
                 setDisabled(false);
             } else {
                 setDisabled(true);
@@ -65,7 +75,7 @@ export default function ProductForm({ isEditing, product, handleFinishEdit, hand
                 setDisabled(true);
             }
         }
-    }, [title, description, tags, price, file, isEditing])
+    }, [title, description, tags, price, file, isEditing, isInventory])
 
     function handleKeyDown(event: React.KeyboardEvent<HTMLFormElement>) {
         if (event.key === 'Enter') {
@@ -85,8 +95,8 @@ export default function ProductForm({ isEditing, product, handleFinishEdit, hand
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        if (!title || !description || !price) return
-        if (!file && !isEditing) return
+
+        if (!file && !isEditing) return // On new products a file is required
 
         const fileToUpload = {
             reference: `photos/${title.replace(" ", "_")}`,
@@ -102,7 +112,8 @@ export default function ProductForm({ isEditing, product, handleFinishEdit, hand
 
         // Set download url based on editing vs new upload
         let downloadURL = null;
-        if (isEditing && product && file) {
+        if (isEditing && product && file) { // if image included use editFile()
+            console.log("Editing product with new image")
             downloadURL = await editFile({
                 id: product.id,
                 title: title,
@@ -110,16 +121,18 @@ export default function ProductForm({ isEditing, product, handleFinishEdit, hand
                 tags: tags,
                 file: file,
                 price: price,
-                url: product.url,
+                url: product.imageUrl,
                 series: series,
                 seriesOrder: seriesOrder,
                 onProgress: onProgress,
             })
-        } else if (isEditing && product) {
-            downloadURL = product.url
-            await editDoc({ id: product.id, title, description, tags, price, series, seriesOrder })
+        } else if (isEditing && product) { // Otherwise we use the current url and editDoc()
+            console.log("Editing product without changing image")
+            downloadURL = product.imageUrl
+            await editDoc({ id: product.id, title, description, tags, price, series, seriesOrder, imageUrl: downloadURL })
         }
         else {
+            console.log("Uploading new product")
             downloadURL = await uploadFile(fileToUpload)
         }
 
@@ -133,9 +146,16 @@ export default function ProductForm({ isEditing, product, handleFinishEdit, hand
             }
 
             // update UI to show updated product
-            if (product) updateProduct({ url: downloadURL, title, price, description, tags, id: product.id });
+            if (product) {
+                console.log('updating product in allPhotos')
+                const updatedPhotos = allPhotos.map((photo) =>
+                    photo.id === product.id ? { ...photo, imageUrl: downloadURL, title, description, tags, price, series, seriesOrder } : photo
+                );
+                setAllPhotos(updatedPhotos)
+            }
+
             resetState();
-            handleFinishEdit;
+            setIsEditing(false);
 
             // TODO: show success message with image and option to edit...
         }
@@ -173,7 +193,7 @@ export default function ProductForm({ isEditing, product, handleFinishEdit, hand
     return (
         <>
             <form onSubmit={handleSubmit} onKeyDown={handleKeyDown}
-                className="bg-white flex flex-col justify-center items-center w-[85vw] border-2 border-black rounded-xl p-4 mt-4 gap-4"
+                className="bg-white flex flex-col justify-center m-auto items-center w-[85vw] border-2 border-black rounded-xl p-4 mt-4 gap-4"
                 style={{ backgroundImage: `url(${background})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
 
                 <h2 className="text-2xl">Add Product</h2>
@@ -181,49 +201,55 @@ export default function ProductForm({ isEditing, product, handleFinishEdit, hand
                 <input type="text" placeholder="Product Name" value={title}
                     className=" border-2 border-black rounded-md p-2 w-[80%]" onChange={(e) => setTitle(e.target.value)} />
 
-
-                <div className="w-[80%] relative">
+                { !isHero && // Show description only if this is not a hero item
+                    <div className="w-[80%] relative">
                     <input type="text" placeholder="Product Description" value={description}
                         className=" border-2 border-black rounded-md p-2 w-full" onChange={(e) => setDescription(e.target.value)} />
                     <Info information="Product Description. This is displayed when user clicks 'more info' on any product." />
                 </div>
+                    }
 
-                <div className="flex flex-col items-between w-[80%] ">
-                    <div className="w-full relative">
-                        <input type="text" placeholder="Product Tags" value={nextTag}
-                            className=" border-2 border-black rounded-md p-2 w-[100%]" onChange={(e) => setNextTag(e.target.value.trim())} />
-                        <Info information="Product Tags. These are used to group products together. 'hero' adds this to the top of the main page, 'inventory' makes this appear in the store! 'vintage' updates the 'Embellished Vintage' category, and 'handmade' updates the 'Hand-Made Originals' category" />
-                    </div>
-                    <div className="w-full flex flex-wrap justify-start items-start">
-                        {tags.map((tag, index) => tag === "edc" ? null : (
-                            <div
-                                onClick={handleRemoveTag(tag)}
-                                className="
+                {isInventory && // Show Tags Series & price only if this is an inventory item
+                    <>
+                        <div className="flex flex-col items-between w-[80%] ">
+
+                            <div className="w-full relative">
+                                <input type="text" placeholder="Product Tags" value={nextTag}
+                                    className=" border-2 border-black rounded-md p-2 w-[100%]" onChange={(e) => setNextTag(e.target.value.trim())} />
+                                <Info information="Product Tags. These are used to group products together. 'hero' adds this to the top of the main page, 'inventory' makes this appear in the store! 'vintage' updates the 'Embellished Vintage' category, and 'handmade' updates the 'Hand-Made Originals' category" />
+                            </div>
+
+                            <div className="w-full flex flex-wrap justify-start items-start">
+                                {tags.map((tag, index) => tag === "edc" ? null : (
+                                    <div
+                                        onClick={handleRemoveTag(tag)}
+                                        className="
                             hover:bg-red-500 hover:cursor-pointer hover:text-white
                             bg-white text-gray-400
                             border-[1px] border-gray-400 
                             rounded-md p-[2px] m-[2px] 
                             flex items-center"
-                                key={index}>
-                                <p className="text-xs inline" >{tag}</p>
-                                <button type="button" className="text-xs mx-1 " >x</button>
-                            </div>))}
-                    </div>
-                    <button type="button" className="p-2 bg-green-500 text-white rounded-md mt-2"
-                        onClick={handleAddTag} >Add Tag+</button>
-                </div>
+                                        key={index}>
+                                        <p className="text-xs inline" >{tag}</p>
+                                        <button type="button" className="text-xs mx-1 " >x</button>
+                                    </div>))}
+                            </div>
+                            <button type="button" className="p-2 bg-green-500 text-white rounded-md mt-2"
+                                onClick={handleAddTag} >Add Tag+</button>
+                        </div>
 
-                <div className="w-[80%] flex relative">
-                    <Info information="Product Series are used to group products together. Series Order is used to determine the order in which products are displayed in a series." />
-                    <input placeholder="Product Series" value={series} className=" border-2 border-black rounded-md p-2 w-[60%] inline" onChange={(e) => setSeries(e.target.value)} />
-                    <div className="w-[40%] relative">
-                        <input value={seriesOrder} type="number" min={1} step="1" className="border-2 border-black rounded-md p-2 w-full z-4" onChange={(e) => setSeriesOrder(parseInt(e.target.value))} />
-                        <label htmlFor="seriesOrder" className="text-xs text-gray-400 absolute top-1/3 right-4 md:right-10">Order</label>
-                    </div>
-                </div>
+                        <div className="w-[80%] flex relative">
+                            <Info information="Product Series are used to group products together. Series Order is used to determine the order in which products are displayed in a series." />
+                            <input placeholder="Product Series" value={series} className=" border-2 border-black rounded-md p-2 w-[60%] inline" onChange={(e) => setSeries(e.target.value)} />
+                            <div className="w-[40%] relative">
+                                <input value={seriesOrder} type="number" min={1} step="1" className="border-2 border-black rounded-md p-2 w-full z-4" onChange={(e) => setSeriesOrder(parseInt(e.target.value))} />
+                                <label htmlFor="seriesOrder" className="text-xs text-gray-400 absolute top-1/3 right-4 md:right-10">Order</label>
+                            </div>
+                        </div>
 
-                <input type="number" min={0} step="1" placeholder="Product Price" value={price || ""}
-                    className=" border-2 border-black rounded-md p-2 w-[80%]" onChange={(e) => setPrice(Number(Number((e.target.value)).toFixed(0)))} />
+                        <input type="number" min={0} step="1" placeholder="Product Price" value={price || ""}
+                            className=" border-2 border-black rounded-md p-2 w-[80%]" onChange={(e) => setPrice(Number(Number((e.target.value)).toFixed(0)))} />
+                    </>}
 
                 <div className="flex flex-col gap-2">
                     <label htmlFor="file"
@@ -235,11 +261,18 @@ export default function ProductForm({ isEditing, product, handleFinishEdit, hand
                 </div>
 
                 <button type="submit" disabled={disabled} className={`p-2 ${disabled ? 'bg-gray-400' : 'bg-blue-500'} text-white w-[90%] h-full rounded-md p-2 max-w-[75%]`}>{isEditing ? "Edit" : "Add"} Product</button>
+
                 <div className="w-[100%] h-10 m-auto flex justify-between items-center gap-4">
-                    {product && <button type="button" onClick={() => updateProduct({ url: product.url, title: product.title, price: product.price, description: product.description, tags: product.tags, id: product.id })} className="p-2 bg-blue-500 h-full text-white rounded-md flex justify-around items-center w-[20%]"><IoIosArrowBack /></button>}
-                    <button type="button" onClick={resetState} className={'bg-yellow-400 $p-2 text-black w-[20%] h-full rounded-md flex p-2 flex-col justify-center items-center flex-grow max-w-[50%] m-auto'}><IoIosRefresh />Refresh</button>
-                    {product && <button type="button" onClick={() => handleDelete(product.url, product.id)} className="p-2 bg-red-600 h-full text-white rounded-md flex justify-around items-center w-[20%] "><IoIosTrash /></button>}
+                    {product && <button type="button"
+                        onClick={() => setIsEditing(false)} className="p-2 bg-blue-500 h-full text-white rounded-md flex justify-around items-center w-[20%]">
+                        <IoIosArrowBack /></button>}
+                    <button type="button" onClick={resetState}
+                        className={'bg-yellow-400 text-black w-[20%] h-full rounded-md flex p-2 flex-col justify-center items-center '}>
+                        <IoIosRefresh /></button>
+                    {product && isInventory && <button type="button" onClick={() => handleDelete(product.imageUrl, product.id)} className="p-2 bg-red-600 h-full text-white rounded-md flex justify-around items-center w-[20%] ">
+                        <IoIosTrash /></button>}
                 </div>
+
             </form>
 
             {/* TODO: Update this progress bar */}

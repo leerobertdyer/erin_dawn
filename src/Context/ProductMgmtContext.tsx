@@ -1,33 +1,33 @@
 import { createContext, useContext, ReactNode } from 'react';
 import { useProductManagement } from '../Hooks/useProductMgmt';
 
-import { IProductToEdit, IProductInfo } from '../Interfaces/IProduct';
+import { IProductInfo } from '../Interfaces/IProduct';
 
 interface ProductManagementContextType {
     isEditing: boolean;
+    setIsEditing: (isEditing: boolean) => void;
     isBatchEdit: boolean;
-    product: IProductToEdit | null;
+    product: IProductInfo | null;
+    setProduct: (product: IProductInfo | null) => void;
     cartProducts: IProductInfo[];
     setCartProducts: (products: IProductInfo[]) => void;
-    updateProduct: (newProduct: IProductToEdit) => void;
     handleSetCartProducts: (products: IProductInfo[]) => void;
     handleEdit: (id: string) => void;
     handleDelete: (url: string, id: string) => void;
     handleBack: () => void;
-    handleFinishEdit: () => void;
     }
 
 const defaultValue: ProductManagementContextType = {
     isEditing: false,
+    setIsEditing: (isEditing: boolean) => {console.log(isEditing)},
     isBatchEdit: false,
     product: null,
+    setProduct: () => {},
     cartProducts: [], setCartProducts: () => {},
-    updateProduct: () => {},
     handleSetCartProducts: () => {},
     handleEdit: () => {},
     handleDelete: () => {},
     handleBack: () => {},
-    handleFinishEdit: () => {},
 };
 
 const ProductManagementContext = createContext<ProductManagementContextType>(defaultValue);
