@@ -1,7 +1,6 @@
 import { User } from "firebase/auth";
 import Frame from "../../Components/Frame/Frame";
 import { useEffect, useState } from "react";
-import { getPhotos } from "../../firebase/getPhotos";
 import { IProductInfo } from "../../Interfaces/IProduct";
 import ProductDetails from "../../Components/ProductDetails/ProductDetails";
 import ShoppingButtons from "../../Components/Buttons/ShoppingButtons";

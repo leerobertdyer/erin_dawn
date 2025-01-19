@@ -1,34 +1,25 @@
-import { useEffect, useState } from "react";
-import { getPhotos } from "../../firebase/getPhotos";
-import { IProductInfo } from "../../Interfaces/IProduct";
-import LoadPhotos from "../../Components/HeroPhotos/LoadPhotos";
+import ShoppingButtons from "../../Components/Buttons/ShoppingButtons";
+import Frame from "../../Components/Frame/Frame";
 import { useProductManagementContext } from "../../Context/ProductMgmtContext";
 
-
-
 export default function Cart() {
-    const { cartProducts } = useProductManagementContext();
-    const [products, setProducts] = useState<IProductInfo[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-        async function fetchCart() {
-            const resp = await getPhotos({ ids: cartProducts.map((p) => p.id), shuffle: false })
-            if (resp) {
-                setProducts(resp)
-                setIsLoading(false)
-            }
-        }
-        fetchCart();
-    }, [])
+    const { cartProducts } = useProductManagementContext();
 
     return (
-        <div>
-            {isLoading && <LoadPhotos />}
-            {products.map((product, key) =>
-                <div key={key} className="flex-grow-0 flex-shrink-0 w-[10rem] md:w-[12rem] lg:w-[14rem]">
-                    {product.imageUrl}
+        <div className="
+        w-full h-fit
+        p-[2rem]
+        md:w-[35vw] md:min-h-screen 
+        bg-edcBlue-20 
+        flex flex-col items-start justify-start">    
+            {cartProducts.map((product, key) =>
+            <Frame key={key} additionalClass="border-0 bg-red-400 p-2">
+                <div className="w-[6rem] md:w-[8rem] lg:w-[10rem] ">
+                    <img src={product.imageUrl} alt={product.title} />
+                    <ShoppingButtons product={product} />
                 </div>
+                </Frame>
             )}
         </div>
     )

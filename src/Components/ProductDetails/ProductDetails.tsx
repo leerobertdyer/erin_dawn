@@ -17,10 +17,7 @@ export default function ProductDetails({ product, handleCloseProductDetails }: I
         <div className="w-full h-fit bg-white flex flex-col md:flex-row justify-center items-center gap-[1rem] overflow:hidden">
             {product.map((photo) =>
                 <div key={photo.id} className="w-[10rem] bg-red-400">
-                    <Frame
-                        additionalClass="w-[10rem]"
-                        u={null}
-                        id={photo.id} >
+                    <Frame additionalClass="w-[10rem]">
                         <img src={photo.imageUrl} alt={photo.title} className="rounded-md" />
                     </Frame>
                 </div>

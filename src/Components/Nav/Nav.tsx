@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { IoIosClose, IoIosMenu, IoLogoInstagram } from "react-icons/io";
+import { IoIosMenu, IoLogoInstagram } from "react-icons/io";
 import { Link, useLocation } from "react-router";
 import { User } from "firebase/auth";
 import CartIconAndNumber from "../cartIconAndNumber/CartIconAndNumber";
@@ -61,6 +61,9 @@ export default function Nav({ u }: INav) {
                     className={`text-center select-none ${path === "/about" ? "w-full bg-edcBlue-20" : ""} `}
                     onClick={() => setIsOpen(false)}>
                     About</Link>
+                <Link to="/cart" className={`text-center select-none ${path === "/cart" ? "w-full bg-edcBlue-20" : ""} `}
+                    onClick={() => setIsOpen(false)}>
+                    Cart</Link>
                 {u && <Link to="/admin"
                     className={`text-center select-none ${path === "/admin" ? "w-full bg-edcBlue-20" : ""} `}
                     onClick={() => setIsOpen(false)}>

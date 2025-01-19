@@ -4,7 +4,7 @@ import { IProductInfo } from "../../Interfaces/IProduct";
 
 interface IShoppingButons {
     product: IProductInfo,
-    handleDetails: (index: number) => void
+    handleDetails?: (index: number) => void
 }
 export default function ShoppingButtons({ product, handleDetails }: IShoppingButons) {
     const { setCartProducts, cartProducts } = useProductManagementContext();
@@ -33,13 +33,13 @@ export default function ShoppingButtons({ product, handleDetails }: IShoppingBut
                 <p>{product.series}</p>
                 <p className="font-retro rotate-6 text-2xl">${product.price}<span className="text-xs">.00</span></p>
             </div>
-            <button
+            {handleDetails && <button
                 className="
                             transition:all duration-[10ms]
                             hover:bg-yellow-500 
                             bg-edcPurple-60 text-white px-2 rounded-md w-[100%]"
                 onClick={() => handleDetails(Number(product.seriesOrder) - 1)}
-            >Details</button>
+            >Details</button>}
             <button
 
                 className={` 
