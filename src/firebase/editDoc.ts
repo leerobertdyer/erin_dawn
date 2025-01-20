@@ -10,9 +10,11 @@ interface IEditDoc {
     imageUrl?: string;
     series?: string;
     seriesOrder?: number;
+    stripeProductId: string; 
+    stripePriceId: string;
 }
 
-export default async function editDoc({ id, title, description, price, tags, imageUrl, series, seriesOrder=0 }: IEditDoc) {
+export default async function editDoc({ id, title, description, price, tags, imageUrl, series, seriesOrder=0, stripeProductId, stripePriceId }: IEditDoc) {
     try {
         const docRef = doc(db, "photos", id);
         console.log('editing doc', docRef.path);
@@ -20,25 +22,29 @@ export default async function editDoc({ id, title, description, price, tags, ima
         if (imageUrl) {
             console.log('imageUrl found: ', imageUrl);
             await updateDoc(docRef, {
-                title: title,
-                description: description,
-                price: price,
-                tags: tags,
-                imageUrl: imageUrl,
-                series: series,
-                seriesOrder: seriesOrder
+                title,
+                description,
+                price,
+                tags,
+                imageUrl,
+                series,
+                seriesOrder,
+                stripeProductId, 
+                stripePriceId
             });
             return;
 
         } else {
             console.log('no imageUrl found');
             await updateDoc(docRef, {
-                title: title,
-                description: description,
-                price: price,
-                tags: tags,
-                series: series,
-                seriesOrder: seriesOrder
+                title,
+                description,
+                price,
+                tags,
+                series,
+                seriesOrder,
+                stripeProductId, 
+                stripePriceId
             });
             
         }

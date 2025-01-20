@@ -7,11 +7,11 @@ import editDoc from "../../firebase/editDoc";
 import Info from "../Info/Info";
 import { useProductManagementContext } from "../../Context/ProductMgmtContext";
 import { usePhotosContext } from "../../Context/PhotosContext";
-
+import { useLocation } from "react-router-dom";
 
 export default function ProductForm() {
     const { product, isEditing, setIsEditing, handleDelete } = useProductManagementContext();
-    const { allPhotos, setAllPhotos } = usePhotosContext();
+    const { allPhotos, handleSetAllPhotos } = usePhotosContext();
     const [title, setTitle] = useState<string>(product?.title || "");
     const [description, setDescription] = useState<string>(product?.description || "");
     const [price, setPrice] = useState<number>(product?.price || 0);
@@ -25,6 +25,8 @@ export default function ProductForm() {
     const [seriesOrder, setSeriesOrder] = useState<number | undefined>(product?.seriesOrder || 1)
     const [isInventory, setIsInventory] = useState<boolean>(true)
     const [isHero, setIsHero] = useState<boolean>(false)
+
+    const location = useLocation();
 
     useEffect(() => {
         if (product) {
@@ -45,16 +47,7 @@ export default function ProductForm() {
                 setIsInventory(false)
             }
         }
-    }, [product, isEditing]);
-
-    // TODO:
-    // Remove the tags in favor of a dropdown to select where the product should be displayed 
-    // (ie hero, inventory, vintageCard, handmadeCard)
-
-
-    function onProgress(percent: number) {
-        setProgress(percent)
-    }
+    }, [product, isEditing, location]);
 
     useEffect(() => {
         if (isEditing) {
@@ -76,6 +69,61 @@ export default function ProductForm() {
             }
         }
     }, [title, description, tags, price, file, isEditing, isInventory])
+
+    function onProgress(percent: number) {
+        setProgress(percent)
+    }
+    const BACKEND = import.meta.env.VITE_BACKEND_URL
+
+    async function createStripeProduct() {
+        const stripeProduct = {
+            name: title,
+            description: description,
+            price: price,
+        }
+        const createProductEndpoint = `${BACKEND}/create-product`
+        console.log("sending fetch to : ", createProductEndpoint)
+        const resp = await fetch(createProductEndpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(stripeProduct)
+        })
+        if (resp.ok) {
+            console.log("Product created successfully")
+            const { stripeProductId, stripePriceId } = await resp.json()
+            return { stripeProductId, stripePriceId }
+        } else {
+            console.log("Error creating product: ", resp)
+            throw new Error("Error creating stripe product and price")
+        }
+    }
+
+    async function editStripeProduct() {
+        const stripeProduct = {
+            stripeProductId: product?.stripeProductId,
+            name: title,
+            description: description,
+            newPrice: price,
+        }
+        const editProductEndpoint = `${BACKEND}/edit-product`
+        console.log("sending fetch to : ", editProductEndpoint)
+        const resp = await fetch(editProductEndpoint, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(stripeProduct)
+        }); if (resp.ok) {
+            console.log("Product edited successfully")
+            const { stripeProductId, stripePriceId } = await resp.json()
+            return { stripeProductId, stripePriceId }
+        } else {
+            console.log("Error editing Stripe Product/Price: ", resp)
+            throw new Error("Error editing stripe product and price")
+        }
+    }
 
     function handleKeyDown(event: React.KeyboardEvent<HTMLFormElement>) {
         if (event.key === 'Enter') {
@@ -129,7 +177,8 @@ export default function ProductForm() {
         } else if (isEditing && product) { // Otherwise we use the current url and editDoc()
             console.log("Editing product without changing image")
             downloadURL = product.imageUrl
-            await editDoc({ id: product.id, title, description, tags, price, series, seriesOrder, imageUrl: downloadURL })
+            const { stripeProductId, stripePriceId } = await editStripeProduct()
+            await editDoc({ id: product.id, title, description, tags, price, series, seriesOrder, imageUrl: downloadURL, stripeProductId, stripePriceId })
         }
         else {
             console.log("Uploading new product")
@@ -142,7 +191,8 @@ export default function ProductForm() {
 
             // Update the db with new url, if necessary
             if (!isEditing) {
-                newDoc({ ...fileToUpload, downloadURL, series: series ?? "", seriesOrder: seriesOrder ?? 1 })
+                const { stripeProductId, stripePriceId } = await createStripeProduct()
+                newDoc({ ...fileToUpload, downloadURL, series: series ?? "", seriesOrder: seriesOrder ?? 1, stripeProductId, stripePriceId })
             }
 
             // update UI to show updated product
@@ -151,9 +201,8 @@ export default function ProductForm() {
                 const updatedPhotos = allPhotos.map((photo) =>
                     photo.id === product.id ? { ...photo, imageUrl: downloadURL, title, description, tags, price, series, seriesOrder } : photo
                 );
-                setAllPhotos(updatedPhotos)
+                handleSetAllPhotos(updatedPhotos)
             }
-
             resetState();
             setIsEditing(false);
 
@@ -191,23 +240,26 @@ export default function ProductForm() {
     }
 
     return (
-        <>
+        <div className="w-screen h-screen min-h-fit overflow-scroll">
             <form onSubmit={handleSubmit} onKeyDown={handleKeyDown}
-                className="bg-white flex flex-col justify-center m-auto items-center w-[85vw] border-2 border-black rounded-xl p-4 mt-4 gap-4"
+                className="bg-white flex flex-col justify-center m-auto items-center w-[85vw] border-2 border-black rounded-md p-4 mt-4 gap-4"
                 style={{ backgroundImage: `url(${background})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
 
-                <h2 className="text-2xl">Add Product</h2>
+                <h2 className="text-2xl p-2 rounded-md bg-white">Add Product</h2>
 
-                <input type="text" placeholder="Product Name" value={title}
-                    className=" border-2 border-black rounded-md p-2 w-[80%]" onChange={(e) => setTitle(e.target.value)} />
-
-                { !isHero && // Show description only if this is not a hero item
-                    <div className="w-[80%] relative">
-                    <input type="text" placeholder="Product Description" value={description}
-                        className=" border-2 border-black rounded-md p-2 w-full" onChange={(e) => setDescription(e.target.value)} />
-                    <Info information="Product Description. This is displayed when user clicks 'more info' on any product." />
+                <div className="flex flex-col w-[80%] justify-between items-center">
+                    <label className="text-xs p-1 rounded-t-md w-[10rem] text-center bg-white">Product Name</label>
+                    <input type="text" placeholder="Product Name" value={title}
+                        className=" border-2 border-black rounded-md p-2 w-full" onChange={(e) => setTitle(e.target.value)} />
                 </div>
-                    }
+
+                {!isHero && // Show description only if this is not a hero item
+                    <div className="w-[80%] relative">
+                        <input type="text" placeholder="Product Description" value={description}
+                            className=" border-2 border-black rounded-md p-2 w-full" onChange={(e) => setDescription(e.target.value)} />
+                        <Info information="Product Description. This is displayed when user clicks 'more info' on any product." />
+                    </div>
+                }
 
                 {isInventory && // Show Tags Series & price only if this is an inventory item
                     <>
@@ -224,7 +276,7 @@ export default function ProductForm() {
                                     <div
                                         onClick={handleRemoveTag(tag)}
                                         className="
-                            hover:bg-red-500 hover:cursor-pointer hover:text-white
+                            hover:bg-rose-600 hover:cursor-pointer hover:text-white
                             bg-white text-gray-400
                             border-[1px] border-gray-400 
                             rounded-md p-[2px] m-[2px] 
@@ -262,14 +314,14 @@ export default function ProductForm() {
 
                 <button type="submit" disabled={disabled} className={`p-2 ${disabled ? 'bg-gray-400' : 'bg-blue-500'} text-white w-[90%] h-full rounded-md p-2 max-w-[75%]`}>{isEditing ? "Edit" : "Add"} Product</button>
 
-                <div className="w-[100%] h-10 m-auto flex justify-between items-center gap-4">
-                    {product && <button type="button"
+                <div className="w-[100%] h-10 m-auto flex justify-center items-center gap-4">
+                    {product && location.pathname !== "/admin" && <button type="button"
                         onClick={() => setIsEditing(false)} className="p-2 bg-blue-500 h-full text-white rounded-md flex justify-around items-center w-[20%]">
                         <IoIosArrowBack /></button>}
                     <button type="button" onClick={resetState}
                         className={'bg-yellow-400 text-black w-[20%] h-full rounded-md flex p-2 flex-col justify-center items-center '}>
                         <IoIosRefresh /></button>
-                    {product && isInventory && <button type="button" onClick={() => handleDelete(product.imageUrl, product.id)} className="p-2 bg-red-600 h-full text-white rounded-md flex justify-around items-center w-[20%] ">
+                    {product && isInventory && location.pathname !== "/admin" && <button type="button" onClick={() => handleDelete(product.imageUrl, product.id)} className="p-2 bg-rose-600 h-full text-white rounded-md flex justify-around items-center w-[20%] ">
                         <IoIosTrash /></button>}
                 </div>
 
@@ -282,6 +334,6 @@ export default function ProductForm() {
                     <p>Upload Progress: {progress}%</p>
                 </div>
             }
-        </>
+        </div>
     )
 }

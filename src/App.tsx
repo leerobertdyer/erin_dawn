@@ -11,6 +11,7 @@ import { auth } from './firebase/firebaseConfig'
 import Cart from './Views/Cart/Cart'
 import { ProductManagementProvider } from './Context/ProductMgmtContext'
 import { PhotosProvider } from './Context/PhotosContext'
+import PurchaseSuccess from './Views/PurchaseSuccess/PurchaseSuccess'
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -37,6 +38,8 @@ function App() {
             <Route path="/" element={<Home u={user}  />} />
             <Route path="/shop" element={<Shop u={user} />} />
             <Route path="/cart" element={<Cart/>} />
+            <Route path="/cart/success" element={<PurchaseSuccess/>} />
+            <Route path="/cart/cancel" element={<Cart/>} />
             <Route path="/about" element={<About />} />
             <Route path="/admin" element={<Admin u={user} setUser={setUser} />} />
           </Routes>

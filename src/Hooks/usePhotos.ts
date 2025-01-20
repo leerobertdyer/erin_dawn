@@ -3,24 +3,42 @@ import { IProductInfo } from "../Interfaces/IProduct";
 import { getPhotos } from "../firebase/getPhotos";
 
 export function usePhotos() {
-    const [allPhotos, setAllPhotos] = useState<IProductInfo[]>([]);
-    const [isLoading, setIsLoading] = useState(true)
+    const [allPhotos, setAllPhotos] = useState<IProductInfo[]>(() => {
+        const savedPhotos = localStorage.getItem('allPhotos');
+        return savedPhotos ? JSON.parse(savedPhotos) : [];
+    });
+    const [isLoading, setIsLoading] = useState(true);
 
+    const cacheTime = 1000 * 60 * 60 // 1 hour
     useEffect(() => {
         async function fetchPhotos() {
-            const resp = await getPhotos({ tags: ["edc"], shuffle: false })
+            const resp = await getPhotos({ tags: ["edc"], shuffle: false });
             if (resp) {
-                setAllPhotos(resp)
+                setAllPhotos(resp);
+                localStorage.setItem('allPhotos', JSON.stringify(resp));
+                localStorage.setItem('lastFetch', Date.now().toString());
                 if (resp.length > 0) {
-                    setIsLoading(false)
+                    setIsLoading(false);
                 }
             }
         }
-        fetchPhotos();
-    }, [])
+        if (
+            allPhotos.length === 0 ||
+            Date.now() - parseInt(localStorage.getItem('lastFetch') ?? "0") > cacheTime
+        ) {
+            fetchPhotos();
+        } else {
+            setIsLoading(false);
+        }
+    }, []);
+
+    function handleSetAllPhotos(photos: IProductInfo[]) {
+        setAllPhotos(photos);
+        localStorage.setItem('allPhotos', JSON.stringify(photos));
+    }
 
     return {
-        allPhotos, setAllPhotos,
+        allPhotos, handleSetAllPhotos,
         isLoading, setIsLoading,
     };
 }

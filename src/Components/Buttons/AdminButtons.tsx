@@ -19,7 +19,9 @@ export default function AdminButtons({ handleEdit, addProduct }: IAdminButtons) 
             imageUrl: "",
             id: "",
             title: "",
-            tags: []
+            tags: [],
+            stripePriceId: "",
+            stripeProductId: ""
         })
         navigate('/admin')
     }

@@ -9,10 +9,9 @@ export default function CartIconAndNumber({ iconSize, cartLength }: ICartAndNumb
 
     return (
         <div className="relative w-fit h-fit">
-            <Link to="/shop" className="flex flex-col justify-center items-center">
+            <Link to="/cart" className="flex flex-col justify-center items-center">
 
-                <HiOutlineShoppingCart size={iconSize} className="absolute w-fit inline"
-                    onClick={() => console.log('cart!')} />
+                <HiOutlineShoppingCart size={iconSize} className="absolute w-fit inline" />
                 {cartLength > 0 && <span className="absolute bottom-0 
                     text-white bg-black p-[2px] 
                     rounded-full w-[25px] h-[25px] flex justify-center items-center">{cartLength}</span>}

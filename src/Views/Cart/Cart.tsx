@@ -1,5 +1,5 @@
-import ShoppingButtons from "../../Components/Buttons/ShoppingButtons";
-import Frame from "../../Components/Frame/Frame";
+import CartItem from "../../Components/CartItem/CartItem";
+import CheckoutButton from "../../Components/CheckoutButton/CheckoutButton";
 import { useProductManagementContext } from "../../Context/ProductMgmtContext";
 
 export default function Cart() {
@@ -8,19 +8,33 @@ export default function Cart() {
 
     return (
         <div className="
-        w-full h-fit
+        w-screen h-fit min-h-screen
         p-[2rem]
-        md:w-[35vw] md:min-h-screen 
-        bg-edcBlue-20 
-        flex flex-col items-start justify-start">    
-            {cartProducts.map((product, key) =>
-            <Frame key={key} additionalClass="border-0 bg-red-400 p-2">
-                <div className="w-[6rem] md:w-[8rem] lg:w-[10rem] ">
-                    <img src={product.imageUrl} alt={product.title} />
-                    <ShoppingButtons product={product} />
+        flex flex-col items-center justify-start
+        gap-4 bg-cover bg-center bg-no-repeat bg-fixed
+        relative"
+            style={{ backgroundImage: 'url(images/background.jpg)' }}>
+            <div className="flex flex-col items-center justify-center gap-4 w-[13rem]">
+
+                <div className="w-full h-fit bg-white p-2 border-2 border-black rounded-md text-center">
+                    <p>Total: ${cartProducts.reduce((acc, product) => acc + product.price, 0)}.00</p>
                 </div>
-                </Frame>
-            )}
+                <CheckoutButton salesItems={cartProducts.map((item) => ({quantity: 1, stripePriceId: item.stripePriceId}))}/>
+            </div>
+            <div className="w-full h-fit flex flex-col items-center justify-start gap-4">
+
+                {cartProducts.map((product, key) =>
+                    <div key={key}
+                        className="
+                w-full md:w-[60vw] md:m-auto 
+                bg-white p-2 m-2 bg-opacity-90
+                border-2 border-black
+                flex items-center justify-evenly 
+                rounded-md gap-2">
+                        <CartItem item={product} />
+                    </div>
+                )}
+            </div>
         </div>
     )
 }

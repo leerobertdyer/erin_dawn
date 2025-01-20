@@ -19,6 +19,8 @@ export default function Main({ u }: { u: User | null }) {
             series: "mainPageVintage",
             price: 0,
             description: "Embellished Vintage",
+            stripePriceId: "",
+            stripeProductId: "",
         });
     const [handMade, setHandMade] = useState<IProductInfo>(
         {
@@ -29,17 +31,17 @@ export default function Main({ u }: { u: User | null }) {
             price: 0,
             description: "Hand-Made Originals",
             id: 'PegS4j5IeJtNS3hlDkjp',
+            stripePriceId: "",
+            stripeProductId: "",
         });
 
     useEffect(() => {
         const vintagePhoto = allPhotos.find(photo => photo.series === "mainPageVintage");
         const handMadePhoto = allPhotos.find(photo => photo.series === "mainPageHandMade");
         if (vintagePhoto) {
-            console.log('Vintage photo: ', vintagePhoto) 
             setVintage(vintagePhoto)
         }
         if (handMadePhoto) {
-            console.log('handmade photo: ', handMadePhoto)
             setHandMade(handMadePhoto)
         }
     }, [allPhotos])

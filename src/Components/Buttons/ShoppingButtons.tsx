@@ -44,7 +44,7 @@ export default function ShoppingButtons({ product, handleDetails }: IShoppingBut
 
                 className={` 
                     ${isInCart
-                        ? "bg-red-400"
+                        ? "bg-rose-600"
                         : "bg-edcPurple-60 hover:bg-yellow-500"}
                     transition:all duration-[10ms]
                     text-white px-2 rounded-md w-[100%]`}

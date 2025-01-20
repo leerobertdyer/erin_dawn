@@ -7,11 +7,11 @@ interface ProductManagementContextType {
     isEditing: boolean;
     setIsEditing: (isEditing: boolean) => void;
     isBatchEdit: boolean;
+    setIsBatchEdit: (isBatchEdit: boolean) => void;
     product: IProductInfo | null;
     setProduct: (product: IProductInfo | null) => void;
     cartProducts: IProductInfo[];
     setCartProducts: (products: IProductInfo[]) => void;
-    handleSetCartProducts: (products: IProductInfo[]) => void;
     handleEdit: (id: string) => void;
     handleDelete: (url: string, id: string) => void;
     handleBack: () => void;
@@ -20,11 +20,11 @@ interface ProductManagementContextType {
 const defaultValue: ProductManagementContextType = {
     isEditing: false,
     setIsEditing: (isEditing: boolean) => {console.log(isEditing)},
+    setIsBatchEdit: (isBatchEdit: boolean) => {console.log(isBatchEdit)},
     isBatchEdit: false,
     product: null,
     setProduct: () => {},
     cartProducts: [], setCartProducts: () => {},
-    handleSetCartProducts: () => {},
     handleEdit: () => {},
     handleDelete: () => {},
     handleBack: () => {},

@@ -9,9 +9,11 @@ interface INewDoc {
   tags: string[];
   series: string;
   seriesOrder: number;
+  stripeProductId: string;
+  stripePriceId: string;
 }
 
-export default async function newDoc({ downloadURL, title, description, price, tags, series, seriesOrder }: INewDoc): Promise<string | null> {
+export default async function newDoc({ downloadURL, title, description, price, tags, series, seriesOrder, stripeProductId, stripePriceId }: INewDoc): Promise<string | null> {
   try {
     const docRef: DocumentReference = await addDoc(collection(db, "photos", title), {
       imageUrl: downloadURL,
@@ -21,7 +23,9 @@ export default async function newDoc({ downloadURL, title, description, price, t
       tags: tags,
       series: series,
       seriesOrder: seriesOrder,
-      createdAt: new Date()
+      createdAt: new Date(),
+      stripeProductId, 
+      stripePriceId
     });
     console.log("Document successfully written with ID: ", docRef.id);
     return docRef.id;

@@ -8,15 +8,15 @@ import AdminButtons from "../../Components/Buttons/AdminButtons";
 import BatchEdit from "../../Components/BatchEdit/BatchEdit";
 import ProductForm from "../../Components/ProductForm/ProductForm";
 import Carousel from "../../Components/Carousel/Carousel";
-import { useProductManagement } from "../../Hooks/useProductMgmt";
 import LoadPhotos from "../../Components/HeroPhotos/LoadPhotos";
 import { usePhotosContext } from "../../Context/PhotosContext";
+import { useProductManagementContext } from "../../Context/ProductMgmtContext";
 
 interface IShop {
     u: User | null
 }
 export default function Shop({ u, }: IShop) {
-    const { handleBack, handleEdit, isEditing, isBatchEdit, handleBatchEdit } = useProductManagement();
+    const { handleBack, handleEdit, isEditing, isBatchEdit, setIsBatchEdit } = useProductManagementContext();
     const { allPhotos } = usePhotosContext();
     const [inventory, setInventory] = useState<IProductInfo[][]>([])
     const [isLoading, setIsLoading] = useState(true)
@@ -25,7 +25,6 @@ export default function Shop({ u, }: IShop) {
 
     useEffect(() => {
         const nextInventory = allPhotos.filter(photo => photo.tags.includes("inventory"))
-        console.log('nextInventory: ', nextInventory)
         const groupedPhotos: IProductInfo[][] = []
         const photoMap: { [key: string]: IProductInfo[] } = {};
         nextInventory.forEach(photo => {
@@ -39,7 +38,7 @@ export default function Shop({ u, }: IShop) {
         for (const key in photoMap) {
             groupedPhotos.push(photoMap[key]);
         }
-        if (u) groupedPhotos.push([{ id: "new", title: "New Product", description: "Add a new product to the inventory", imageUrl: "images/card.jpg", price: 0, series: "uncategorized", tags: ["inventory"] }])
+        if (u) groupedPhotos.push([{ id: "new", title: "New Product", description: "Add a new product to the inventory", imageUrl: "images/card.jpg", price: 0, series: "uncategorized", tags: ["inventory"], stripePriceId: "", stripeProductId: "" }])    
         setInventory(groupedPhotos.sort((a, b) => (a[0].order ?? 0) - (b[0].order ?? 0)))
     if (groupedPhotos.length > 0) setIsLoading(false)
     }, [u, allPhotos])
@@ -52,9 +51,13 @@ export default function Shop({ u, }: IShop) {
     function handleCloseProductDetails() {
         setShowDetails(false)
     }
+    function handleBatchEdit(index: number) {
+        setArrayIndex(index)
+        setIsBatchEdit(true)
+    }
 
     if (isBatchEdit) {
-        return <BatchEdit products={inventory[arrayIndex] ?? []} u={u ?? null} handleBack={handleBack} handleEdit={handleEdit} />
+        return <BatchEdit products={inventory[arrayIndex] ?? []} handleBack={handleBack} />
     } else if (isEditing) {
         return <div className="w-screen h-screen bg-white fixed top-0 left-0 z-50 flex justify-center items-center">
             <ProductForm />
@@ -72,7 +75,7 @@ export default function Shop({ u, }: IShop) {
                     <Frame>
                         {series.length === 1
                             ? u && series[0].id === "new" ?
-                            <div className="h-[505px] flex flex-col justify-around items-center">
+                            <div className="h-fit md:h-[505px] flex flex-col justify-around items-center">
                                 <img src="/images/card.jpg" alt="Add a new product" className="rounded-md" />
                                 Add New Product
                                 <AdminButtons addProduct={true}  />
@@ -84,8 +87,8 @@ export default function Shop({ u, }: IShop) {
                                     <ShoppingButtons product={series[0]} handleDetails={() => handleClickProductDetails(index)} />
                                 </>
                             : <Carousel photos={series.map(photo => ({ id: photo.id, url: photo.imageUrl, title: photo.title, seriesOrder: photo.seriesOrder ?? 0 }))} >
-                                {u && <AdminButtons handleEdit={handleBatchEdit} />}
-                                <ShoppingButtons product={series[index]} handleDetails={() => handleClickProductDetails(index)} />
+                                {u && <AdminButtons handleEdit={() => handleBatchEdit(index)} />}
+                                <ShoppingButtons product={series[0]} handleDetails={() => handleClickProductDetails(0)} />
                             </Carousel>}
                     </Frame>
                 </div>

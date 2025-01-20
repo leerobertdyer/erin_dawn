@@ -8,4 +8,6 @@ export interface IProductInfo {
     order?: number;
     series?: string;
     seriesOrder?: number;
+    stripePriceId: string;
+    stripeProductId: string;
 }

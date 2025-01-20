@@ -10,7 +10,6 @@ export default function AdminPanel() {
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 setName(user.displayName || "")
-                console.log("User signed in: ", user.displayName)
             }
         })
     }, [])
@@ -29,12 +28,12 @@ export default function AdminPanel() {
                 Admin Panel
             </h1>
 
-            <div className="bg-white flex flex-col fustify-center items-center w-[85vw] rounded-xl p-4 mt-4 gap-4">
+            <div className="bg-white text-xs md:text-lg flex flex-col fustify-center items-center w-[85vw] rounded-md p-4 mt-4 gap-4">
                 <p>Hello {name},</p>
-                <div className="w-full flex justify-center items-center gap-4">
+                <div className="w-full flex flex-col md:flex-row justify-center items-center gap-4">
                     <p>If you'd like to see the site as a normal user: </p>
                     <button onClick={logout}
-                        className="p-2 bg-red-500 rounded-md text-white">Log Out</button>
+                        className="p-2 bg-rose-600 rounded-md text-white min-w-[10rem]">Log Out</button>
                 </div>
             </div>
             <ProductForm />

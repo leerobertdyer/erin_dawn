@@ -34,7 +34,7 @@ export default function Admin({ u, setUser }: { u: User | null, setUser: (user: 
             <AdminPanel />
             :
             <div className="bg-white flex justify-center items-center w-screen h-screen">
-                <div className="border-2 border-black rounded-xl p-4 bg-blue-300 w-[35vw] h-[25vw] flex justify-center items-center mb-20">
+                <div className="border-2 border-black rounded-md p-4 bg-blue-300 w-[35vw] h-[25vw] flex justify-center items-center mb-20">
                     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                         <h1 className="text-3xl">Backdoor Login</h1>
                         <input type="email" required placeholder="Email" className="p-2" onChange={(e) => setEmail(e.target.value)} />
