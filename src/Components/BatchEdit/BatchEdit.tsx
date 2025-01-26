@@ -3,7 +3,6 @@ import Frame from "../Frame/Frame";
 import AdminButtons from "../Buttons/AdminButtons";
 import { useProductManagementContext } from "../../Context/ProductMgmtContext";
 import { useState } from "react";
-import { usePhotos } from "../../Hooks/usePhotos";
 import WarningDialogue from "../WarningDialogue/WarningDialogue";
 import { usePhotosContext } from "../../Context/PhotosContext";
 

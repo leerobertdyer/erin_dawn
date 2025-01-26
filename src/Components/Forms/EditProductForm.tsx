@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 import MainFormTemplate from "./MainFormTemplate";
 import CustomInput from "../CustomInput/CustomInput";
 import WarningDialogue from "../WarningDialogue/WarningDialogue";
-import { usePhotos } from "../../Hooks/usePhotos";
 import { IProductInfo } from "../../Interfaces/IProduct";
 import { usePhotosContext } from "../../Context/PhotosContext";
 

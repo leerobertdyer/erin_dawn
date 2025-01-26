@@ -6,7 +6,6 @@ import MainFormTemplate from "./MainFormTemplate";
 import uploadFile from "../../firebase/uploadFile";
 import newDoc from "../../firebase/newDoc";
 import LoadingBar from "../LoadingBar/LoadingBar";
-import { usePhotos } from "../../Hooks/usePhotos";
 import { useNavigate } from "react-router-dom";
 import { usePhotosContext } from "../../Context/PhotosContext";
 
