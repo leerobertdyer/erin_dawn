@@ -21,8 +21,10 @@ export default function Main({ u }: { u: User | null }) {
             flex flex-col sm:flex-row justify-center items-center gap-[4rem]">
             {mainPagePhotos.map((mpPhoto, key) =>
 
-                <Frame key={key} additionalClass="w-[87vw] md:w-[40vw] lg:w-[35vw] h-auto" hover={true} >
-                    <img src={mpPhoto.imageUrl} alt="Embellished Vintage" className="rounded-md h-full w-auto object-cover object-center" />
+                <Frame key={key} additionalClass="w-[87vw] md:w-[40vw] lg:w-[35vw] h-fit max-h-[65rem] max-w-[55rem]" hover={true} >
+                    <div className=" h-[70vh] w-full">
+                    <img src={mpPhoto.imageUrl} alt="Embellished Vintage" className="rounded-md h-full w-full object-cover object-center" />
+                    </div>
                     <button className="text-center text-lg">{mpPhoto.category}</button>
                     {u && <AdminButtons handleEdit={() => handleEdit(mpPhoto.id)} />}
                 </Frame>

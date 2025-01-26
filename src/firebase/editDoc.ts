@@ -9,12 +9,12 @@ interface IEditDoc {
     tags: string[];
     imageUrl?: string;
     series?: string;
-    seriesOrder?: number;
+    itemOrder?: number;
     stripeProductId: string; 
     stripePriceId: string;
 }
 
-export default async function editDoc({ id, title, description, price, tags, imageUrl, series, seriesOrder=0, stripeProductId, stripePriceId }: IEditDoc) {
+export default async function editDoc({ id, title, description, price, tags, imageUrl, series, itemOrder=0, stripeProductId, stripePriceId }: IEditDoc) {
     try {
         const docRef = doc(db, "photos", id);
         console.log('editing doc', docRef.path);
@@ -28,7 +28,7 @@ export default async function editDoc({ id, title, description, price, tags, ima
                 tags,
                 imageUrl,
                 series,
-                seriesOrder,
+                itemOrder,
                 stripeProductId, 
                 stripePriceId
             });
@@ -42,7 +42,7 @@ export default async function editDoc({ id, title, description, price, tags, ima
                 price,
                 tags,
                 series,
-                seriesOrder,
+                itemOrder,
                 stripeProductId, 
                 stripePriceId
             });

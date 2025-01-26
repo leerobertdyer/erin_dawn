@@ -11,6 +11,7 @@ export default function Carousel({ photos, children }: ICarouselParams) {
     const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
     const [isSpinning, setIsSpinning] = useState(false);
     const [loadedPhotos, setLoadedPhotos] = useState<ICarouselPhoto[]>([]);
+    const [isFirstSpin, setIsFirstSpin] = useState(true);
     const { allPhotos } = usePhotosContext();
 
     useEffect(() => {
@@ -30,7 +31,10 @@ export default function Carousel({ photos, children }: ICarouselParams) {
     useEffect(() => {
         let interval: NodeJS.Timeout;
         if (isSpinning && loadedPhotos.length > 1) {
-            setCurrentPhotoIndex(1);
+            if (isFirstSpin) {
+                setIsFirstSpin(false);
+                setCurrentPhotoIndex(1);
+            }
             interval = setInterval(() => {
                 setCurrentPhotoIndex((prev) => { return prev + 1 < loadedPhotos.length ? prev + 1 : 0 });
             }, 1000);
@@ -38,6 +42,7 @@ export default function Carousel({ photos, children }: ICarouselParams) {
                 clearInterval(interval);
                 setCurrentPhotoIndex(0);
                 setIsSpinning(false);
+                setIsFirstSpin(true);
             }
         }
         return () => {if (interval) clearInterval(interval)};
@@ -57,9 +62,9 @@ export default function Carousel({ photos, children }: ICarouselParams) {
     return (
         <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} className="flex flex-col justify-between h-full w-full">
             {loadedPhotos.length > 0 && loadedPhotos[currentPhotoIndex] && (
-                <div className="h-[65%] w-full">
+                <div className="w-full h-[65%] rounded-md overflow-hidden">
                 <img src={loadedPhotos[currentPhotoIndex].url} alt={loadedPhotos[currentPhotoIndex].title}
-                className="h-full w-full object-cover object-center rounded-md"/>
+                className="h-full w-full object-cover object-center"/>
                 </div>
             )}
             {children}

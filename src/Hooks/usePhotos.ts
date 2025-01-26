@@ -33,7 +33,7 @@ export function usePhotos() {
         } else {
             setIsLoading(false);
         }
-    }, [allPhotos]);
+    }, []);
 
     function handleSetAllPhotos(photos: IProductInfo[]) {
         setAllPhotos(photos);

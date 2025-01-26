@@ -8,9 +8,11 @@ import CustomInput from "../CustomInput/CustomInput";
 import WarningDialogue from "../WarningDialogue/WarningDialogue";
 import { IProductInfo } from "../../Interfaces/IProduct";
 import { usePhotosContext } from "../../Context/PhotosContext";
+import editDoc from "../../firebase/editDoc";
+import editFile from "../../firebase/editfile";
 
 export default function EditProductForm() {
-    const { product, isEditing, handleEdit, handleDelete, previousUrl, handleBack } = useProductManagementContext();
+    const { product, isEditing, handleDelete, previousUrl, handleBack } = useProductManagementContext();
     const { allPhotos, handleSetAllPhotos } = usePhotosContext();
 
     const navigate = useNavigate();
@@ -25,11 +27,86 @@ export default function EditProductForm() {
         if (!isEditing) navigate(previousUrl);
     }, [isEditing])
 
-    function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    const BACKEND = import.meta.env.VITE_BACKEND_URL;
+
+    async function editStripeProduct() {
+        const stripeProduct = {
+            stripeProductId: product?.stripeProductId,
+            name: title,
+            description: description,
+            newPrice: price,
+        }
+        const editProductEndpoint = `${BACKEND}/edit-product`
+        console.log("sending fetch to : ", editProductEndpoint)
+        const resp = await fetch(editProductEndpoint, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(stripeProduct)
+        }); if (resp.ok) {
+            console.log("Product edited successfully")
+            const { stripeProductId, stripePriceId } = await resp.json()
+            return { stripeProductId, stripePriceId }
+        } else {
+            console.log("Error editing Stripe Product/Price: ", resp)
+            throw new Error("Error editing stripe product and price")
+        }
+    }
+
+    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         if (!product) return;
+        let downloadUrl = "";
 
-        handleEdit(product.id);
+        const { stripeProductId, stripePriceId } = await editStripeProduct()
+
+        const allPhotosWithItemName = allPhotos.filter((photo) => photo.itemName === product.itemName);
+        allPhotosWithItemName.forEach(async (photo) => {
+
+            if (file) { // if file is present, edit the file then update doc
+                downloadUrl = await editFile({
+                    file,
+                    id: photo.id,
+                    url: photo.imageUrl,
+                    title,
+                    description,
+                    price,
+                    tags: photo.tags,
+                    series: photo.series,
+                    itemOrder: photo.itemOrder,
+                    stripeProductId,
+                    stripePriceId
+                });
+
+                await editDoc({
+                    id: photo.id,
+                    title,
+                    description,
+                    tags: photo.tags,
+                    price,
+                    series: photo.series,
+                    itemOrder: photo.itemOrder,
+                    imageUrl: downloadUrl,
+                    stripeProductId,
+                    stripePriceId
+                })
+            } else { // if file is not present, update doc only
+                await editDoc({
+                    id: product.id,
+                    title,
+                    description,
+                    tags: product.tags,
+                    price,
+                    series: product.series,
+                    itemOrder: product.itemOrder,
+                    imageUrl: product.imageUrl,
+                    stripeProductId,
+                    stripePriceId
+                })
+            }
+        })
+            navigate(previousUrl);
     }
 
     function resetState() {
@@ -40,7 +117,7 @@ export default function EditProductForm() {
         setBackground(product?.imageUrl ?? "");
     }
 
-    if (product?.seriesOrder && product.seriesOrder > 1) return (
+    if (product?.itemOrder && product.itemOrder > 1) return (
         <div className="flex flex-col justify-center items-center w-screen h-fit overflow-scroll">
             <form onSubmit={handleSubmit} onKeyDown={preventEnterFromSubmitting}
                 className="bg-white flex flex-col justify-center m-auto items-center w-[85vw] h-screen border-2 border-black rounded-md p-4 mt-4 gap-4"
@@ -87,9 +164,13 @@ export default function EditProductForm() {
                         <p className="text-center w-full m-auto py-1 px-2 rounded-md text-xs text-gray-400 bg-white">{file ? file.name : "No File Selected"}</p>
                     </div>
 
-                    <button type="submit"
-                        className="p-2 rounded-md text-white bg-edcPurple-60 w-[15rem]">Submit</button>
-                
+                    <button type="submit" 
+                    className="
+                        bg-edcPurple-60 text-white 
+                        hover:bg-yellow-500 hover:text-edcPurple-60 
+                        rounded-md p-2 w-full">
+                        Submit</button>
+
                 </MainFormTemplate>
                 <div className="w-[100%] h-10 m-auto flex justify-center items-center gap-4">
 

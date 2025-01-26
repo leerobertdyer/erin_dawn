@@ -8,7 +8,7 @@ interface ICartAndNumber {
 export default function CartIconAndNumber({ iconSize, cartLength }: ICartAndNumber) {
 
     return (
-        <div className="relative w-fit h-fit">
+        <div className="relative w-full h-full">
             <Link to="/cart" className="flex flex-col justify-center items-center">
 
                 <HiOutlineShoppingCart size={iconSize} className="absolute w-fit inline" />

@@ -38,7 +38,7 @@ export default function ShoppingButtons({ product, handleDetails }: IShoppingBut
                             transition:all duration-[10ms]
                             hover:bg-yellow-500 
                             bg-edcPurple-60 text-white px-2 rounded-md w-[100%]"
-                onClick={() => handleDetails(Number(product.seriesOrder) - 1)}
+                onClick={() => handleDetails(Number(product.itemOrder) - 1)}
             >Details</button>}
             <button
 

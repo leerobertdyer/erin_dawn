@@ -1,5 +1,5 @@
 import uploadFile from "./uploadFile";
-import removeFile from "./removeFile";
+import { removeFile } from "./removeFile";
 import editDoc from "./editDoc";
 
 // There is no firebase function to edit a file. Instead the solution is to: 
@@ -16,13 +16,13 @@ interface IEditFile {
     tags: string[];
     url: string;
     series?: string;
-    seriesOrder?: number;  
+    itemOrder?: number;  
     onProgress?: (progress: number) => void;
     stripePriceId: string;
     stripeProductId: string;
 }
 
-export default async function editFile({ url, id, title, description, price, tags, file, onProgress, series, seriesOrder, stripePriceId, stripeProductId }: IEditFile): Promise<string> {
+export default async function editFile({ url, id, title, description, price, tags, file, onProgress, series, itemOrder, stripePriceId, stripeProductId }: IEditFile): Promise<string> {
 
     try {
 
@@ -33,14 +33,14 @@ export default async function editFile({ url, id, title, description, price, tag
         }
 
         // upload new file
-        const imageUrl = await uploadFile({ reference: title.replace(' ', '_'), file, onProgress });
+        const imageUrl = await uploadFile({ reference: title.replace(/ /g, '_'), file, onProgress });
         if (!imageUrl) {
             throw new Error("Issue uploading new file");
         }
 
         // update doc with new file url
         try {
-            await editDoc({ id, title, description, price, tags, imageUrl, series, seriesOrder, stripePriceId, stripeProductId });
+            await editDoc({ id, title, description, price, tags, imageUrl, series, itemOrder, stripePriceId, stripeProductId });
         } catch (error) {
             throw new Error("Issue updating document: " + error);
         }

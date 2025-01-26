@@ -17,7 +17,8 @@ export default function AdminButtons({ handleEdit, addProduct, addPhotoToSeries,
     function handleAddProduct() {
         setProduct({
             series: "",
-            seriesOrder: 0,
+            itemName: "",
+            itemOrder: 0,
             price: 0,
             description: "",
             imageUrl: "",
@@ -31,7 +32,7 @@ export default function AdminButtons({ handleEdit, addProduct, addPhotoToSeries,
     }
 
     return (
-        <div className="flex justify-center items-center w-full h-full p-2 gap-4">
+        <div className="flex justify-center items-center w-full p-2 gap-4">
             {addProduct && <AdminButtonWrapper onclickFunction={handleAddProduct} content={"Add Product"} />}
             {handleEdit && <AdminButtonWrapper onclickFunction={handleEdit} content={"Edit"} />}
             {addPhotoToSeries && <AdminButtonWrapper onclickFunction={addPhotoToSeries} content={"SERIES"} />}

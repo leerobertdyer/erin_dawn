@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { IProductInfo } from '../Interfaces/IProduct';
 import removeProduct from '../firebase/removeProduct';
-import removeFile from '../firebase/removeFile';
+import { removeFile } from '../firebase/removeFile';
 import { getPhoto } from '../firebase/getPhotos';
 
 export function useProductManagement() {
@@ -35,7 +35,8 @@ export function useProductManagement() {
             imageUrl: photoData.imageUrl,
             id: id,
             series: photoData.series,
-            seriesOrder: photoData.seriesOrder,
+            itemName: photoData.itemName,
+            itemOrder: photoData.itemOrder,
             stripePriceId: photoData.stripePriceId,
             stripeProductId: photoData.stripeProductId
         };
@@ -50,17 +51,19 @@ export function useProductManagement() {
         const success = await removeProduct({ url, id });
         setIsEditing(false);
         
-        if (!success) {
-            try {
+        if (!success) { 
+            try { // TODO remove this trycatch after development to avoid data mismanagement
                 await removeFile({ url });
                 await removeProduct({ url, id });
             } catch (error) {
                 console.error("Error in cleanup:", error);
                 return false;
             }
+            return false;
         }
         return true;
     };
+
 
     const handleBack = () => {
         setIsBatchEdit(false);

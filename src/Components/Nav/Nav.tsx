@@ -4,12 +4,14 @@ import { Link, useLocation } from "react-router";
 import { User } from "firebase/auth";
 import CartIconAndNumber from "../cartIconAndNumber/CartIconAndNumber";
 import { useProductManagementContext } from "../../Context/ProductMgmtContext";
+import { GiHandBag } from "react-icons/gi";
 
 interface INav {
     u: User | null
 }
 export default function Nav({ u }: INav) {
     const { cartProducts } = useProductManagementContext();
+    
     const cartLength = cartProducts.length;
     const [isOpen, setIsOpen] = useState(false);
     const [iconSize, setIconSize] = useState(60)
@@ -94,9 +96,14 @@ export default function Nav({ u }: INav) {
                     className="
                 hover:cursor-pointer
                 border-2 border-black rounded-md" />
-                <a href="https://www.instagram.com/erindawn_campbell" target="_blank" >
+                <a href="https://www.instagram.com/erindawn_campbell" target="_blank" className="w-[3.5rem] flex justify-center" >
                     <IoLogoInstagram size={iconSize} /></a>
-                <CartIconAndNumber cartLength={cartLength} iconSize={iconSize} />
+              {cartLength > 0 
+                ? <div className="w-[3.5rem] flex justify-center"><CartIconAndNumber cartLength={cartLength} iconSize={iconSize} /></div>
+                : <Link to="/shop" className="w-[3.5rem] flex justify-center">
+                    <GiHandBag  size={iconSize} />
+                    </Link>
+            }  
                 <div className="text-right">
                     <Link to="/">
                         <h1 className="font-retro text-[1.25rem] md:text-[2.5rem] m-0 p-0">ERIn DaWn cAmPbELl</h1>

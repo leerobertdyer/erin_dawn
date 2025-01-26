@@ -42,17 +42,17 @@ export default function Shop({ u }: IShop) {
         const groupedPhotos: IProductInfo[][] = []
         const photoMap: { [key: string]: IProductInfo[] } = {};
         nextInventory.forEach(photo => {
-            const key = photo.series ?? "uncategorized";
+            const key = photo.itemName ?? "uncategorized";
             if (!photoMap[key]) {
                 photoMap[key] = [];
             }
             photoMap[key].push(photo);
-            photoMap[key].sort((a, b) => (a.seriesOrder ?? 0) - (b.seriesOrder ?? 0))
+            photoMap[key].sort((a, b) => (a.itemOrder ?? 0) - (b.itemOrder ?? 0))
         })
         for (const key in photoMap) {
             groupedPhotos.push(photoMap[key]);
         }
-        if (u) groupedPhotos.push([{ id: "new", title: "New Product", description: "Add a new product to the inventory", imageUrl: "images/card.jpg", price: 0, series: "uncategorized", tags: ["inventory"], stripePriceId: "", stripeProductId: "", order: -10 }])
+        if (u) groupedPhotos.push([{ id: "new", itemName: "card", title: "New Product", description: "Add a new product to the inventory", imageUrl: "images/card.jpg", price: 0, series: "uncategorized", tags: ["inventory"], stripePriceId: "", stripeProductId: "", order: -10 }])
         setInventory(groupedPhotos.sort((a, b) => (a[0].order ?? 0) - (b[0].order ?? 0))) // TODO: Apply order to all products to place them in desired page area
         if (groupedPhotos.length > 0) setIsLoading(false)
     }, [u, allPhotos])
@@ -89,27 +89,28 @@ export default function Shop({ u }: IShop) {
             {inventory.length > 0 && inventory.map((series, index) => (
                 <div key={index}
                     className="
-                    h-[100vh] w-[90vw] 
+                    h-[100vh] w-[90vw]  max-h-[37rem] max-w-[27rem] overflow-hidden 
                     md:h-[70vh] md:w-[45vw]
                     flex mb-[1rem]">
-                    <Frame > 
+                    <Frame >
                         {series.length === 1
                             ? u && series[0].id === "new" ?
                                 <div className="flex flex-col justify-between items-center h-full w-full">
-                                    <div className="w-full h-[50%]">
-
-                                    <img src="/images/card.jpg" alt="Add a new product" className="w-full h-full rounded-md object-contain object-center" />
+                                    <div className="w-full h-[75%] overflow-hidden rounded-md">
+                                        <img src="/images/card.jpg" alt="Add a new product" className="w-full h-full object-contain object-center" />
                                     </div>
                                     Add New Product
                                     <AdminButtons addProduct={true} />
                                 </div>
                                 :
-                                <>
-                                    <img src={series[0].imageUrl} alt={series[0].title} className="rounded-md h-full object-cover object-center" />
-                                    {u && series[0].series && <AdminButtons addPhotoToSeries={() => handleAddPhotoToSeries(series[0])} handleEdit={() => handleEdit(series[0].id)} />}
-                                    <ShoppingButtons product={series[0]} handleDetails={() => handleClickProductDetails(index)} />
-                                </>
-                            : <Carousel photos={series.map(photo => ({ id: photo.id, url: photo.imageUrl, title: photo.title, seriesOrder: photo.seriesOrder ?? 0 }))} >
+                                <div className="flex flex-col justify-between items-center h-full w-full">
+                                    <div className="w-full h-[65%] rounded-md overflow-hidden">
+                                        <img src={series[0].imageUrl} alt={series[0].title} className="h-full w-full object-cover object-center" />
+                                    </div>
+                                        {u && series[0].series && <AdminButtons addPhotoToSeries={() => handleAddPhotoToSeries(series[0])} handleEdit={() => handleEdit(series[0].id)} />}
+                                        <ShoppingButtons product={series[0]} handleDetails={() => handleClickProductDetails(index)} />
+                                </div>
+                            : <Carousel photos={series.map(photo => ({ id: photo.id, url: photo.imageUrl, title: photo.title, itemOrder: photo.itemOrder ?? 0 }))} >
                                 {u && <AdminButtons
                                     addPhotoToSeries={() => handleAddPhotoToSeries(series[0])}
                                     handleEdit={() => handleBatchEdit(index)} />}

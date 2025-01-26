@@ -17,7 +17,6 @@ export interface ICategory {
 
     const doc = querySnapshot.docs[0];
     const data = doc.data();
-    console.log(data.categories)
     const categories = data.categories || [];
 
     return categories;

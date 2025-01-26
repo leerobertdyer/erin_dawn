@@ -3,7 +3,7 @@ import { getCategories, ICategory } from "../../firebase/getProductInfo";
 import CustomInput from "../CustomInput/CustomInput";
 import { IoIosCamera } from "react-icons/io";
 import uploadFile from "../../firebase/uploadFile";
-import newDoc from "../../firebase/newDoc";
+import { newDoc, addNewCategory, addNewSeries } from "../../firebase/newDoc";
 import { createStripeProduct } from "../../Stripe/newStripe";
 import { usePhotosContext } from "../../Context/PhotosContext";
 import LoadingBar from "../LoadingBar/LoadingBar";
@@ -81,22 +81,30 @@ export default function NewProductForm() {
         setProgress(percent)
     }
 
-    function handleNewCategory() {
-        // Add category to db
-        console.log('adding new category to db...')
+    async function handleNewCategory() {
+        // Add new category to db
+        const success = await addNewCategory({ category: newCategoryName, series: newSeriesName })
+        if (success) console.log('Category added successfully')
+        else throw new Error("Error adding new category")
     }
 
-    function handleNewSeries() {
+    async function handleNewSeries() {
         // Add series to db
+        console.log("newCategoryName: ", newCategoryName)
+        console.log("category: ", category)
+        console.log(newCategoryName ?? category)
+        const success = await addNewSeries({ category: newCategoryName.length > 0 ? newCategoryName : category, series: newSeriesName })
+        if (success) console.log('Series added successfully')
+        else throw new Error("Error adding new series")
         console.log('adding new series to db...')
     }
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        if (newCategoryName && newSeriesName) {
-            handleNewSeries();
-            handleNewCategory();
-        }
+        if (!file) return;
+
+        if (newCategoryName.length > 0) await handleNewCategory();
+        if (newSeriesName.length > 0 && newCategoryName === newCategorySelector.name) await handleNewSeries();
 
         const fileToUpload = {
             reference: `${title.replace(/ /g, "_")}`,
@@ -117,9 +125,11 @@ export default function NewProductForm() {
             title: title.replace(/ /g, "_"),
             description,
             price: Number(price),
-            tags,
-            series,
-            seriesOrder: 1, // new product is always first in series
+            category: newCategoryName !== newCategorySelector.name ? newCategoryName : category,    
+            tags: newCategoryName !== newCategorySelector.name ? ["edc", "mainPage", "inventory"] : tags,
+            series: series === newSeries ? newSeriesName : series,
+            itemName: title.replace(/ /g, "_"),
+            itemOrder: 1, // new product is always first in series
             stripeProductId,
             stripePriceId,
         })
@@ -131,10 +141,12 @@ export default function NewProductForm() {
             imageUrl: downloadUrl,
             title,
             description,
+            category: newCategoryName !== newCategorySelector.name ? newCategoryName : category,
             price: Number(price),
-            tags,
-            series,
-            seriesOrder: 1, // new product is always first in series
+            tags: newCategoryName !== newCategorySelector.name ? ["edc", "mainPage", "inventory"] : tags,
+            series: series === newSeries ? newSeriesName : series,
+            itemName: title.replace(/ /g, "_"),
+            itemOrder: 1, // new product is always first in series
             stripeProductId,
             stripePriceId,
         }]
@@ -193,7 +205,12 @@ export default function NewProductForm() {
                                     <label htmlFor="fileInput" className="w-full bg-gray-200 p-2 rounded-md text-center cursor-pointer flex justify-center items-center gap-4 border-2 border-edcPurple-60">Select Photo<IoIosCamera /></label>
                                     <input id="fileInput" hidden onChange={(e) => handleFileChange(e, setFile, setBackground)} type="file" required={true} />
                                 </>}
-                            {file && <button type="submit" className="bg-black text-white p-2 rounded-md w-full">Add Product</button>}
+                            {file && <button type="submit"
+                                className="
+                                    bg-edcPurple-60 text-white 
+                                    hover:bg-yellow-500 hover:text-edcPurple-60 
+                                    rounded-md p-2 w-full">
+                                Submit</button>}
                         </>}
                 </>}
                 {progress > 0 && <LoadingBar progress={progress} />}

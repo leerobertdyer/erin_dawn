@@ -4,7 +4,7 @@ import { useProductManagementContext } from "../../Context/ProductMgmtContext";
 import { IoIosCamera } from "react-icons/io";
 import MainFormTemplate from "./MainFormTemplate";
 import uploadFile from "../../firebase/uploadFile";
-import newDoc from "../../firebase/newDoc";
+import { newDoc } from "../../firebase/newDoc";
 import LoadingBar from "../LoadingBar/LoadingBar";
 import { useNavigate } from "react-router-dom";
 import { usePhotosContext } from "../../Context/PhotosContext";
@@ -32,8 +32,8 @@ export default function NewSeriesPhotoForm() {
         e.preventDefault();
         if (!product) return;
 
-        const nextIndex = allPhotos.filter(photo => photo.series === product.series).length + 1
-        console.log("Current Series Length: ", nextIndex)
+        const nextIndex = allPhotos.filter(photo => photo.itemName === product.itemName).length + 1
+        console.log("Next photo in item array will have itemNumber: ", nextIndex)
 
         const newTitle = `${product.title.replace(/ /g, "_")}${(nextIndex + 1).toString()}`
         console.log("New Title: ", newTitle)
@@ -56,7 +56,8 @@ export default function NewSeriesPhotoForm() {
             price: product.price,
             tags: product.tags,
             series: product.series!,
-            seriesOrder: nextIndex, // new product is always first in series
+            itemName: product.itemName,
+            itemOrder: nextIndex, 
             stripeProductId: product.stripeProductId!,
             stripePriceId: product.stripeProductId!,
         })
@@ -71,7 +72,8 @@ export default function NewSeriesPhotoForm() {
             price: product.price,
             tags: product.tags,
             series: product.series!,
-            seriesOrder: nextIndex, // new product is always first in series
+            itemName: product.itemName,
+            itemOrder: nextIndex, // new product is always first in series
             stripeProductId: product.stripeProductId!,
             stripePriceId: product.stripeProductId!,
         }]
@@ -111,8 +113,12 @@ export default function NewSeriesPhotoForm() {
                         {file ? <p className="text-center w-full m-auto py-1 px-2 rounded-md text-xs text-gray-400 bg-white">{file.name}</p> : <p className="text-xs text-gray-400">No file selected</p>}
                     </div>
 
-                    <button type="submit"
-                        className="p-2 rounded-md text-white bg-edcPurple-60 w-[15rem] mb-4">Submit</button>
+                    <button type="submit" 
+                    className="
+                        bg-edcPurple-60 text-white 
+                        hover:bg-yellow-500 hover:text-edcPurple-60 
+                        rounded-md p-2 w-full">
+                        Submit</button>
 
                 </MainFormTemplate>
 

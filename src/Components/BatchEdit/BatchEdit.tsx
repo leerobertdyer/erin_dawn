@@ -24,8 +24,19 @@ export default function BatchEdit({ products, handleBack }: IBatchEdit) {
     }
 
     function onFinalDelete(product: IProductInfo) {
-        handleSetAllPhotos(allPhotos.filter((photo) => photo.id !== product.id))
-        handleDelete(product.imageUrl, product.id);
+        if (product.itemOrder === 1) {
+            const itemName = product.itemName;
+            const itemPhotos = allPhotos.filter((photo) => photo.itemName === itemName);
+            console.log('deleteing all photos in series', itemPhotos);
+            itemPhotos.forEach(async (photo) => {
+                 handleDelete(photo.imageUrl, photo.id);
+            });
+        handleSetAllPhotos(allPhotos.filter((photo) => photo.itemName !== product.itemName))
+        
+        } else{
+            handleSetAllPhotos(allPhotos.filter((photo) => photo.id !== product.id))
+            handleDelete(product.imageUrl, product.id);
+        }
         setIsDeleting(false);
         setIsBatchEdit(false);
     }
@@ -34,7 +45,7 @@ export default function BatchEdit({ products, handleBack }: IBatchEdit) {
         <WarningDialogue
         onYes={() => onFinalDelete(currentProduct!)}
         closeDialogue={() => setIsDeleting(false)}
-        message={currentProduct?.seriesOrder === 1 
+        message={currentProduct?.itemOrder === 1 
             ? "This is the main photo deleting this will delete all photos in the series. Is that ok?" 
             : "This will remove this photo from your series. Is that ok?"}        />
     )
@@ -45,7 +56,7 @@ export default function BatchEdit({ products, handleBack }: IBatchEdit) {
                 {products.map((product) =>
                     <Frame key={product.id} additionalClass="w-[15rem]">
                         <img src={product.imageUrl} id={product.id} className="rounded-md"/>
-                        {product.seriesOrder === 1
+                        {product.itemOrder === 1
                         ? <AdminButtons  onDelete={() => onClickDelete(product)}/>
                         : <AdminButtons removePhotoFromSeries={() => onClickDelete(product)} handleEdit={() => handleEdit(product.id)} />
                         }
