@@ -9,7 +9,7 @@ import editFile  from "../../firebase/editfile";
 import editDoc from "../../firebase/editDoc";
 
 export default function EditHeroForm() {
-    const { product, isEditing, handleEdit, previousUrl, handleBack } = useProductManagementContext();
+    const { product, isEditing, previousUrl, handleBack } = useProductManagementContext();
     const { allPhotos, handleSetAllPhotos } = usePhotosContext();
     const navigate = useNavigate();
 
@@ -52,7 +52,7 @@ export default function EditHeroForm() {
             stripePriceId: "na",
         })
 
-        const nextPhotos = handleSetAllPhotos(allPhotos.map(photo => {
+        handleSetAllPhotos(allPhotos.map(photo => {
             if (photo.id === product.id) {
                 return {
                     ...photo,

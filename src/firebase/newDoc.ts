@@ -1,7 +1,5 @@
 import { addDoc, collection, DocumentReference, getDocs, updateDoc } from "firebase/firestore";
 import { db } from "./firebaseConfig";
-import editDoc from "./editDoc";
-
 
 interface INewDoc {
   downloadUrl: string;

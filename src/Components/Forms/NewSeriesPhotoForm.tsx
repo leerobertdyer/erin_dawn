@@ -54,6 +54,7 @@ export default function NewSeriesPhotoForm() {
             title: newTitle,
             description: product.description,
             price: product.price,
+            category: product.category ?? "uncategorized",
             tags: product.tags,
             series: product.series!,
             itemName: product.itemName,
