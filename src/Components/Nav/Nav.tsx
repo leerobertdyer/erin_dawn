@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { IoIosMenu, IoLogoInstagram } from "react-icons/io";
 import { Link, useLocation } from "react-router";
 import { User } from "firebase/auth";
@@ -18,6 +18,7 @@ export default function Nav({ u }: INav) {
     const path = location.pathname
 
     //TODO: update menu so that it slowly accordsions open and closed for both mobile and desktop
+    const menuRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const handleResize = () => {
@@ -37,9 +38,20 @@ export default function Nav({ u }: INav) {
         };
     }, []);
 
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (menuRef.current && !menuRef.current.contains(event.target as Node)) setIsOpen(false);
+        };
+        if (isOpen) document.addEventListener('mousedown', handleClickOutside);
+        else document.removeEventListener('mousedown', handleClickOutside);
+
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+
+    }, [isOpen])
+
     return (
         <>
-            {isOpen && <div className="
+            {isOpen && <div ref={menuRef} className="
             w-full h-[35vh] md:w-[40vh] md:h-full
             bg-white
             border-b-2 border-black border-r-2
@@ -47,28 +59,28 @@ export default function Nav({ u }: INav) {
             text-[1rem] md:text-[2rem]
             flex flex-col justify-center md:justify-between items-center gap-2 md:gap-0">
                 {!isSmallScreen && <IoIosMenu size={iconSize - 5} className="hover: cursor-pointer w-full h-20"
-                 onClick={() => setIsOpen(false)}  />}
-                 <div className="flex flex-col h-full w-full justify-center items-center gap-4 border-y-2 border-black">
-                <Link to="/"
-                    className={`text-center select-none ${path === "/" ? "w-full bg-edcBlue-20" : ""} `}
-                    onClick={() => setIsOpen(false)}
-                >Home</Link>
-                <Link to="/shop"
-                    className={`text-center select-none ${path === "/shop" ? "w-full bg-edcBlue-20" : ""} `}
-                    onClick={() => setIsOpen(false)}
-                >Shop</Link>
-                <Link to="/about"
-                    className={`text-center select-none ${path === "/about" ? "w-full bg-edcBlue-20" : ""} `}
-                    onClick={() => setIsOpen(false)}>
-                    About</Link>
-                <Link to="/cart" className={`text-center select-none ${path === "/cart" ? "w-full bg-edcBlue-20" : ""} `}
-                    onClick={() => setIsOpen(false)}>
-                    Cart</Link>
-                {u && <Link to="/admin"
-                    className={`text-center select-none ${path === "/admin" ? "w-full bg-edcBlue-20" : ""} `}
-                    onClick={() => setIsOpen(false)}>
-                    Admin</Link>}
-                    </div>
+                    onClick={() => setIsOpen(false)} />}
+                <div className="flex flex-col h-full w-full justify-center items-center gap-4 border-y-2 border-black">
+                    <Link to="/"
+                        className={`text-center select-none ${path === "/" ? "w-full bg-edcBlue-20" : ""} `}
+                        onClick={() => setIsOpen(false)}
+                    >Home</Link>
+                    <Link to="/shop"
+                        className={`text-center select-none ${path === "/shop" ? "w-full bg-edcBlue-20" : ""} `}
+                        onClick={() => setIsOpen(false)}
+                    >Shop</Link>
+                    <Link to="/about"
+                        className={`text-center select-none ${path === "/about" ? "w-full bg-edcBlue-20" : ""} `}
+                        onClick={() => setIsOpen(false)}>
+                        About</Link>
+                    <Link to="/cart" className={`text-center select-none ${path === "/cart" ? "w-full bg-edcBlue-20" : ""} `}
+                        onClick={() => setIsOpen(false)}>
+                        Cart</Link>
+                    {u && <Link to="/admin"
+                        className={`text-center select-none ${path === "/admin" ? "w-full bg-edcBlue-20" : ""} `}
+                        onClick={() => setIsOpen(false)}>
+                        Admin</Link>}
+                </div>
             </div>
             }
 

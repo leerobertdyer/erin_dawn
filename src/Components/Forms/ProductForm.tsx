@@ -4,10 +4,11 @@ import editFile from "../../firebase/editfile";
 import newDoc from "../../firebase/newDoc";
 import { IoIosArrowBack, IoIosRefresh, IoIosTrash } from "react-icons/io";
 import editDoc from "../../firebase/editDoc";
-import Info from "../Info/Info";
 import { useProductManagementContext } from "../../Context/ProductMgmtContext";
 import { usePhotosContext } from "../../Context/PhotosContext";
 import { useLocation } from "react-router-dom";
+
+// TODO: REMOVE THIS FORM COMPLETELY...
 
 export default function ProductForm() {
     const { product, isEditing, setIsEditing, handleDelete } = useProductManagementContext();
@@ -51,17 +52,15 @@ export default function ProductForm() {
 
     useEffect(() => {
         if (isEditing) {
-            if (!isInventory && product && isEditing) {
-                if (product.title !== title || product.description !== description || file) {
-                    setDisabled(false);
-                }
+            if (!isInventory && product) {
+                // if it is not inventory and there is a product to edit, we only check title description or file for changes.
+                setDisabled((product.title !== title || product.description !== description || file) ? false : true);
+            }   // otherwise we need all the information to be filled out.
+            else {
+                setDisabled((title && description && tags.length > 0 && price && price >= 0) ? false : true);
             }
-            else if (title && description && tags.length > 0 && price && price >= 0) {
-                setDisabled(false);
-            } else {
-                setDisabled(true);
-            }
-        } else {
+        }
+        if (!isEditing) {
             if (title && description && tags.length > 0 && price && price >= 0 && file) {
                 setDisabled(false);
             } else {
@@ -147,7 +146,7 @@ export default function ProductForm() {
         if (!file && !isEditing) return // On new products a file is required
 
         const fileToUpload = {
-            reference: `photos/${title.replace(" ", "_")}`,
+            reference: `photos/${title.replace(/ /g, "_")}`,
             title: title,
             description: description,
             tags: tags,
@@ -159,10 +158,10 @@ export default function ProductForm() {
         }
 
         // Set download url based on editing vs new upload
-        let downloadURL = null;
+        let downloadUrl = null;
         if (isEditing && product && file) { // if image included use editFile()
             console.log("Editing product with new image")
-            downloadURL = await editFile({
+            downloadUrl = await editFile({
                 id: product.id,
                 title: title,
                 description: description,
@@ -173,38 +172,43 @@ export default function ProductForm() {
                 series: series,
                 seriesOrder: seriesOrder,
                 onProgress: onProgress,
+                stripePriceId: product.stripePriceId,
+                stripeProductId: product.stripeProductId
             })
         } else if (isEditing && product) { // Otherwise we use the current url and editDoc()
             console.log("Editing product without changing image")
-            downloadURL = product.imageUrl
+            downloadUrl = product.imageUrl
             const { stripeProductId, stripePriceId } = await editStripeProduct()
-            await editDoc({ id: product.id, title, description, tags, price, series, seriesOrder, imageUrl: downloadURL, stripeProductId, stripePriceId })
+            await editDoc({ id: product.id, title, description, tags, price, series, seriesOrder, imageUrl: downloadUrl, stripeProductId, stripePriceId })
         }
         else {
             console.log("Uploading new product")
-            downloadURL = await uploadFile(fileToUpload)
+            downloadUrl = await uploadFile(fileToUpload)
         }
 
-        // Handle success or error dependant on downloadURLd
-        if (downloadURL) {
-            console.log("Product uploaded successfully: ", downloadURL)
+        // Handle success or error dependant on downloadUrld
+        if (downloadUrl) {
+            console.log("Product uploaded successfully: ", downloadUrl)
 
-            // Update the db with new url, if necessary
+            // Update the db with new url for new products
             if (!isEditing) {
                 const { stripeProductId, stripePriceId } = await createStripeProduct()
-                newDoc({ ...fileToUpload, downloadURL, series: series ?? "", seriesOrder: seriesOrder ?? 1, stripeProductId, stripePriceId })
+                const newId = await newDoc({ ...fileToUpload, downloadUrl, series: series ?? "", seriesOrder: seriesOrder ?? 1, stripeProductId, stripePriceId })
+                handleSetAllPhotos([...allPhotos, { imageUrl: downloadUrl, title, description, tags, price, series, seriesOrder, id: newId ?? "", stripePriceId, stripeProductId }])
             }
 
             // update UI to show updated product
             if (product) {
                 console.log('updating product in allPhotos')
                 const updatedPhotos = allPhotos.map((photo) =>
-                    photo.id === product.id ? { ...photo, imageUrl: downloadURL, title, description, tags, price, series, seriesOrder } : photo
+                    photo.id === product.id ? { ...photo, imageUrl: downloadUrl, title, description, tags, price, series, seriesOrder } : photo
                 );
                 handleSetAllPhotos(updatedPhotos)
             }
+
             resetState();
             setIsEditing(false);
+
 
             // TODO: show success message with image and option to edit...
         }
@@ -245,7 +249,7 @@ export default function ProductForm() {
                 className="bg-white flex flex-col justify-center m-auto items-center w-[85vw] border-2 border-black rounded-md p-4 mt-4 gap-4"
                 style={{ backgroundImage: `url(${background})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
 
-                <h2 className="text-2xl p-2 rounded-md bg-white">Add Product</h2>
+                <h2 className="text-2xl p-2 rounded-md bg-white">{isEditing ? "Edit Product" : "Add Product"}</h2>
 
                 <div className="flex flex-col w-[80%] justify-between items-center">
                     <label className="text-xs p-1 rounded-t-md w-[10rem] text-center bg-white">Product Name</label>
@@ -257,7 +261,7 @@ export default function ProductForm() {
                     <div className="w-[80%] relative">
                         <input type="text" placeholder="Product Description" value={description}
                             className=" border-2 border-black rounded-md p-2 w-full" onChange={(e) => setDescription(e.target.value)} />
-                        <Info information="Product Description. This is displayed when user clicks 'more info' on any product." />
+                        {/* <Info information="Product Description. This is displayed when user clicks 'Details' on any product." /> */}
                     </div>
                 }
 
@@ -268,7 +272,7 @@ export default function ProductForm() {
                             <div className="w-full relative">
                                 <input type="text" placeholder="Product Tags" value={nextTag}
                                     className=" border-2 border-black rounded-md p-2 w-[100%]" onChange={(e) => setNextTag(e.target.value.trim())} />
-                                <Info information="Product Tags. These are used to group products together. 'hero' adds this to the top of the main page, 'inventory' makes this appear in the store! 'vintage' updates the 'Embellished Vintage' category, and 'handmade' updates the 'Hand-Made Originals' category" />
+                                {/* <Info information="Product Tags. These are used to group products together. 'hero' adds this to the top of the main page, 'inventory' makes this appear in the store! 'vintage' updates the 'Embellished Vintage' category, and 'handmade' updates the 'Hand-Made Originals' category" /> */}
                             </div>
 
                             <div className="w-full flex flex-wrap justify-start items-start">
@@ -291,7 +295,7 @@ export default function ProductForm() {
                         </div>
 
                         <div className="w-[80%] flex relative">
-                            <Info information="Product Series are used to group products together. Series Order is used to determine the order in which products are displayed in a series." />
+                            {/* <Info information="Product Series are used to group products together. Series Order is used to determine the order in which products are displayed in a series." /> */}
                             <input placeholder="Product Series" value={series} className=" border-2 border-black rounded-md p-2 w-[60%] inline" onChange={(e) => setSeries(e.target.value)} />
                             <div className="w-[40%] relative">
                                 <input value={seriesOrder} type="number" min={1} step="1" className="border-2 border-black rounded-md p-2 w-full z-4" onChange={(e) => setSeriesOrder(parseInt(e.target.value))} />

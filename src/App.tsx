@@ -12,6 +12,10 @@ import Cart from './Views/Cart/Cart'
 import { ProductManagementProvider } from './Context/ProductMgmtContext'
 import { PhotosProvider } from './Context/PhotosContext'
 import PurchaseSuccess from './Views/PurchaseSuccess/PurchaseSuccess'
+import NewProductForm from './Components/Forms/NewProductForm'
+import EditProductForm from './Components/Forms/EditProductForm'
+import EditHeroForm from './Components/Forms/EditHeroForm'
+import NewSeriesPhotoForm from './Components/Forms/NewSeriesPhotoForm'
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -42,6 +46,10 @@ function App() {
             <Route path="/cart/cancel" element={<Cart/>} />
             <Route path="/about" element={<About />} />
             <Route path="/admin" element={<Admin u={user} setUser={setUser} />} />
+            <Route path="/add-product" element={<NewProductForm />} />
+            <Route path="/edit-product" element={<EditProductForm />} />
+            <Route path="/add-series-photo" element={<NewSeriesPhotoForm />} />
+            <Route path="/edit-hero" element={<EditHeroForm />} />
           </Routes>
         </Router>
       </PhotosProvider>

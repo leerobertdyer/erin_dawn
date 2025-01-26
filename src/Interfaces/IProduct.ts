@@ -10,4 +10,5 @@ export interface IProductInfo {
     seriesOrder?: number;
     stripePriceId: string;
     stripeProductId: string;
+    category?: string;
 }

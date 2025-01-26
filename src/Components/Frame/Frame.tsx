@@ -18,7 +18,7 @@ export default function Frame({ additionalClass, hover, spin, children }: IFrame
                         flex justify-center items-center 
                         bg-white p-2 
                         border-2 border-black h-full">
-                <div className="flex flex-col justify-between items-center h-full">
+                <div className="flex flex-col justify-between items-center h-full w-full">
                     {children}
                 </div>
             </div>

@@ -4,17 +4,17 @@ import Hero from "../../Components/Hero/Hero";
 import Main from "../../Components/Main/Main";
 import HeroPhotos from "../../Components/HeroPhotos/HeroPhotos";
 import { useProductManagementContext } from "../../Context/ProductMgmtContext";
-import ProductForm from "../../Components/ProductForm/ProductForm";
-
+import { useEffect } from "react";
 
 interface IHome {
     u: User | null
 }
 export function Home({ u }: IHome) {
-    const { isEditing } = useProductManagementContext();
+    const { setIsEditing } = useProductManagementContext();
+    useEffect(() => {
+        setIsEditing(false)
+    }, [])
 
-    if (isEditing) return <ProductForm />
-    
     return (
         <>
             <BackgroundDiv image="images/background.jpg">
@@ -23,7 +23,7 @@ export function Home({ u }: IHome) {
                 </Hero>
             </BackgroundDiv>
             <BackgroundDiv image="images/background.jpg">
-                <Main u={u}/>
+                <Main u={u} />
             </BackgroundDiv>
         </>
     )

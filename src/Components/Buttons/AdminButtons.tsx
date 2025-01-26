@@ -1,12 +1,16 @@
 import { useNavigate } from "react-router-dom"
 import { useProductManagementContext } from "../../Context/ProductMgmtContext";
+import AdminButtonWrapper from "./AdminButtonWrapper";
 
 interface IAdminButtons {
     handleEdit?: () => void
     addProduct?: boolean
+    addPhotoToSeries?: () => void
+    removePhotoFromSeries?: () => void
+    onDelete? : () => void
 }
 
-export default function AdminButtons({ handleEdit, addProduct }: IAdminButtons) {
+export default function AdminButtons({ handleEdit, addProduct, addPhotoToSeries, removePhotoFromSeries, onDelete }: IAdminButtons) {
     const { setProduct } = useProductManagementContext();
     const navigate = useNavigate();
 
@@ -23,19 +27,16 @@ export default function AdminButtons({ handleEdit, addProduct }: IAdminButtons) 
             stripePriceId: "",
             stripeProductId: ""
         })
-        navigate('/admin')
+        navigate('/add-product')
     }
+
     return (
-        <div className="flex justify-center items-center w-full p-2 gap-4">
-            <button
-                className="
-                            transition:all duration-[10ms]
-                            hover:bg-yellow-500 hover:text-black
-                            bg-edcPurple-60 text-white px-2 rounded-md w-[100%]"
-                onClick={
-                    addProduct ? () => handleAddProduct() : handleEdit}>
-                {addProduct ? "Add" : "Edit"}
-            </button>
+        <div className="flex justify-center items-center w-full h-full p-2 gap-4">
+            {addProduct && <AdminButtonWrapper onclickFunction={handleAddProduct} content={"Add Product"} />}
+            {handleEdit && <AdminButtonWrapper onclickFunction={handleEdit} content={"Edit"} />}
+            {addPhotoToSeries && <AdminButtonWrapper onclickFunction={addPhotoToSeries} content={"SERIES"} />}
+            {removePhotoFromSeries && <AdminButtonWrapper onclickFunction={removePhotoFromSeries} content={"REMOVE"} />}
+            {onDelete && <AdminButtonWrapper onclickFunction={onDelete} content={"DELETE"} />}
         </div>
     )
 }

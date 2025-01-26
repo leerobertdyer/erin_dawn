@@ -15,12 +15,14 @@ interface ProductManagementContextType {
     handleEdit: (id: string) => void;
     handleDelete: (url: string, id: string) => void;
     handleBack: () => void;
+    previousUrl: string;
+    setPreviousUrl: (url: string) => void;
     }
 
 const defaultValue: ProductManagementContextType = {
     isEditing: false,
-    setIsEditing: (isEditing: boolean) => {console.log(isEditing)},
-    setIsBatchEdit: (isBatchEdit: boolean) => {console.log(isBatchEdit)},
+    setIsEditing: () => {},
+    setIsBatchEdit: () => {},
     isBatchEdit: false,
     product: null,
     setProduct: () => {},
@@ -28,6 +30,8 @@ const defaultValue: ProductManagementContextType = {
     handleEdit: () => {},
     handleDelete: () => {},
     handleBack: () => {},
+    previousUrl: '/',
+    setPreviousUrl: () => {},
 };
 
 const ProductManagementContext = createContext<ProductManagementContextType>(defaultValue);

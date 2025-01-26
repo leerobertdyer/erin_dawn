@@ -9,7 +9,10 @@ export function usePhotos() {
     });
     const [isLoading, setIsLoading] = useState(true);
 
-    const cacheTime = 1000 * 60 * 60 // 1 hour
+    const cacheTime = import.meta.env.VITE_ENV === "development"
+        ? 1000 // 1 second for testing
+        : 1000 * 60 * 60 // 1 hour
+
     useEffect(() => {
         async function fetchPhotos() {
             const resp = await getPhotos({ tags: ["edc"], shuffle: false });
@@ -30,7 +33,7 @@ export function usePhotos() {
         } else {
             setIsLoading(false);
         }
-    }, []);
+    }, [allPhotos]);
 
     function handleSetAllPhotos(photos: IProductInfo[]) {
         setAllPhotos(photos);

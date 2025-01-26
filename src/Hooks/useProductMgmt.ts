@@ -5,9 +5,11 @@ import removeFile from '../firebase/removeFile';
 import { getPhoto } from '../firebase/getPhotos';
 
 export function useProductManagement() {
+
     const [isEditing, setIsEditing] = useState(false);
     const [isBatchEdit, setIsBatchEdit] = useState(false);
     const [product, setProduct] = useState<IProductInfo | null>(null);
+    const [previousUrl, setPreviousUrl] = useState<string>('/');
     const [cartProducts, setCartProducts] = useState<IProductInfo[]>(() => {
         const savedProducts = localStorage.getItem('cartProducts');
         return savedProducts ? JSON.parse(savedProducts) : [];
@@ -22,9 +24,9 @@ export function useProductManagement() {
     }, [cartProducts])
 
     const handleEdit = async (id: string) => {
-        const photoData = await getPhoto({ id });
+        const photoData = await getPhoto({id});
+        console.log(photoData);
         setIsBatchEdit(false);
-        
         const productData = {
             title: photoData.title,
             description: photoData.description,
@@ -37,12 +39,12 @@ export function useProductManagement() {
             stripePriceId: photoData.stripePriceId,
             stripeProductId: photoData.stripeProductId
         };
-        
         setIsEditing(() => {
             setProduct(productData);
             return true;
         })
     };
+    
 
     const handleDelete = async (url: string, id: string) => {
         const success = await removeProduct({ url, id });
@@ -65,12 +67,12 @@ export function useProductManagement() {
         setIsEditing(false);
     }
 
-
     return {
         isEditing, setIsEditing,
         isBatchEdit, setIsBatchEdit,
         product, setProduct,
         cartProducts, setCartProducts,
+        previousUrl, setPreviousUrl,
         handleEdit,
         handleDelete,
         handleBack,

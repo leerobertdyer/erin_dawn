@@ -5,16 +5,33 @@ import { User } from "firebase/auth";
 import AdminButtons from "../Buttons/AdminButtons";
 import { useProductManagementContext } from "../../Context/ProductMgmtContext";
 import { usePhotosContext } from "../../Context/PhotosContext";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface IPhotos {
     u: User | null
 }
 export default function HeroPhotos({ u }: IPhotos) {
-    const { handleEdit, isEditing } = useProductManagementContext();
     const { allPhotos, isLoading, } = usePhotosContext();
     const photos = allPhotos.filter(photo => photo.tags.includes("hero"))
+    
+    const { isEditing, handleEdit, setPreviousUrl } = useProductManagementContext();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        setPreviousUrl(location.pathname)
+    }, [location])
+
+    useEffect(() => {
+        if (isEditing) {
+            navigate('/edit-hero');
+        } else {
+            navigate('/')
+        }
+    }, [isEditing, navigate]);
 
     //TODO: for the phone version, make the photos scrollable
+    //TODO: Update the handleEdit to navigate to the right form...
 
     if (isLoading) return (
         <div className="w-full h-[45vh] flex justify-center items-center">
@@ -23,10 +40,7 @@ export default function HeroPhotos({ u }: IPhotos) {
     )
 
     return (<>
-        <div className={`
-            w-[100vw] ${isEditing ? "h-fit" : "h-[45vh] overflow-hidden"} 
-            flex justify-center items-center
-            `}>
+        <div className="w-[100vw] h-[45vh] flex justify-center items-center">
             {photos.length > 0 &&
                 photos.map((photo, key) => {
                     return (

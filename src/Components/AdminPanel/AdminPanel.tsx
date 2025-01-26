@@ -1,7 +1,7 @@
 import { onAuthStateChanged, signOut } from "firebase/auth"
 import { auth } from "../../firebase/firebaseConfig";
 import { useEffect, useState } from "react";
-import ProductForm from "../ProductForm/ProductForm";
+import AddProductCard from "../AddProductCard/AddProductCard";
 
 export default function AdminPanel() {
     const [name, setName] = useState<string>("");
@@ -36,7 +36,10 @@ export default function AdminPanel() {
                         className="p-2 bg-rose-600 rounded-md text-white min-w-[10rem]">Log Out</button>
                 </div>
             </div>
-            <ProductForm />
+
+            <div className="w-[18rem] flex bg-white justify-center items-center gap-4 mt-4">
+            <AddProductCard />
+            </div>
         </div>
     )
 }

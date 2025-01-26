@@ -2,7 +2,7 @@ import { addDoc, collection, DocumentReference } from "firebase/firestore";
 import { db } from "./firebaseConfig";
 
 interface INewDoc {
-  downloadURL: string;
+  downloadUrl: string;
   title: string;
   description: string;
   price: number;
@@ -13,16 +13,17 @@ interface INewDoc {
   stripePriceId: string;
 }
 
-export default async function newDoc({ downloadURL, title, description, price, tags, series, seriesOrder, stripeProductId, stripePriceId }: INewDoc): Promise<string | null> {
+export default async function newDoc({ downloadUrl, title, description, price, tags, series, seriesOrder, stripeProductId, stripePriceId }: INewDoc): Promise<string | null> {
   try {
-    const docRef: DocumentReference = await addDoc(collection(db, "photos", title), {
-      imageUrl: downloadURL,
-      title: title,
-      description: description,
-      price: price,
-      tags: tags,
-      series: series,
-      seriesOrder: seriesOrder,
+    console.log("Adding document to firestore: ", title);
+    const docRef: DocumentReference = await addDoc(collection(db, "photos"), {
+      imageUrl: downloadUrl,
+      title,
+      description,
+      price,
+      tags,
+      series,
+      seriesOrder,
       createdAt: new Date(),
       stripeProductId, 
       stripePriceId
