@@ -8,6 +8,7 @@ import { newDoc } from "../../firebase/newDoc";
 import LoadingBar from "../LoadingBar/LoadingBar";
 import { useNavigate } from "react-router-dom";
 import { usePhotosContext } from "../../Context/PhotosContext";
+import { resizeFile } from "../../util/resizeFile";
 
 export default function NewSeriesPhotoForm() {
     const [background, setBackground] = useState("/images/background.jpg");
@@ -25,7 +26,7 @@ export default function NewSeriesPhotoForm() {
 
     useEffect(() => {
         if (!product) navigate("/shop")
-            console.log(product)
+        console.log(product)
     }, [])
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -35,12 +36,14 @@ export default function NewSeriesPhotoForm() {
         const nextIndex = allPhotos.filter(photo => photo.itemName === product.itemName).length + 1
         console.log("Next photo in item array will have itemNumber: ", nextIndex)
 
-        const newTitle = `${product.title.replace(/ /g, "_")}${(nextIndex + 1).toString()}`
+        const newTitle = `${product.title.replace(/ /g, "_")}${(nextIndex).toString()}`
         console.log("New Title: ", newTitle)
+
+        const rezisedFile = await resizeFile(file, 400, 600);
 
         const fileToUpload = {
             reference: newTitle,
-            file: file as File,
+            file: rezisedFile,
             onProgress: onProgress,
         }
 
@@ -54,11 +57,12 @@ export default function NewSeriesPhotoForm() {
             title: newTitle,
             description: product.description,
             price: product.price,
+            size: product.size,
             category: product.category ?? "uncategorized",
             tags: product.tags,
             series: product.series!,
             itemName: product.itemName,
-            itemOrder: nextIndex, 
+            itemOrder: nextIndex,
             stripeProductId: product.stripeProductId!,
             stripePriceId: product.stripeProductId!,
         })
@@ -71,6 +75,7 @@ export default function NewSeriesPhotoForm() {
             title: newTitle,
             description: product.description,
             price: product.price,
+            size: product.size,
             tags: product.tags,
             series: product.series!,
             itemName: product.itemName,
@@ -79,7 +84,7 @@ export default function NewSeriesPhotoForm() {
             stripePriceId: product.stripeProductId!,
         }]
         handleSetAllPhotos(updatedPhotos)
-        
+
         navigate("/shop")
 
     }
@@ -114,8 +119,8 @@ export default function NewSeriesPhotoForm() {
                         {file ? <p className="text-center w-full m-auto py-1 px-2 rounded-md text-xs text-gray-400 bg-white">{file.name}</p> : <p className="text-xs text-gray-400">No file selected</p>}
                     </div>
 
-                    <button type="submit" 
-                    className="
+                    <button type="submit"
+                        className="
                         bg-edcPurple-60 text-white 
                         hover:bg-yellow-500 hover:text-edcPurple-60 
                         rounded-md p-2 w-full">

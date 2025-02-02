@@ -1,4 +1,4 @@
-import { IoIosCamera, IoIosTrash } from "react-icons/io"
+import { IoIosArrowBack, IoIosArrowForward, IoIosCamera, IoIosKey, IoIosTrash } from "react-icons/io"
 
 interface ICustomAdminButton {
     onclickFunction: () => void
@@ -22,7 +22,20 @@ export default function AdminButtonWrapper({ onclickFunction, content }: ICustom
                     <div className="flex justify-center items-center gap-2">
                         <IoIosTrash />
                     </div>
-                    :  content }
+                    : content === "KEY"
+                        ? <div className="flex justify-center items-center gap-2">
+                            <IoIosKey />
+                        </div>
+                        : content === "LEFT"
+                            ? <div className="flex justify-center items-center gap-2">
+                                <IoIosArrowBack />
+                            </div>
+                            : content === "RIGHT"
+
+                                ? <div className="flex justify-center items-center gap-2">
+                                    <IoIosArrowForward />
+                                </div>
+                                : content}
 
         </button>)
 }

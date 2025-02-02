@@ -25,12 +25,12 @@ export function useProductManagement() {
 
     const handleEdit = async (id: string) => {
         const photoData = await getPhoto({id});
-        console.log(photoData);
         setIsBatchEdit(false);
         const productData = {
             title: photoData.title,
             description: photoData.description,
             price: photoData.price,
+            size: photoData.size,
             tags: photoData.tags,
             imageUrl: photoData.imageUrl,
             id: id,

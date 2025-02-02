@@ -10,6 +10,7 @@ import LoadingBar from "../LoadingBar/LoadingBar";
 import { useNavigate } from "react-router-dom";
 import { handleFileChange, preventEnterFromSubmitting } from "./formUtil";
 import MainFormTemplate from "./MainFormTemplate";
+import { resizeFile } from "../../util/resizeFile";
 
 const defaultSeries = "--Select Series--";
 const newSeries = "--NEW SERIES--";
@@ -34,12 +35,13 @@ export default function NewProductForm() {
     const [series, setSeries] = useState(defaultSeries);
     const [newSeriesName, setNewSeriesName] = useState("");
     const [price, setPrice] = useState<number | null>();
+    const [size, setSize] = useState("");
     const [description, setDescription] = useState("");
-    const [sizing, setSizing] = useState("");
     const [file, setFile] = useState<File | null | undefined>();
     const [background, setBackground] = useState("");
     const [tags, setTags] = useState<string[]>(["edc", "inventory"]);
     const [progress, setProgress] = useState(0);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
         async function setup() {
@@ -61,6 +63,15 @@ export default function NewProductForm() {
         }
     }, [categories, category])
 
+    useEffect(() => {
+        if (newCategoryName.length > 0) {
+            console.log("setting tags for new category")
+            setTags(["edc", "mainPage", "inventory"])
+        } else {
+            console.log("setting tags for inventory")
+            setTags(["edc", "inventory"])
+        }
+    }, [newCategoryName])
 
     function resetState() {
         setTitle("")
@@ -69,8 +80,8 @@ export default function NewProductForm() {
         setSeries(defaultSeries)
         setNewSeriesName("")
         setPrice(null)
+        setSize("")
         setDescription("")
-        setSizing("")
         setFile(null)
         setBackground("")
         setTags(["edc", "inventory"])
@@ -83,7 +94,13 @@ export default function NewProductForm() {
 
     async function handleNewCategory() {
         // Add new category to db
+        console.log('adding new category to db...')
         const success = await addNewCategory({ category: newCategoryName, series: newSeriesName })
+        if (newSeriesName.length > 0) { // add new series for new category
+            const success = await addNewSeries({ category: newCategoryName, series: newSeriesName })
+            if (success) console.log('Series added successfully')
+            else throw new Error("Error adding new series")
+        }
         if (success) console.log('Category added successfully')
         else throw new Error("Error adding new category")
     }
@@ -101,14 +118,24 @@ export default function NewProductForm() {
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        if (!file) return;
+        setIsSubmitting(true);
+
+        if (!file) {
+            setIsSubmitting(false);
+            return;
+        } 
 
         if (newCategoryName.length > 0) await handleNewCategory();
-        if (newSeriesName.length > 0 && newCategoryName === newCategorySelector.name) await handleNewSeries();
+        // if newSeriesName is present but not new category:
+        if (newSeriesName.length > 0 && newCategoryName !== newCategorySelector.name)
+            await handleNewSeries();
+
+        // resize incoming photo
+        const rezisedFile = await resizeFile(file, 400, 600);
 
         const fileToUpload = {
             reference: `${title.replace(/ /g, "_")}`,
-            file: file as File,
+            file: rezisedFile as File,
             onProgress: onProgress,
         }
 
@@ -125,8 +152,9 @@ export default function NewProductForm() {
             title: title.replace(/ /g, "_"),
             description,
             price: Number(price),
-            category: newCategoryName !== newCategorySelector.name ? newCategoryName : category,    
-            tags: newCategoryName !== newCategorySelector.name ? ["edc", "mainPage", "inventory"] : tags,
+            size,
+            category: newCategoryName !== newCategorySelector.name ? newCategoryName : category,
+            tags,
             series: series === newSeries ? newSeriesName : series,
             itemName: title.replace(/ /g, "_"),
             itemOrder: 1, // new product is always first in series
@@ -142,8 +170,9 @@ export default function NewProductForm() {
             title,
             description,
             category: newCategoryName !== newCategorySelector.name ? newCategoryName : category,
+            tags,
+            size,
             price: Number(price),
-            tags: newCategoryName !== newCategorySelector.name ? ["edc", "mainPage", "inventory"] : tags,
             series: series === newSeries ? newSeriesName : series,
             itemName: title.replace(/ /g, "_"),
             itemOrder: 1, // new product is always first in series
@@ -199,13 +228,14 @@ export default function NewProductForm() {
                         <>
                             <CustomInput label="Price" value={price ? price.toString() : ""} onChange={(e) => setPrice(Number(e.target.value))} min={1} step="1" type="number" placeholder="Price" required={true} />
                             {Number(price) > 0 && <CustomInput label="Description" value={description} onChange={(e) => setDescription(e.target.value)} type="text" placeholder="Description" required={true} />}
-                            {description && <CustomInput label="Sizing (type 'na' if doesn't apply)" value={sizing} onChange={(e) => setSizing(e.target.value)} type="text" placeholder="Sizing" required={true} />}
-                            {sizing &&
+                            {description && <CustomInput label="Sizing (type 'na' if doesn't apply)" value={size} onChange={(e) => setSize(e.target.value)} type="text" placeholder="Sizing" required={true} />}
+                            {size &&
                                 <>
                                     <label htmlFor="fileInput" className="w-full bg-gray-200 p-2 rounded-md text-center cursor-pointer flex justify-center items-center gap-4 border-2 border-edcPurple-60">Select Photo<IoIosCamera /></label>
                                     <input id="fileInput" hidden onChange={(e) => handleFileChange(e, setFile, setBackground)} type="file" required={true} />
                                 </>}
                             {file && <button type="submit"
+                                disabled={isSubmitting}
                                 className="
                                     bg-edcPurple-60 text-white 
                                     hover:bg-yellow-500 hover:text-edcPurple-60 

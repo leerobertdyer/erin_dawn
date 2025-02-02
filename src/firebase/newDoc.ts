@@ -7,6 +7,7 @@ interface INewDoc {
   itemName?: string;
   description: string;
   price: number;
+  size: string;
   tags: string[];
   series: string;
   category: string;
@@ -15,7 +16,7 @@ interface INewDoc {
   stripePriceId: string;
 }
 
-async function newDoc({ downloadUrl, title, description, price, tags, series, itemOrder, stripeProductId, stripePriceId, itemName, category }: INewDoc): Promise<string | null> {
+async function newDoc({ downloadUrl, title, description, price, size, tags, series, itemOrder, stripeProductId, stripePriceId, itemName, category }: INewDoc): Promise<string | null> {
   if (!itemName) itemName = title;
   if (!category) category = "uncategorized";
   try {
@@ -25,6 +26,7 @@ async function newDoc({ downloadUrl, title, description, price, tags, series, it
       title,
       description,
       price,
+      size,
       tags,
       series,
       itemName,

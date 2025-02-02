@@ -2,8 +2,8 @@ import { Link } from "react-router-dom";
 
 export default function PurchaseSuccess() {
     return (
-        <div style={{ backgroundImage: 'url(/images/background.jpg)' }} 
-        className="bg-cover bg-center bg-no-repeat bg-fixed w-screen h-screen">
+        <div style={{ backgroundImage: 'url(/images/background.jpg)' }}
+            className="bg-cover bg-center bg-no-repeat bg-fixed w-screen h-screen">
             <div className="bg-edcBlue-80 bg-opacity-50 text-white w-full h-screen flex flex-col items-center justify-center">
                 <div className="w-[30rem] h-[20rem] border-4 bg-edcBlue-80 border-white rounded-md flex flex-col items-center justify-evenly">
                     <h1>Payment processed</h1>

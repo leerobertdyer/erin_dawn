@@ -10,18 +10,21 @@ import { IProductInfo } from "../../Interfaces/IProduct";
 import { usePhotosContext } from "../../Context/PhotosContext";
 import editDoc from "../../firebase/editDoc";
 import editFile from "../../firebase/editfile";
+import { resizeFile } from "../../util/resizeFile";
 
 export default function EditProductForm() {
-    const { product, isEditing, handleDelete, previousUrl, handleBack } = useProductManagementContext();
+    const { product, isEditing, setIsEditing, handleDelete, previousUrl, handleBack } = useProductManagementContext();
     const { allPhotos, handleSetAllPhotos } = usePhotosContext();
 
     const navigate = useNavigate();
     const [title, setTitle] = useState(product?.title ?? "");
     const [description, setDescription] = useState(product?.description ?? "");
     const [price, setPrice] = useState(product?.price ?? 0.00);
-    const [file, setFile] = useState<File | null>();
+    const [size, setSize] = useState(product?.size ?? "");
+    const [file, setFile] = useState<File | null>(null);
     const [background, setBackground] = useState(product?.imageUrl ?? "");
     const [isDeleting, setIsDeleting] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
         if (!isEditing) navigate(previousUrl);
@@ -56,57 +59,85 @@ export default function EditProductForm() {
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        if (!product) return;
+        setIsSubmitting(true);
+        if (!product) {
+            setIsSubmitting(false);
+            return;
+        }
         let downloadUrl = "";
 
         const { stripeProductId, stripePriceId } = await editStripeProduct()
-
+        const nextPhotos = [];
+        if (file) { // if file is present, edit the file then update doc for that specific photo
+            const resizedFile = await resizeFile(file, 400, 600);
+            downloadUrl = await editFile({
+                file: resizedFile,
+                id: product.id,
+                url: product.imageUrl,
+                title,
+                description,
+                price,
+                size,
+                tags: product.tags,
+                series: product.series,
+                itemOrder: product.itemOrder,
+                itemName: product.itemName,
+                stripeProductId,
+                stripePriceId
+            });
+            nextPhotos.push({
+                id: product.id,
+                imageUrl: downloadUrl,
+                title,
+                description,
+                price,
+                size,
+                tags: product.tags,
+                series: product.series,
+                itemOrder: product.itemOrder,
+                itemName: product.itemName,
+                stripeProductId,
+                stripePriceId
+            });
+        }
         const allPhotosWithItemName = allPhotos.filter((photo) => photo.itemName === product.itemName);
-        allPhotosWithItemName.forEach(async (photo) => {
-
-            if (file) { // if file is present, edit the file then update doc
-                downloadUrl = await editFile({
-                    file,
-                    id: photo.id,
-                    url: photo.imageUrl,
-                    title,
-                    description,
-                    price,
-                    tags: photo.tags,
-                    series: photo.series,
-                    itemOrder: photo.itemOrder,
-                    stripeProductId,
-                    stripePriceId
-                });
-
-                await editDoc({
-                    id: photo.id,
-                    title,
-                    description,
-                    tags: photo.tags,
-                    price,
-                    series: photo.series,
-                    itemOrder: photo.itemOrder,
-                    imageUrl: downloadUrl,
-                    stripeProductId,
-                    stripePriceId
-                })
-            } else { // if file is not present, update doc only
-                await editDoc({
-                    id: product.id,
-                    title,
-                    description,
-                    tags: product.tags,
-                    price,
-                    series: product.series,
-                    itemOrder: product.itemOrder,
-                    imageUrl: product.imageUrl,
-                    stripeProductId,
-                    stripePriceId
-                })
+        console.log("All photos with item name: ", allPhotosWithItemName)
+        for (const photo of allPhotosWithItemName) { // this loops over the whole series.
+            if (photo.id === product.id && file) continue; // skip the photo that was just edited
+            // if file is not present, update metadata only
+            console.log("Editing photo: ", photo)
+            const newPhoto = {
+                id: photo.id,
+                imageUrl: photo.imageUrl,
+                title,
+                description,
+                price,
+                size,
+                tags: photo.tags,
+                series: photo.series,
+                itemOrder: photo.itemOrder,
+                itemName: photo.itemName,
+                stripeProductId,
+                stripePriceId
             }
+            await editDoc(newPhoto);
+            nextPhotos.push(newPhoto);
+        }
+
+        const nextAllPhotos = allPhotos.map((photo) => {
+            const editedPhoto = nextPhotos.find((ePhoto) => ePhoto.id === photo.id);
+            if (editedPhoto) {
+                console.log('FOUND PHOTO IN ALLPHOTO STAT UPDATE: ', editedPhoto.title)
+                return editedPhoto;
+            }
+            return photo;
         })
-            navigate(previousUrl);
+        console.log("CHECK THIS ONE!", nextAllPhotos)
+
+        handleSetAllPhotos(nextAllPhotos);
+
+        setIsEditing(false);
+        navigate('/shop');
     }
 
     function resetState() {
@@ -116,17 +147,6 @@ export default function EditProductForm() {
         setFile(null);
         setBackground(product?.imageUrl ?? "");
     }
-
-    if (product?.itemOrder && product.itemOrder > 1) return (
-        <div className="flex flex-col justify-center items-center w-screen h-fit overflow-scroll">
-            <form onSubmit={handleSubmit} onKeyDown={preventEnterFromSubmitting}
-                className="bg-white flex flex-col justify-center m-auto items-center w-[85vw] h-screen border-2 border-black rounded-md p-4 mt-4 gap-4"
-                style={{ backgroundImage: `url(${background})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
-
-
-            </form>
-        </div>
-    )
 
     function onClickDelete() {
         setIsDeleting(true);
@@ -146,7 +166,10 @@ export default function EditProductForm() {
 
             <form onSubmit={handleSubmit} onKeyDown={preventEnterFromSubmitting}
                 className="bg-white flex flex-col justify-center m-auto items-center w-[85vw] h-screen border-2 border-black rounded-md p-4 mt-4 gap-4"
-                style={{ backgroundImage: `url(${background})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+                style={{ backgroundImage: `url(${background})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+            >
+
+
                 <MainFormTemplate product={product} handleClickBack={handleBack} resetState={resetState} handleDelete={onClickDelete}>
 
                     <CustomInput type="text" label="Product Name" placeholder="Product Name" value={title} onChange={(e) => setTitle(e.target.value)} />
@@ -154,6 +177,8 @@ export default function EditProductForm() {
                     <CustomInput type="text" label="Product Description" placeholder="Product Description" value={description} onChange={(e) => setDescription(e.target.value)} />
 
                     <CustomInput type="number" label="Product Price" placeholder="Product Price" value={price.toString()} onChange={(e) => setPrice(Number(Number((e.target.value)).toFixed(0)))} />
+
+                    <CustomInput type="text" label="Size" placeholder="Product Sizing" value={size} onChange={(e) => setSize(e.target.value)} />
 
                     <div className="flex flex-col gap-2">
                         <label htmlFor="file"
@@ -164,17 +189,15 @@ export default function EditProductForm() {
                         <p className="text-center w-full m-auto py-1 px-2 rounded-md text-xs text-gray-400 bg-white">{file ? file.name : "No File Selected"}</p>
                     </div>
 
-                    <button type="submit" 
-                    className="
+                    <button type="submit"
+                        disabled={isSubmitting}
+                        className="
                         bg-edcPurple-60 text-white 
                         hover:bg-yellow-500 hover:text-edcPurple-60 
                         rounded-md p-2 w-full">
                         Submit</button>
 
                 </MainFormTemplate>
-                <div className="w-[100%] h-10 m-auto flex justify-center items-center gap-4">
-
-                </div>
 
             </form>
         </div>

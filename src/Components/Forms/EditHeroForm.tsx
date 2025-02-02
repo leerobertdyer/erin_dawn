@@ -5,8 +5,10 @@ import { handleFileChange, preventEnterFromSubmitting } from "./formUtil";
 import { IoIosCamera, } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import MainFormTemplate from "./MainFormTemplate";
-import editFile  from "../../firebase/editfile";
+import editFile from "../../firebase/editfile";
 import editDoc from "../../firebase/editDoc";
+import { resizeFile } from "../../util/resizeFile";
+import LoadingBar from "../LoadingBar/LoadingBar";
 
 export default function EditHeroForm() {
     const { product, isEditing, previousUrl, handleBack } = useProductManagementContext();
@@ -14,15 +16,22 @@ export default function EditHeroForm() {
     const navigate = useNavigate();
 
     const [file, setFile] = useState<File | null>();
+    const [progress, setProgress] = useState(0);
     const [background, setBackground] = useState(product?.imageUrl ?? "");
 
     useEffect(() => {
         if (!isEditing) navigate(previousUrl);
     }, [isEditing])
 
-   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    function onProgress(progress: number) {
+        setProgress(progress);
+    }
+
+    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         if (!product) return;
+
+        const resizedFile = await resizeFile(file, 300, 400);
 
         const fileToEdit = {
             id: product.id,
@@ -31,22 +40,24 @@ export default function EditHeroForm() {
             price: product.price,
             tags: product.tags,
             url: product.imageUrl,
+            size: product.size,
             series: product.series,
             itemOrder: product.itemOrder,
             stripePriceId: product.stripePriceId,
             stripeProductId: product.stripeProductId,
-            file: file as File,
-            onProgress: (percent: number) => console.log(percent),  
+            file: resizedFile,
+            onProgress,
 
         }
 
         const downloadUrl = await editFile(fileToEdit);
         console.log("Download URL: ", downloadUrl)
-        
+
         if (!downloadUrl) return;
 
-          await editDoc({
+        await editDoc({
             ...product,
+            size: product.size,
             imageUrl: downloadUrl,
             stripeProductId: "na",
             stripePriceId: "na",
@@ -94,15 +105,16 @@ export default function EditHeroForm() {
                         <p className="text-center w-full m-auto py-1 px-2 rounded-md text-xs text-gray-400 bg-white">{file ? file.name : "No File Selected"}</p>
                     </div>
 
-                    <button type="submit" 
-                    className="
+                    <button type="submit"
+                        disabled={progress > 0}
+                        className="
                         bg-edcPurple-60 text-white 
                         hover:bg-yellow-500 hover:text-edcPurple-60 
                         rounded-md p-2 w-full">
                         Submit</button>
 
                 </MainFormTemplate>
-
+                {progress > 0 && <LoadingBar progress={progress} />}
             </form>
         </div>
     )

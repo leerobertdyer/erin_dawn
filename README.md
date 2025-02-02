@@ -6,8 +6,12 @@ Currently selling at [Grandmother Goods](https://www.gmother.com/)
 
 # TODO
 
-1. Make items purchaseable
-2. Make it easy for Erin to add/remove products, and update the website photos. 
-3. Make sure when it is editable that it does not allow her to break website by removing hero photos, or other crucial style photos. 
-4. Add photos to session or store locally somehow to avoid constant calls to firebase on refresh
-5. When #4 is implemented will need to update the allPhotos state as well to match the new state. 
+- Implement Firebase Caching instead of local store
+- Edit Categories Form
+    - Make sure can edit series in this form or another
+- Utilize the size field in firestore and in UI
+- Allow changing of "Key" photo for a given item
+- Drag and Drop order change for store items
+- Move firebase functions to backend
+- Rotate Credentials
+- Cleanup unused products in stripe

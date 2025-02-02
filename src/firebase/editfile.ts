@@ -13,16 +13,18 @@ interface IEditFile {
     title: string;
     description: string;
     price: number;
+    size: string;
     tags: string[];
     url: string;
     series?: string;
     itemOrder?: number;  
+    itemName?: string;
     onProgress?: (progress: number) => void;
     stripePriceId: string;
     stripeProductId: string;
 }
 
-export default async function editFile({ url, id, title, description, price, tags, file, onProgress, series, itemOrder, stripePriceId, stripeProductId }: IEditFile): Promise<string> {
+export default async function editFile({ url, id, title, description, price, tags, file, onProgress, series, itemOrder, itemName, stripePriceId, stripeProductId, size }: IEditFile): Promise<string> {
 
     try {
 
@@ -40,7 +42,7 @@ export default async function editFile({ url, id, title, description, price, tag
 
         // update doc with new file url
         try {
-            await editDoc({ id, title, description, price, tags, imageUrl, series, itemOrder, stripePriceId, stripeProductId });
+            await editDoc({ id, title, description, price, tags, imageUrl, series, itemOrder, itemName, stripePriceId, stripeProductId, size });
         } catch (error) {
             throw new Error("Issue updating document: " + error);
         }

@@ -12,4 +12,5 @@ export interface IProductInfo {
     stripePriceId: string;
     stripeProductId: string;
     category?: string;
+    size: string;
 }

@@ -52,7 +52,7 @@ export default function Shop({ u }: IShop) {
         for (const key in photoMap) {
             groupedPhotos.push(photoMap[key]);
         }
-        if (u) groupedPhotos.push([{ id: "new", itemName: "card", title: "New Product", description: "Add a new product to the inventory", imageUrl: "images/card.jpg", price: 0, series: "uncategorized", tags: ["inventory"], stripePriceId: "", stripeProductId: "", order: -10 }])
+        if (u) groupedPhotos.push([{ id: "new", itemName: "card", title: "New Product", description: "Add a new product to the inventory", size: "", imageUrl: "images/card.jpg", price: 0, series: "uncategorized", tags: ["inventory"], stripePriceId: "", stripeProductId: "", order: -10 }])
         setInventory(groupedPhotos.sort((a, b) => (a[0].order ?? 0) - (b[0].order ?? 0))) // TODO: Apply order to all products to place them in desired page area
         if (groupedPhotos.length > 0) setIsLoading(false)
     }, [u, allPhotos])
@@ -89,7 +89,7 @@ export default function Shop({ u }: IShop) {
             {inventory.length > 0 && inventory.map((series, index) => (
                 <div key={index}
                     className="
-                    h-[100vh] w-[90vw]  max-h-[37rem] max-w-[27rem] overflow-hidden 
+                    max-h-[37rem] max-w-[27rem] overflow-hidden 
                     md:h-[70vh] md:w-[45vw]
                     flex mb-[1rem]">
                     <Frame >
@@ -110,11 +110,11 @@ export default function Shop({ u }: IShop) {
                                         {u && series[0].series && <AdminButtons addPhotoToSeries={() => handleAddPhotoToSeries(series[0])} handleEdit={() => handleEdit(series[0].id)} />}
                                         <ShoppingButtons product={series[0]} handleDetails={() => handleClickProductDetails(index)} />
                                 </div>
-                            : <Carousel photos={series.map(photo => ({ id: photo.id, url: photo.imageUrl, title: photo.title, itemOrder: photo.itemOrder ?? 0 }))} >
+                            : <Carousel photos={series.map(photo => ({ id: photo.id, url: photo.imageUrl, title: photo.itemName, itemOrder: photo.itemOrder ?? 0 }))} >
                                 {u && <AdminButtons
                                     addPhotoToSeries={() => handleAddPhotoToSeries(series[0])}
                                     handleEdit={() => handleBatchEdit(index)} />}
-                                <ShoppingButtons product={series[0]} handleDetails={() => handleClickProductDetails(0)} />
+                                <ShoppingButtons product={series[0]} handleDetails={() => handleClickProductDetails(index)} />
                             </Carousel>}
                     </Frame>
                 </div>
