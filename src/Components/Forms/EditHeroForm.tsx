@@ -6,7 +6,6 @@ import { IoIosCamera, } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import MainFormTemplate from "./MainFormTemplate";
 import editFile from "../../firebase/editfile";
-import editDoc from "../../firebase/editDoc";
 import { resizeFile } from "../../util/resizeFile";
 import LoadingBar from "../LoadingBar/LoadingBar";
 

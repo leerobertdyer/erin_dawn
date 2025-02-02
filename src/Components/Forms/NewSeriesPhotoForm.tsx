@@ -9,7 +9,6 @@ import LoadingBar from "../LoadingBar/LoadingBar";
 import { useNavigate } from "react-router-dom";
 import { usePhotosContext } from "../../Context/PhotosContext";
 import { resizeFile } from "../../util/resizeFile";
-import { IProductInfo } from "../../Interfaces/IProduct";
 
 export default function NewSeriesPhotoForm() {
     const [background, setBackground] = useState("/images/background.jpg");
