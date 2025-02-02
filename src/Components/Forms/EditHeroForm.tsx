@@ -12,7 +12,7 @@ import LoadingBar from "../LoadingBar/LoadingBar";
 
 export default function EditHeroForm() {
     const { product, isEditing, previousUrl, handleBack } = useProductManagementContext();
-    const { allPhotos, handleSetAllPhotos } = usePhotosContext();
+    const { allPhotos, setAllPhotos } = usePhotosContext();
     const navigate = useNavigate();
 
     const [file, setFile] = useState<File | null>();
@@ -42,6 +42,7 @@ export default function EditHeroForm() {
             url: product.imageUrl,
             size: product.size,
             series: product.series,
+            category: product.category,
             itemOrder: product.itemOrder,
             stripePriceId: product.stripePriceId,
             stripeProductId: product.stripeProductId,
@@ -55,15 +56,7 @@ export default function EditHeroForm() {
 
         if (!downloadUrl) return;
 
-        await editDoc({
-            ...product,
-            size: product.size,
-            imageUrl: downloadUrl,
-            stripeProductId: "na",
-            stripePriceId: "na",
-        })
-
-        handleSetAllPhotos(allPhotos.map(photo => {
+        setAllPhotos(allPhotos.map(photo => {
             if (photo.id === product.id) {
                 return {
                     ...photo,

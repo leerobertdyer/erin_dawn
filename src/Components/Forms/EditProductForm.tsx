@@ -14,7 +14,7 @@ import { resizeFile } from "../../util/resizeFile";
 
 export default function EditProductForm() {
     const { product, isEditing, setIsEditing, handleDelete, previousUrl, handleBack } = useProductManagementContext();
-    const { allPhotos, handleSetAllPhotos } = usePhotosContext();
+    const { allPhotos, setAllPhotos } = usePhotosContext();
 
     const navigate = useNavigate();
     const [title, setTitle] = useState(product?.title ?? "");
@@ -79,6 +79,7 @@ export default function EditProductForm() {
                 price,
                 size,
                 tags: product.tags,
+                category: product.category,
                 series: product.series,
                 itemOrder: product.itemOrder,
                 itemName: product.itemName,
@@ -93,6 +94,7 @@ export default function EditProductForm() {
                 price,
                 size,
                 tags: product.tags,
+                category: product.category,
                 series: product.series,
                 itemOrder: product.itemOrder,
                 itemName: product.itemName,
@@ -105,16 +107,16 @@ export default function EditProductForm() {
         for (const photo of allPhotosWithItemName) { // this loops over the whole series.
             if (photo.id === product.id && file) continue; // skip the photo that was just edited
             // if file is not present, update metadata only
-            console.log("Editing photo: ", photo)
             const newPhoto = {
                 id: photo.id,
-                imageUrl: photo.imageUrl,
+                imageUrl: undefined,
                 title,
                 description,
                 price,
                 size,
                 tags: photo.tags,
                 series: photo.series,
+                category: photo.category,
                 itemOrder: photo.itemOrder,
                 itemName: photo.itemName,
                 stripeProductId,
@@ -134,7 +136,7 @@ export default function EditProductForm() {
         })
         console.log("CHECK THIS ONE!", nextAllPhotos)
 
-        handleSetAllPhotos(nextAllPhotos);
+        setAllPhotos(nextAllPhotos);
 
         setIsEditing(false);
         navigate('/shop');
@@ -153,7 +155,7 @@ export default function EditProductForm() {
     }
 
     function onFinalDelete(product: IProductInfo) {
-        handleSetAllPhotos(allPhotos.filter((photo) => photo.id !== product.id))
+        setAllPhotos(allPhotos.filter((photo) => photo.id !== product.id))
         handleDelete(product.imageUrl, product.id);
     }
 

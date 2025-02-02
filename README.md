@@ -6,12 +6,15 @@ Currently selling at [Grandmother Goods](https://www.gmother.com/)
 
 # TODO
 
-- Implement Firebase Caching instead of local store
-- Edit Categories Form
-    - Make sure can edit series in this form or another
-- Utilize the size field in firestore and in UI
-- Allow changing of "Key" photo for a given item
+- If no photos show up in a given category or filter display a message
+- add option to clear filter in shop
+- Let user know when shop is filtered
+
+- Update Key Change for mobile friendly version
 - Drag and Drop order change for store items
 - Move firebase functions to backend
 - Rotate Credentials
 - Cleanup unused products in stripe
+- Do we need an edit series form? 
+- Check different browsers. Style in safari for admin is janky 
+    - Specifically in hero

@@ -16,7 +16,7 @@ interface IShop {
     u: User | null
 }
 export default function Shop({ u }: IShop) {
-    const { handleBack, handleEdit, isEditing, isBatchEdit, setIsBatchEdit, setPreviousUrl, setProduct } = useProductManagementContext();
+    const { handleBack, handleEdit, isEditing, isBatchEdit, setFilteredInventory, filteredInventory, setIsBatchEdit, setPreviousUrl, setProduct } = useProductManagementContext();
     const location = useLocation();
     const { allPhotos } = usePhotosContext();
     const [inventory, setInventory] = useState<IProductInfo[][]>([])
@@ -33,12 +33,29 @@ export default function Shop({ u }: IShop) {
     useEffect(() => {
         if (isEditing) navigate('/edit-product');
         else if (isAddingPhoto) navigate('/add-series-photo')
-        else navigate('/shop')
     }, [isEditing, navigate, isAddingPhoto]);
+
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const category = params.get('category');
+        console.log('Category:', category)  
+        if (category) {
+            const filteredPhotos = allPhotos.filter(photo => photo.category === category);
+            if (filteredPhotos.length > 0) {
+                setFilteredInventory(filteredPhotos);
+                console.log('wtf', filteredPhotos)
+            }
+            else setFilteredInventory(allPhotos.filter(photo => photo.tags.includes("inventory")));
+        } else {
+            setFilteredInventory(allPhotos.filter(photo => photo.tags.includes("inventory")));
+        }
+    }, [location.search, allPhotos, setFilteredInventory]);
 
 
     useEffect(() => {
-        const nextInventory = allPhotos.filter(photo => photo.tags.includes("inventory"))
+        console.log('hete: ', filteredInventory)
+        const nextInventory = filteredInventory.filter(photo => photo.tags.includes("inventory"))
+        console.log('nextInventory: ', nextInventory)
         const groupedPhotos: IProductInfo[][] = []
         const photoMap: { [key: string]: IProductInfo[] } = {};
         nextInventory.forEach(photo => {
@@ -55,7 +72,7 @@ export default function Shop({ u }: IShop) {
         if (u) groupedPhotos.push([{ id: "new", itemName: "card", title: "New Product", description: "Add a new product to the inventory", size: "", imageUrl: "images/card.jpg", price: 0, series: "uncategorized", tags: ["inventory"], stripePriceId: "", stripeProductId: "", order: -10 }])
         setInventory(groupedPhotos.sort((a, b) => (a[0].order ?? 0) - (b[0].order ?? 0))) // TODO: Apply order to all products to place them in desired page area
         if (groupedPhotos.length > 0) setIsLoading(false)
-    }, [u, allPhotos])
+    }, [u, filteredInventory])
 
     function handleClickProductDetails(index: number) {
         setArrayIndex(index)

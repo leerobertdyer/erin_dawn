@@ -17,6 +17,8 @@ interface ProductManagementContextType {
     handleBack: () => void;
     previousUrl: string;
     setPreviousUrl: (url: string) => void;
+    setFilteredInventory: (inventory: IProductInfo[]) => void;
+    filteredInventory: IProductInfo[];
     }
 
 const defaultValue: ProductManagementContextType = {
@@ -32,6 +34,8 @@ const defaultValue: ProductManagementContextType = {
     handleBack: () => {},
     previousUrl: '/',
     setPreviousUrl: () => {},
+    setFilteredInventory: () => {},
+    filteredInventory: []
 };
 
 const ProductManagementContext = createContext<ProductManagementContextType>(defaultValue);

@@ -17,7 +17,7 @@ export default function BatchEdit({ products, handleBack }: IBatchEdit) {
     const [currentProduct, setCurrentProduct] = useState<IProductInfo | null>(null);
     const [isSettingKey, setIsSettingKey] = useState(false);
 
-    const { allPhotos, handleSetAllPhotos } = usePhotosContext();
+    const { allPhotos, setAllPhotos } = usePhotosContext();
     const { handleDelete } = useProductManagementContext();
 
     function onClickDelete(product: IProductInfo) {
@@ -33,10 +33,10 @@ export default function BatchEdit({ products, handleBack }: IBatchEdit) {
             itemPhotos.forEach(async (photo) => {
                 handleDelete(photo.imageUrl, photo.id);
             });
-            handleSetAllPhotos(allPhotos.filter((photo) => photo.itemName !== product.itemName))
+            setAllPhotos(allPhotos.filter((photo) => photo.itemName !== product.itemName))
 
         } else {
-            handleSetAllPhotos(allPhotos.filter((photo) => photo.id !== product.id))
+            setAllPhotos(allPhotos.filter((photo) => photo.id !== product.id))
             handleDelete(product.imageUrl, product.id);
         }
         setIsDeleting(false);
@@ -58,7 +58,7 @@ export default function BatchEdit({ products, handleBack }: IBatchEdit) {
             size: otherProduct.size,
             itemOrder: product.itemOrder
         })
-        handleSetAllPhotos(allPhotos.map((photo) => {
+        setAllPhotos(allPhotos.map((photo) => {
           return photo.id === product.id 
                 ? {...photo, itemOrder: otherIndex} 
                     : photo.id === otherProduct.id 

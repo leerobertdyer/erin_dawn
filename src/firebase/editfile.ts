@@ -16,6 +16,7 @@ interface IEditFile {
     size: string;
     tags: string[];
     url: string;
+    category?: string;
     series?: string;
     itemOrder?: number;  
     itemName?: string;
@@ -24,10 +25,9 @@ interface IEditFile {
     stripeProductId: string;
 }
 
-export default async function editFile({ url, id, title, description, price, tags, file, onProgress, series, itemOrder, itemName, stripePriceId, stripeProductId, size }: IEditFile): Promise<string> {
+export default async function editFile({ url, id, title, description, price, tags, file, onProgress, series, category, itemOrder, itemName, stripePriceId, stripeProductId, size }: IEditFile): Promise<string> {
 
     try {
-
         // delete file
         const deleteFile = await removeFile({ url });
         if (!deleteFile) {
@@ -39,10 +39,9 @@ export default async function editFile({ url, id, title, description, price, tag
         if (!imageUrl) {
             throw new Error("Issue uploading new file");
         }
-
         // update doc with new file url
         try {
-            await editDoc({ id, title, description, price, tags, imageUrl, series, itemOrder, itemName, stripePriceId, stripeProductId, size });
+            await editDoc({ id, title, description, price, tags, imageUrl, series, category, itemOrder, itemName, stripePriceId, stripeProductId, size });
         } catch (error) {
             throw new Error("Issue updating document: " + error);
         }

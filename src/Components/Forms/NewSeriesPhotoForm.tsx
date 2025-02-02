@@ -9,6 +9,7 @@ import LoadingBar from "../LoadingBar/LoadingBar";
 import { useNavigate } from "react-router-dom";
 import { usePhotosContext } from "../../Context/PhotosContext";
 import { resizeFile } from "../../util/resizeFile";
+import { IProductInfo } from "../../Interfaces/IProduct";
 
 export default function NewSeriesPhotoForm() {
     const [background, setBackground] = useState("/images/background.jpg");
@@ -16,7 +17,7 @@ export default function NewSeriesPhotoForm() {
     const [progress, setProgress] = useState(0);
 
     const { handleBack, product } = useProductManagementContext();
-    const { allPhotos, handleSetAllPhotos } = usePhotosContext();
+    const { allPhotos, setAllPhotos } = usePhotosContext();
 
     const navigate = useNavigate();
 
@@ -49,7 +50,6 @@ export default function NewSeriesPhotoForm() {
 
         // Upload file to storage return download url
         const downloadUrl = await uploadFile(fileToUpload);
-        console.log("Download URL: ", downloadUrl)
 
         // Create new product in firestore
         const newProductId = await newDoc({
@@ -69,21 +69,23 @@ export default function NewSeriesPhotoForm() {
         if (!newProductId) throw new Error("Error creating new product");
 
         //Update the current photo state
-        const updatedPhotos = [...allPhotos, {
-            id: newProductId,
-            imageUrl: downloadUrl,
-            title: newTitle,
-            description: product.description,
-            price: product.price,
-            size: product.size,
-            tags: product.tags,
-            series: product.series!,
-            itemName: product.itemName,
-            itemOrder: nextIndex, // new product is always first in series
-            stripeProductId: product.stripeProductId!,
-            stripePriceId: product.stripeProductId!,
-        }]
-        handleSetAllPhotos(updatedPhotos)
+        setAllPhotos([
+            ...allPhotos,
+            {
+                id: newProductId,
+                imageUrl: downloadUrl,
+                title: newTitle,
+                description: product.description,
+                price: product.price,
+                size: product.size,
+                tags: product.tags,
+                series: product.series!,
+                itemName: product.itemName,
+                itemOrder: nextIndex,
+                stripeProductId: product.stripeProductId!,
+                stripePriceId: product.stripeProductId!,
+            }
+        ]);
 
         navigate("/shop")
 

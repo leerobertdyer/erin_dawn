@@ -4,7 +4,8 @@ import { Link, useLocation } from "react-router";
 import { User } from "firebase/auth";
 import CartIconAndNumber from "../cartIconAndNumber/CartIconAndNumber";
 import { useProductManagementContext } from "../../Context/ProductMgmtContext";
-import { GiHandBag } from "react-icons/gi";
+import { CiShop } from "react-icons/ci";
+
 
 interface INav {
     u: User | null
@@ -101,7 +102,7 @@ export default function Nav({ u }: INav) {
               {cartLength > 0 
                 ? <div className="w-[3.5rem] flex justify-center"><CartIconAndNumber cartLength={cartLength} iconSize={iconSize} /></div>
                 : <Link to="/shop" className="w-[3.5rem] flex justify-center">
-                    <GiHandBag  size={iconSize} />
+                    <CiShop  size={iconSize} />
                     </Link>
             }  
                 <div className="text-right">

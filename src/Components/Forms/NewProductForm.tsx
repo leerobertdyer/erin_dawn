@@ -24,7 +24,7 @@ const defaultCategory = {
 }
 
 export default function NewProductForm() {
-    const { allPhotos, handleSetAllPhotos } = usePhotosContext();
+    const { allPhotos, setAllPhotos } = usePhotosContext();
     const navigate = useNavigate();
 
     const [categories, setCategories] = useState<ICategory[]>([defaultCategory]);
@@ -42,6 +42,7 @@ export default function NewProductForm() {
     const [tags, setTags] = useState<string[]>(["edc", "inventory"]);
     const [progress, setProgress] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [sizeChecked, setSizeChecked] = useState(false);
 
     useEffect(() => {
         async function setup() {
@@ -63,16 +64,6 @@ export default function NewProductForm() {
         }
     }, [categories, category])
 
-    useEffect(() => {
-        if (newCategoryName.length > 0) {
-            console.log("setting tags for new category")
-            setTags(["edc", "mainPage", "inventory"])
-        } else {
-            console.log("setting tags for inventory")
-            setTags(["edc", "inventory"])
-        }
-    }, [newCategoryName])
-
     function resetState() {
         setTitle("")
         setCategory(defaultCategory.name)
@@ -86,6 +77,7 @@ export default function NewProductForm() {
         setBackground("")
         setTags(["edc", "inventory"])
         setProgress(0)
+        setSizeChecked(false)
     }
 
     function onProgress(percent: number) {
@@ -94,22 +86,43 @@ export default function NewProductForm() {
 
     async function handleNewCategory() {
         // Add new category to db
-        console.log('adding new category to db...')
         const success = await addNewCategory({ category: newCategoryName, series: newSeriesName })
-        if (newSeriesName.length > 0) { // add new series for new category
-            const success = await addNewSeries({ category: newCategoryName, series: newSeriesName })
-            if (success) console.log('Series added successfully')
-            else throw new Error("Error adding new series")
-        }
         if (success) console.log('Category added successfully')
         else throw new Error("Error adding new category")
+
+        // now add the photo for the new category
+        const safeName = newCategoryName.replace(/ /g, "_");
+        const resizedFile = await resizeFile(file, 1200, 1400);
+        const fileToUpload = {
+            reference: safeName,
+            file: resizedFile,
+            onProgress: onProgress,
+        }
+        const downloadUrl = await uploadFile(fileToUpload)
+        if (!downloadUrl) throw new Error("Error uploading new category photo")
+
+        const newPhoto = {
+            downloadUrl,
+            title: newCategoryName,
+            description: newCategoryName,
+            price: 0,
+            size: "",
+            tags: ["edc", "mainPage"],
+            series: newSeriesName,
+            itemName: safeName,
+            itemOrder: 0,
+            category: newCategoryName,
+            stripeProductId: "",
+            stripePriceId: "",
+        }
+        const newId = await newDoc(newPhoto)
+        if (!newId) throw new Error("Error creating new category photo")
+        setAllPhotos([...allPhotos, { ...newPhoto, imageUrl: downloadUrl, id: newId }])
+
     }
 
     async function handleNewSeries() {
         // Add series to db
-        console.log("newCategoryName: ", newCategoryName)
-        console.log("category: ", category)
-        console.log(newCategoryName ?? category)
         const success = await addNewSeries({ category: newCategoryName.length > 0 ? newCategoryName : category, series: newSeriesName })
         if (success) console.log('Series added successfully')
         else throw new Error("Error adding new series")
@@ -123,7 +136,7 @@ export default function NewProductForm() {
         if (!file) {
             setIsSubmitting(false);
             return;
-        } 
+        }
 
         if (newCategoryName.length > 0) await handleNewCategory();
         // if newSeriesName is present but not new category:
@@ -146,14 +159,17 @@ export default function NewProductForm() {
         // Create new product in stripe account
         const { stripeProductId, stripePriceId } = await createStripeProduct(title, description, Number(price))
 
+        const categoryNameToSave = newCategoryName.length > 0 ? newCategoryName : category;
+        console.log("Category to save: ", categoryNameToSave)
+
         // Create new product in firestore
         const newProductId = await newDoc({
             downloadUrl,
             title: title.replace(/ /g, "_"),
             description,
             price: Number(price),
-            size,
-            category: newCategoryName !== newCategorySelector.name ? newCategoryName : category,
+            size: sizeChecked ? size : "",
+            category: categoryNameToSave,
             tags,
             series: series === newSeries ? newSeriesName : series,
             itemName: title.replace(/ /g, "_"),
@@ -169,9 +185,9 @@ export default function NewProductForm() {
             imageUrl: downloadUrl,
             title,
             description,
-            category: newCategoryName !== newCategorySelector.name ? newCategoryName : category,
+            category: categoryNameToSave,
             tags,
-            size,
+            size: sizeChecked ? size : "",
             price: Number(price),
             series: series === newSeries ? newSeriesName : series,
             itemName: title.replace(/ /g, "_"),
@@ -179,7 +195,7 @@ export default function NewProductForm() {
             stripeProductId,
             stripePriceId,
         }]
-        handleSetAllPhotos(updatedPhotos)
+        setAllPhotos(updatedPhotos)
 
         navigate("/shop")
         //TODO: Clear form & success message
@@ -228,12 +244,10 @@ export default function NewProductForm() {
                         <>
                             <CustomInput label="Price" value={price ? price.toString() : ""} onChange={(e) => setPrice(Number(e.target.value))} min={1} step="1" type="number" placeholder="Price" required={true} />
                             {Number(price) > 0 && <CustomInput label="Description" value={description} onChange={(e) => setDescription(e.target.value)} type="text" placeholder="Description" required={true} />}
-                            {description && <CustomInput label="Sizing (type 'na' if doesn't apply)" value={size} onChange={(e) => setSize(e.target.value)} type="text" placeholder="Sizing" required={true} />}
-                            {size &&
-                                <>
+                            {description && <CustomInput type="checkbox" value={''} label="Add Size Info?" onChange={(e) => setSizeChecked(e.target.checked)} />}
+                           {sizeChecked && <CustomInput label="Sizing Description" value={size} onChange={(e) => setSize(e.target.value)} type="text" placeholder="Sizing" required={true} />}
                                     <label htmlFor="fileInput" className="w-full bg-gray-200 p-2 rounded-md text-center cursor-pointer flex justify-center items-center gap-4 border-2 border-edcPurple-60">Select Photo<IoIosCamera /></label>
                                     <input id="fileInput" hidden onChange={(e) => handleFileChange(e, setFile, setBackground)} type="file" required={true} />
-                                </>}
                             {file && <button type="submit"
                                 disabled={isSubmitting}
                                 className="

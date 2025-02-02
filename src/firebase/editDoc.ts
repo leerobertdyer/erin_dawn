@@ -10,13 +10,14 @@ interface IEditDoc {
     tags: string[];
     imageUrl?: string;
     series?: string;
+    category?: string;
     itemOrder?: number;
     itemName?: string;
     stripeProductId: string; 
     stripePriceId: string;
 }
 
-export default async function editDoc({ id, title, description, price, tags, imageUrl, series, itemOrder=0, itemName, stripeProductId, stripePriceId, size }: IEditDoc) {
+export default async function editDoc({ id, title, description, price, tags, imageUrl, series, category, itemOrder=0, itemName, stripeProductId, stripePriceId, size }: IEditDoc) {
     try {
         const docRef = doc(db, "photos", id);
         console.log('editing doc', docRef.path);
@@ -31,6 +32,7 @@ export default async function editDoc({ id, title, description, price, tags, ima
                 tags,
                 imageUrl,
                 series,
+                category,
                 itemOrder,
                 itemName,
                 stripeProductId, 
@@ -46,6 +48,7 @@ export default async function editDoc({ id, title, description, price, tags, ima
                 price,
                 size,
                 tags,
+                category,
                 series,
                 itemOrder,
                 itemName,
@@ -56,7 +59,6 @@ export default async function editDoc({ id, title, description, price, tags, ima
         }
     } catch (error) {
         console.log("Error updating document: ", error);
-
     }
 
 }

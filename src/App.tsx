@@ -16,6 +16,7 @@ import NewProductForm from './Components/Forms/NewProductForm'
 import EditProductForm from './Components/Forms/EditProductForm'
 import EditHeroForm from './Components/Forms/EditHeroForm'
 import NewSeriesPhotoForm from './Components/Forms/NewSeriesPhotoForm'
+import EditCategoryForm from './Components/Forms/EditCategoryForm'
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -50,6 +51,7 @@ function App() {
             <Route path="/edit-product" element={<EditProductForm />} />
             <Route path="/add-series-photo" element={<NewSeriesPhotoForm />} />
             <Route path="/edit-hero" element={<EditHeroForm />} />
+            <Route path="/edit-category" element={<EditCategoryForm />} />
           </Routes>
         </Router>
       </PhotosProvider>

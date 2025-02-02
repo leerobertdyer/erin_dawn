@@ -10,6 +10,7 @@ export function useProductManagement() {
     const [isBatchEdit, setIsBatchEdit] = useState(false);
     const [product, setProduct] = useState<IProductInfo | null>(null);
     const [previousUrl, setPreviousUrl] = useState<string>('/');
+    const [filteredInventory, setFilteredInventory] = useState<IProductInfo[]>([]);
     const [cartProducts, setCartProducts] = useState<IProductInfo[]>(() => {
         const savedProducts = localStorage.getItem('cartProducts');
         return savedProducts ? JSON.parse(savedProducts) : [];
@@ -74,6 +75,7 @@ export function useProductManagement() {
         isEditing, setIsEditing,
         isBatchEdit, setIsBatchEdit,
         product, setProduct,
+        filteredInventory, setFilteredInventory,
         cartProducts, setCartProducts,
         previousUrl, setPreviousUrl,
         handleEdit,

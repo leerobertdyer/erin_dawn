@@ -4,13 +4,13 @@ import { IProductInfo } from '../Interfaces/IProduct';
 
 interface PhotosContextType {
     allPhotos: IProductInfo[];
-    handleSetAllPhotos: (photos: IProductInfo[]) => void;
+    setAllPhotos: (photos: IProductInfo[]) => void;
     isLoading: boolean;
 }
 
 const defaultValue: PhotosContextType = {
     allPhotos: [],
-    handleSetAllPhotos: (_: IProductInfo[]) => {},
+    setAllPhotos: (_: IProductInfo[]) => {},
     isLoading: true,
 };
 
