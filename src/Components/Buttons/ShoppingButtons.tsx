@@ -11,19 +11,17 @@ export default function ShoppingButtons({ product, handleDetails }: IShoppingBut
     const [isInCart, setIsInCart] = useState(false)
 
     useEffect(() => {
-        if (cartProducts.includes(product)) {
-            setIsInCart(true)
-        } else {
-            setIsInCart(false)
-        }
-    }, [cartProducts])
+        console.log('cart changed in shoppingButtons')
+        setIsInCart(cartProducts.some(p => p.id === product.id));
+    }, [cartProducts, product.id])
 
     function handleAddToCart(product: IProductInfo) {
-        setCartProducts([...cartProducts, product])
+        const nextProducts = [...cartProducts, product]
+        setCartProducts(nextProducts)
     }
 
     function handleRemoveFromCart(product: IProductInfo) {
-        const newCart = cartProducts.filter(p => p !== product)
+        const newCart = cartProducts.filter(p => p.id !== product.id)
         setCartProducts(newCart)
     }
 

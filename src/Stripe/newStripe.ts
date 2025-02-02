@@ -1,5 +1,4 @@
-
-const BACKEND = import.meta.env.VITE_BACKEND_URL
+import { BACKEND_URL } from "../util/constants"
 
 async function createStripeProduct(title: string, description: string, price: number) {
     const stripeProduct = {
@@ -7,7 +6,7 @@ async function createStripeProduct(title: string, description: string, price: nu
         description: description,
         price: price,
     }
-    const createProductEndpoint = `${BACKEND}/create-product`
+    const createProductEndpoint = `${BACKEND_URL}/create-product`
     console.log("sending fetch to : ", createProductEndpoint)
     const resp = await fetch(createProductEndpoint, {
         method: 'POST',
@@ -33,7 +32,7 @@ async function editStripeProduct(stripeProductId: string, name: string, descript
         description,
         newPrice,
     }
-    const editProductEndpoint = `${BACKEND}/edit-product`
+    const editProductEndpoint = `${BACKEND_URL}/edit-product`
     console.log("sending fetch to : ", editProductEndpoint)
     const resp = await fetch(editProductEndpoint, {
         method: 'PUT',

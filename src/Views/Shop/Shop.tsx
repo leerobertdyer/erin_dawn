@@ -16,7 +16,7 @@ interface IShop {
     u: User | null
 }
 export default function Shop({ u }: IShop) {
-    const { handleBack, handleEdit, isEditing, isBatchEdit, setFilteredInventory, filteredInventory, setIsBatchEdit, setPreviousUrl, setProduct } = useProductManagementContext();
+    const { handleBack, handleEdit, isEditing, isBatchEdit, setFilteredInventory, filteredInventory, setIsBatchEdit, setPreviousUrl, setProduct, cartProducts } = useProductManagementContext();
     const location = useLocation();
     const { allPhotos } = usePhotosContext();
     const [inventory, setInventory] = useState<IProductInfo[][]>([])
@@ -30,6 +30,7 @@ export default function Shop({ u }: IShop) {
         setPreviousUrl(location.pathname)
     }, [location])
 
+
     useEffect(() => {
         if (isEditing) navigate('/edit-product');
         else if (isAddingPhoto) navigate('/add-series-photo')
@@ -38,12 +39,10 @@ export default function Shop({ u }: IShop) {
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         const category = params.get('category');
-        console.log('Category:', category)  
         if (category) {
             const filteredPhotos = allPhotos.filter(photo => photo.category === category);
             if (filteredPhotos.length > 0) {
                 setFilteredInventory(filteredPhotos);
-                console.log('wtf', filteredPhotos)
             }
             else setFilteredInventory(allPhotos.filter(photo => photo.tags.includes("inventory")));
         } else {
@@ -53,9 +52,7 @@ export default function Shop({ u }: IShop) {
 
 
     useEffect(() => {
-        console.log('hete: ', filteredInventory)
         const nextInventory = filteredInventory.filter(photo => photo.tags.includes("inventory"))
-        console.log('nextInventory: ', nextInventory)
         const groupedPhotos: IProductInfo[][] = []
         const photoMap: { [key: string]: IProductInfo[] } = {};
         nextInventory.forEach(photo => {
@@ -88,7 +85,6 @@ export default function Shop({ u }: IShop) {
     }
 
     function handleAddPhotoToSeries(product: IProductInfo) {
-        console.log(`Adding photo to ${product.series} series`)
         setProduct(product)
         setIsAddingPhoto(true)
     }

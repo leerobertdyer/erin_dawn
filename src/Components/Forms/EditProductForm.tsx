@@ -11,6 +11,7 @@ import { usePhotosContext } from "../../Context/PhotosContext";
 import editDoc from "../../firebase/editDoc";
 import editFile from "../../firebase/editfile";
 import { resizeFile } from "../../util/resizeFile";
+import { BACKEND_URL } from "../../util/constants";
 
 export default function EditProductForm() {
     const { product, isEditing, setIsEditing, handleDelete, previousUrl, handleBack } = useProductManagementContext();
@@ -30,8 +31,6 @@ export default function EditProductForm() {
         if (!isEditing) navigate(previousUrl);
     }, [isEditing])
 
-    const BACKEND = import.meta.env.VITE_BACKEND_URL;
-
     async function editStripeProduct() {
         const stripeProduct = {
             stripeProductId: product?.stripeProductId,
@@ -39,7 +38,7 @@ export default function EditProductForm() {
             description: description,
             newPrice: price,
         }
-        const editProductEndpoint = `${BACKEND}/edit-product`
+        const editProductEndpoint = `${BACKEND_URL}/edit-product`
         console.log("sending fetch to : ", editProductEndpoint)
         const resp = await fetch(editProductEndpoint, {
             method: 'PUT',

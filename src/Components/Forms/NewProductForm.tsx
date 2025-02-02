@@ -242,7 +242,7 @@ export default function NewProductForm() {
                     {series === newSeries && <CustomInput label="New Series Name" value={newSeriesName} onChange={(e) => setNewSeriesName(e.target.value)} type="text" placeholder="New Series" required={true} />}
                     {series !== defaultSeries && (newSeriesName || series !== newSeriesName) &&
                         <>
-                            <CustomInput label="Price" value={price ? price.toString() : ""} onChange={(e) => setPrice(Number(e.target.value))} min={1} step="1" type="number" placeholder="Price" required={true} />
+                            <CustomInput label="Price" value={price ? price.toString() : ""} onChange={(e) => setPrice(Number(e.target.value))} min={.01} type="number" placeholder="Price" required={true} />
                             {Number(price) > 0 && <CustomInput label="Description" value={description} onChange={(e) => setDescription(e.target.value)} type="text" placeholder="Description" required={true} />}
                             {description && <CustomInput type="checkbox" value={''} label="Add Size Info?" onChange={(e) => setSizeChecked(e.target.checked)} />}
                            {sizeChecked && <CustomInput label="Sizing Description" value={size} onChange={(e) => setSize(e.target.value)} type="text" placeholder="Sizing" required={true} />}
