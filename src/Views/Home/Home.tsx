@@ -1,4 +1,3 @@
-import { User } from "firebase/auth";
 import BackgroundDiv from "../../Components/BackgroundDiv/BackgroundDiv";
 import Hero from "../../Components/Hero/Hero";
 import Main from "../../Components/Main/Main";
