@@ -28,12 +28,12 @@ export default function AdminButtonWrapper({ onclickFunction, content }: ICustom
                         </div>
                         : content === "LEFT"
                             ? <div className="flex justify-center items-center gap-2">
-                                <IoIosArrowBack />
+                                <IoIosArrowBack />Prev
                             </div>
                             : content === "RIGHT"
 
                                 ? <div className="flex justify-center items-center gap-2">
-                                    <IoIosArrowForward />
+                                    Next<IoIosArrowForward />
                                 </div>
                                 : content}
 

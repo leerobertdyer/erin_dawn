@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { IProductInfo } from "../Interfaces/IProduct";
-import { getPhotos } from "../firebase/getPhotos";
+import { getPhotos } from "../firebase/getFiles";
 
 export function usePhotos() {
     const [allPhotos, setAllPhotos] = useState<IProductInfo[]>([]);

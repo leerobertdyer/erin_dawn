@@ -34,15 +34,13 @@ export default function NewSeriesPhotoForm() {
         if (!product) return;
 
         const nextIndex = allPhotos.filter(photo => photo.itemName === product.itemName).length + 1
-        console.log("Next photo in item array will have itemNumber: ", nextIndex)
 
-        const newTitle = `${product.title.replace(/ /g, "_")}${(nextIndex).toString()}`
-        console.log("New Title: ", newTitle)
+        const safeTitle = `${product.title.replace(/ /g, "_")}`
 
         const rezisedFile = await resizeFile(file, 400, 600);
 
         const fileToUpload = {
-            reference: newTitle,
+            reference: safeTitle,
             file: rezisedFile,
             onProgress: onProgress,
         }
@@ -53,7 +51,7 @@ export default function NewSeriesPhotoForm() {
         // Create new product in firestore
         const newProductId = await newDoc({
             downloadUrl,
-            title: newTitle,
+            title: product.title,
             description: product.description,
             price: product.price,
             size: product.size,
@@ -73,7 +71,7 @@ export default function NewSeriesPhotoForm() {
             {
                 id: newProductId,
                 imageUrl: downloadUrl,
-                title: newTitle,
+                title: product.title,
                 description: product.description,
                 price: product.price,
                 size: product.size,

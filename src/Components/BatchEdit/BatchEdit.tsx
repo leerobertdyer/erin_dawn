@@ -5,7 +5,7 @@ import { useProductManagementContext } from "../../Context/ProductMgmtContext";
 import { useState } from "react";
 import WarningDialogue from "../WarningDialogue/WarningDialogue";
 import { usePhotosContext } from "../../Context/PhotosContext";
-import editDoc from "../../firebase/editDoc";
+import { editDoc } from "../../firebase/editDoc";
 
 interface IBatchEdit {
     products: IProductInfo[];
@@ -94,11 +94,11 @@ export default function BatchEdit({ products, handleBack }: IBatchEdit) {
     )
 
     return (
-        <div className="fixed top-0 left-0 z-10 w-screen min-h-full py-[2rem] bg-white flex flex-col items-center">
-            <div className="flex flex-col md:flex-row justify-center items-center gap-[1rem] w-full">
+        <div className="fixed top-0 left-0 z-10 w-screen h-screen py-[2rem] overflow-auto bg-white flex flex-col items-center">
+            <div className="flex flex-col md:flex-row justify-center items-center gap-[1rem] w-full h-fit">
                 {products.map((product) =>
-                    <Frame key={product.id} additionalClass="w-[15rem] ">
-                        <img src={product.imageUrl} id={product.id} className="rounded-md" />
+                    <Frame key={product.id} additionalClass="w-[15rem] h-[24rem]">
+                        <img src={product.imageUrl} id={product.id} className="rounded-md object-cover h-[80%]" />
                         {isSettingKey
                             ? product.itemOrder === 1
                                 ? <AdminButtons moveProductRight={() => moveProductRight(product)} />
@@ -114,7 +114,7 @@ export default function BatchEdit({ products, handleBack }: IBatchEdit) {
                 )}
             </div>
             <button onClick={isSettingKey ? () => handleFinishKey() : handleBack}
-                className="w-[10rem] m-auto bg-edcPurple-60 text-white  p-2 rounded-md">{isSettingKey ? "Done" : "Back"}</button>
+                className="w-[10rem] mx-auto mt-6 bg-edcPurple-60 text-white  p-2 rounded-md">{isSettingKey ? "Done" : "Back"}</button>
         </div>
     )
 }

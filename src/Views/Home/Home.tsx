@@ -6,10 +6,8 @@ import HeroPhotos from "../../Components/HeroPhotos/HeroPhotos";
 import { useProductManagementContext } from "../../Context/ProductMgmtContext";
 import { useEffect } from "react";
 
-interface IHome {
-    u: User | null
-}
-export function Home({ u }: IHome) {
+
+export function Home() {
     const { setIsEditing } = useProductManagementContext();
     useEffect(() => {
         setIsEditing(false)
@@ -19,11 +17,11 @@ export function Home({ u }: IHome) {
         <>
             <BackgroundDiv image="images/background.jpg">
                 <Hero>
-                    <HeroPhotos u={u} />
+                    <HeroPhotos />
                 </Hero>
             </BackgroundDiv>
             <BackgroundDiv image="images/background.jpg">
-                <Main u={u} />
+                <Main />
             </BackgroundDiv>
         </>
     )

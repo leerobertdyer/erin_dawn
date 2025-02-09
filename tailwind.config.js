@@ -5,7 +5,8 @@ export const content = [
 ];
 export const theme = {
   fontFamily: {
-    retro: ['RetromaVibesRegular']
+    retro: ['RetromaVibesRegular'],
+    classy: ['GowunDodum-Regular']
   },
 
   extend: {

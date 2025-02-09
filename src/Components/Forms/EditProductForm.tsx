@@ -8,7 +8,7 @@ import CustomInput from "../CustomInput/CustomInput";
 import WarningDialogue from "../WarningDialogue/WarningDialogue";
 import { IProductInfo } from "../../Interfaces/IProduct";
 import { usePhotosContext } from "../../Context/PhotosContext";
-import editDoc from "../../firebase/editDoc";
+import { editDoc } from "../../firebase/editDoc";
 import editFile from "../../firebase/editfile";
 import { resizeFile } from "../../util/resizeFile";
 import { BACKEND_URL } from "../../util/constants";

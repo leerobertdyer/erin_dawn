@@ -18,8 +18,8 @@ export default async function uploadFile({ reference, file, onProgress }: IUploa
         (snapshot) => {
           // Observe state change events such as progress, pause, and resume
           const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          onProgress && onProgress(Math.floor(progress));
-          console.log('Upload is ' + progress + '% done');
+          onProgress(Math.floor(progress));
+          console.log('Upload is ' + Math.floor(progress) + '% done');
           switch (snapshot.state) {
             case 'paused':
               console.log('Upload is paused');

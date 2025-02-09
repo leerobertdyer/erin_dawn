@@ -9,16 +9,14 @@ export default function CartItem({ item }: ICartItem) {
 
     return (
         <div className="
-        w-full h-[7rem]
-        flex items-center justify-between 
-        p-2 border-2 border-black rounded-md gap-2">
-            <div className="overflow-hidden w-18 h-18 rounded-md">
-            <img src={item.imageUrl} alt={item.title} className="w-20 h-20 object-cover object-center" />
-            </div>
-            <p className="font-retro rotate-6 text-2xl">${item.price}<span className="text-xs">.00</span></p>
-            <div className="flex flex-col items-end justify-center gap-2">
-                <h1>"{item.title}"</h1>
-                <button className=" bg-rose-600 text-white p-1 rounded-md"
+        w-full h-fit
+        flex flex-col items-center justify-between 
+        p-2 border-2 border-black rounded-md gap-4 bg-cover bg-center"
+        style={{ backgroundImage: `url(${item.imageUrl})` }}>
+            <p className="bg-white border-2 border-black px-2 rounded-md font-retro rotate-6 text-2xl ">${item.price}<span className="text-xs">.00</span></p>
+            <div className="flex flex-col items-center justify-center gap-4">
+                <h1 className="bg-white border-2 border-black p-2 rounded-md text-wrap w-full text-center">"{item.title}"</h1>
+                <button className="bg-rose-600 text-white p-1 rounded-md"
                 onClick={() => setCartProducts(cartProducts.filter(product => product.id !== item.id))}>Remove</button>
             </div>
         </div>

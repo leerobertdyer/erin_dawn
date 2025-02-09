@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { IProductInfo } from '../Interfaces/IProduct';
 import removeProduct from '../firebase/removeProduct';
 import { removeFile } from '../firebase/removeFile';
-import { getPhoto } from '../firebase/getPhotos';
+import { getPhoto } from '../firebase/getFiles';
 
 export function useProductManagement() {
 

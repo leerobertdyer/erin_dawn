@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { browserSessionPersistence, getAuth, setPersistence } from "firebase/auth";
+import { browserLocalPersistence, getAuth, setPersistence } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
@@ -23,13 +23,13 @@ const storage = getStorage(app);
 const analytics = getAnalytics(app);
 const auth = getAuth(app);
 
-setPersistence(auth, browserSessionPersistence)
+setPersistence(auth, browserLocalPersistence)
   .then(() => {
-    console.log('Session persistence set');
+    console.log('local persistence set');
   })
   .catch((error) => {
     console.error('Error setting session persistence: ', error);
   });
-
+  
 
 export { auth, analytics, app, db, storage };

@@ -11,11 +11,11 @@ export default function ShoppingButtons({ product, handleDetails }: IShoppingBut
     const [isInCart, setIsInCart] = useState(false)
 
     useEffect(() => {
-        console.log('cart changed in shoppingButtons')
         setIsInCart(cartProducts.some(p => p.id === product.id));
     }, [cartProducts, product.id])
 
     function handleAddToCart(product: IProductInfo) {
+        console.log("Adding this url to fucking cart", product.imageUrl)
         const nextProducts = [...cartProducts, product]
         setCartProducts(nextProducts)
     }
@@ -25,11 +25,11 @@ export default function ShoppingButtons({ product, handleDetails }: IShoppingBut
         setCartProducts(newCart)
     }
 
-    return (
-        <div className="flex flex-col justify-center items-center w-full p-2 gap-4">
-            <div className="flex justify-around w-full bg-white p-2 rounded-md text-edcPurple-80">
+  return (
+        <div className="flex flex-col justify-center items-center w-full pb-2 px-2 gap-2">
+            <div className="flex justify-around w-full flex-wrap gap-2 bg-white p-0 rounded-md text-edcPurple-80">
                 <p>{product.itemName}</p>
-                <p className="font-retro rotate-6 text-2xl">${product.price}<span className="text-xs">.00</span></p>
+                <p className="font-retro rotate-6 text-2xl p-0">${product.price}<span className="text-xs">.00</span></p>
             </div>
             {handleDetails && <button
                 className="

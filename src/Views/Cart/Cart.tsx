@@ -1,4 +1,3 @@
-
 import CartItem from "../../Components/CartItem/CartItem";
 import CheckoutButton from "../../Components/CheckoutButton/CheckoutButton";
 import { useProductManagementContext } from "../../Context/ProductMgmtContext";
@@ -20,7 +19,7 @@ export default function Cart() {
                 <div className="w-full h-fit bg-white p-2 border-2 border-black rounded-md text-center">
                     <p>Total: ${cartProducts.reduce((acc, product) => acc + product.price, 0)}.00</p>
                 </div>
-                <CheckoutButton salesItems={cartProducts.map((item) => ({ id: item.id, quantity: 1, stripePriceId: item.stripePriceId }))} />
+                <CheckoutButton salesItems={cartProducts.map((item) => ({ id: item.id, quantity: 1, itemName: item.itemName, stripePriceId: item.stripePriceId, price: item.price }))} />
             </div>
             <div className="w-full h-fit flex flex-col items-center justify-start gap-4">
 

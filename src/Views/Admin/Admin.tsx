@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { auth } from "../../firebase/firebaseConfig";
-import { setPersistence, signInWithEmailAndPassword, User, browserSessionPersistence } from "@firebase/auth";
+import { setPersistence, signInWithEmailAndPassword, browserLocalPersistence } from "@firebase/auth";
 import AdminPanel from "../../Components/AdminPanel/AdminPanel";
+import { useUserContext } from "../../Context/UserContext";
 
-export default function Admin({ u, setUser }: { u: User | null, setUser: (user: User | null) => void }) {
+export default function Admin() {
+    const { user, setUser } = useUserContext();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    async function login(email: string, password: string) {
-        await setPersistence(auth, browserSessionPersistence)
+    async function loginWithEmailPass(email: string, password: string) {
+        await setPersistence(auth, browserLocalPersistence)
         signInWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
                 const user = userCredential.user;
@@ -25,16 +27,17 @@ export default function Admin({ u, setUser }: { u: User | null, setUser: (user: 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!email || !password) return
-        login(email, password);
+        loginWithEmailPass(email, password);
+        // TODO: add passwordless login (IE apple, google, etc)
     };
 
     return (
-        u
+        user
             ?
             <AdminPanel />
             :
-            <div className="bg-white flex justify-center items-center w-screen h-screen">
-                <div className="border-2 border-black rounded-md p-4 bg-blue-300 w-[35vw] h-[25vw] flex justify-center items-center mb-20">
+            <div className="bg-[url('/images/background.jpg')] bg-cover bg-center flex justify-center items-center w-screen h-screen">
+                <div className="border-2 border-black rounded-md p-4 w-[35vw] h-[25vw] flex justify-center items-center mb-20">
                     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                         <h1 className="text-3xl">Backdoor Login</h1>
                         <input type="email" required placeholder="Email" className="p-2" onChange={(e) => setEmail(e.target.value)} />

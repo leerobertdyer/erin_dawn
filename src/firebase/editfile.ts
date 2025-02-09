@@ -1,6 +1,6 @@
 import uploadFile from "./uploadFile";
 import { removeFile } from "./removeFile";
-import editDoc from "./editDoc";
+import { editDoc } from "./editDoc";
 
 // There is no firebase function to edit a file. Instead the solution is to: 
 //  1. delete file

@@ -8,7 +8,7 @@ import CustomInput from "../CustomInput/CustomInput";
 import { useNavigate } from "react-router-dom";
 import editFile from "../../firebase/editfile";
 import { resizeFile } from "../../util/resizeFile";
-import editDoc from "../../firebase/editDoc";
+import { editDoc } from "../../firebase/editDoc";
 import { usePhotosContext } from "../../Context/PhotosContext";
 
 export default function EditCategoryForm() {

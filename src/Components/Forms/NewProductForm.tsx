@@ -165,14 +165,14 @@ export default function NewProductForm() {
         // Create new product in firestore
         const newProductId = await newDoc({
             downloadUrl,
-            title: title.replace(/ /g, "_"),
+            title,
             description,
             price: Number(price),
             size: sizeChecked ? size : "",
             category: categoryNameToSave,
             tags,
             series: series === newSeries ? newSeriesName : series,
-            itemName: title.replace(/ /g, "_"),
+            itemName: title,
             itemOrder: 1, // new product is always first in series
             stripeProductId,
             stripePriceId,
@@ -190,7 +190,7 @@ export default function NewProductForm() {
             size: sizeChecked ? size : "",
             price: Number(price),
             series: series === newSeries ? newSeriesName : series,
-            itemName: title.replace(/ /g, "_"),
+            itemName: title,
             itemOrder: 1, // new product is always first in series
             stripeProductId,
             stripePriceId,

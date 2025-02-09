@@ -1,17 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { IoIosMenu, IoLogoInstagram } from "react-icons/io";
 import { Link, useLocation } from "react-router";
-import { User } from "firebase/auth";
 import CartIconAndNumber from "../cartIconAndNumber/CartIconAndNumber";
 import { useProductManagementContext } from "../../Context/ProductMgmtContext";
 import { CiShop } from "react-icons/ci";
+import { useUserContext } from "../../Context/UserContext";
 
-
-interface INav {
-    u: User | null
-}
-export default function Nav({ u }: INav) {
+export default function Nav() {
     const { cartProducts } = useProductManagementContext();
+    const { user } = useUserContext();
     
     const cartLength = cartProducts.length;
     const [isOpen, setIsOpen] = useState(false);
@@ -79,7 +76,7 @@ export default function Nav({ u }: INav) {
                     <Link to="/cart" className={`text-center select-none ${path === "/cart" ? "w-full bg-edcBlue-20" : ""} `}
                         onClick={() => setIsOpen(false)}>
                         Cart</Link>
-                    {u && <Link to="/admin"
+                    {user && <Link to="/admin"
                         className={`text-center select-none ${path === "/admin" ? "w-full bg-edcBlue-20" : ""} `}
                         onClick={() => setIsOpen(false)}>
                         Admin</Link>}

@@ -13,11 +13,11 @@ interface IEditDoc {
     category?: string;
     itemOrder?: number;
     itemName?: string;
-    stripeProductId: string; 
+    stripeProductId: string;
     stripePriceId: string;
 }
 
-export default async function editDoc({ id, title, description, price, tags, imageUrl, series, category, itemOrder=0, itemName, stripeProductId, stripePriceId, size }: IEditDoc) {
+async function editDoc({ id, title, description, price, tags, imageUrl, series, category, itemOrder = 0, itemName, stripeProductId, stripePriceId, size }: IEditDoc) {
     try {
         const docRef = doc(db, "photos", id);
         console.log('editing doc', docRef.path);
@@ -35,7 +35,7 @@ export default async function editDoc({ id, title, description, price, tags, ima
                 category,
                 itemOrder,
                 itemName,
-                stripeProductId, 
+                stripeProductId,
                 stripePriceId
             });
             return;
@@ -52,13 +52,38 @@ export default async function editDoc({ id, title, description, price, tags, ima
                 series,
                 itemOrder,
                 itemName,
-                stripeProductId, 
+                stripeProductId,
                 stripePriceId
             });
-            
+
         }
     } catch (error) {
         console.log("Error updating document: ", error);
     }
-
 }
+
+async function updateAboutText({ short, long, longHeader }: { short: string, long: string, longHeader: string }) {
+    try {
+        const docRef = doc(db, "texts", "about");
+        await updateDoc(docRef, {
+            short,
+            long,
+            longHeader
+        });
+    } catch (error) {
+        console.error("Error updating about text: ", error);
+    }
+}
+
+async function shipOrder({ id }: { id: string }) {
+    try {
+        const docRef = doc(db, "sales", id);
+        await updateDoc(docRef, {
+            isShipped: true
+        });
+    } catch (error) {
+        console.error("Error updating order: ", error);
+    }
+}
+
+export { editDoc, updateAboutText, shipOrder }
