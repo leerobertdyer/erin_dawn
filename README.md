@@ -15,6 +15,10 @@ Currently selling at [Grandmother Goods](https://www.gmother.com/)
     - Add "MEASUREMENTS" as it's own field
 - Get and add the text for "Keeping it clean" in the details section
 
+- Fix glitch where old photo shows after editing and then re-editing on hero at least...
+
+- Fix style to ensure ALL photos are the same in hero
+
 
 - Add note about free shipping in US
 
