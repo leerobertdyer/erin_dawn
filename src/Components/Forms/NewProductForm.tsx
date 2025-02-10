@@ -91,7 +91,7 @@ export default function NewProductForm() {
         else throw new Error("Error adding new category")
 
         // now add the photo for the new category
-        const safeName = newCategoryName.replace(/ /g, "_");
+        const safeName = newCategoryName.replace(/ /g, "_") + Date.now().toString();
         const resizedFile = await resizeFile(file, 1200, 1400);
         const fileToUpload = {
             reference: safeName,
@@ -147,7 +147,7 @@ export default function NewProductForm() {
         const rezisedFile = await resizeFile(file, 400, 600);
 
         const fileToUpload = {
-            reference: `${title.replace(/ /g, "_")}`,
+            reference: `${title.replace(/ /g, "_")}${Date.now().toString()}`,
             file: rezisedFile as File,
             onProgress: onProgress,
         }

@@ -7,6 +7,14 @@ Currently selling at [Grandmother Goods](https://www.gmother.com/)
 # TODO
 
 
+- Hero Upgrade
+    - Add +new hero option to hero bar
+    - Add auto scroll back to hero
+- Add to size in form
+    - Keep size for "large/medium/etc..."
+    - Add "MEASUREMENTS" as it's own field
+- Get and add the text for "Keeping it clean" in the details section
+
 
 - Add note about free shipping in US
 

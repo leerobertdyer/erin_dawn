@@ -35,7 +35,7 @@ export default function NewSeriesPhotoForm() {
 
         const nextIndex = allPhotos.filter(photo => photo.itemName === product.itemName).length + 1
 
-        const safeTitle = `${product.title.replace(/ /g, "_")}`
+        const safeTitle = `${product.title.replace(/ /g, "_")}${nextIndex}`
 
         const rezisedFile = await resizeFile(file, 400, 600);
 
