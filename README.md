@@ -19,6 +19,10 @@ Currently selling at [Grandmother Goods](https://www.gmother.com/)
 
 - Fix style to ensure ALL photos are the same in hero
 
+- Fix style PHOTO not filling inside of details view
+
+- Make description input a rich text editor
+
 
 - Add note about free shipping in US
 

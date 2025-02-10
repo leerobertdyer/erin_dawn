@@ -7,7 +7,6 @@ import { usePhotosContext } from "../../Context/PhotosContext";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../../Context/UserContext";
-// import AutoScroll from "../AutoScroll/AutoScroll";
 
 
 export default function HeroPhotos() {
@@ -43,19 +42,18 @@ export default function HeroPhotos() {
     return (<>
         <div className="w-[100vw] h-[45vh] flex justify-center items-center">
             {photos.length > 0 &&
-            // <AutoScroll> {
                 photos.map((photo, key) => {
                     return (
-                        <div key={key} className={`
-                        w-[10rem] md:w-[12rem] lg:w-[14rem] p-4 `}>
+                        <div key={key} className="
+                            flex-shrink-0
+                            w-[10rem] md:w-[12rem] lg:w-[14rem] p-4 h-full">
                             <Frame >
-                                <img src={photo.imageUrl} alt={photo.title} className="rounded-md object-cover object-center" />
+                                <img src={photo.imageUrl} alt={photo.title} className="rounded-md h-full w-auto object-cover object-center" />
                                 {user && <AdminButtons handleEdit={() => handleEdit(photo.id)} />}
                             </Frame>
                         </div>
                     )
                 })
-                // }</AutoScroll>
             }
         </div>
     </>
