@@ -8,6 +8,7 @@ import { shipOrder } from "../../firebase/editDoc";
 
 export default function AdminPanel() {
     const [allOrders, setAllOrders] = useState([]);
+    const [unshippedOrders, setUnshippedOrders] = useState([]);
     const [showCopyMessage, setShowCopyMessage] = useState(false); 
     const [addressCopied, setAddressCopied] = useState("");
     const currentYear = new Date().getFullYear();
@@ -17,6 +18,7 @@ export default function AdminPanel() {
             const orders = await getOrders();
             console.log('All Orders:', orders);
             setAllOrders(orders);
+            setUnshippedOrders(orders.filter((order: any) => !order.isShipped));
         }
         fetchCurrentOrders();
     }, [])
@@ -52,7 +54,7 @@ export default function AdminPanel() {
             const idToTarget = customerName.replace(/\s/g, "_")+"_"+sessionId
             console.log('Mark as Shipped:', idToTarget )
             shipOrder({ id: idToTarget });
-            setAllOrders(allOrders.filter((order: any) => order.sessionId !== sessionId));
+            setUnshippedOrders(unshippedOrders.filter((order: any) => order.sessionId !== sessionId));
         }
 
     return (
@@ -93,8 +95,8 @@ export default function AdminPanel() {
                         return acc;
                     }, 0)}</p>
                     <h1 className="text-2xl bg-white rounded-md w-fit p-2 mx-auto my-2">Current Unshipped Orders</h1>
-                    {allOrders.map((order: any) => {
-                        if (!order.isShipped) return (
+                    {unshippedOrders.map((order: any) => {
+                        return (
                             <div key={order.sessionId} className="bg-white flex flex-col items-center justify-center gap-2 p-2 text-center border-2 border-black rounded-md">
                                 <p>TOTAL SALE: ${order.totalSales}</p>
                                 <p>CUSTOMER NAME: {order.customerName}</p>
