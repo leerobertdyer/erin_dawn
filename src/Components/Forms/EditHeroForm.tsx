@@ -8,6 +8,7 @@ import MainFormTemplate from "./MainFormTemplate";
 import editFile from "../../firebase/editfile";
 import { resizeFile } from "../../util/resizeFile";
 import LoadingBar from "../LoadingBar/LoadingBar";
+import { NEW_PRODUCT_IMAGE_QUALITY } from "../../util/constants";
 
 export default function EditHeroForm() {
     const { product, isEditing, previousUrl, handleBack } = useProductManagementContext();
@@ -30,7 +31,12 @@ export default function EditHeroForm() {
         e.preventDefault();
         if (!product) return;
 
-        const resizedFile = await resizeFile(file, 300, 400);
+        const resizedFile = await resizeFile(file, {
+            maxWidth: 300,
+            maxHeight: 400,
+            maintainAspectRatio: true,
+            quality: NEW_PRODUCT_IMAGE_QUALITY
+        });
 
         const fileToEdit = {
             id: product.id,
@@ -40,6 +46,7 @@ export default function EditHeroForm() {
             tags: product.tags,
             url: product.imageUrl,
             size: product.size,
+            dimensions: product.dimensions,
             series: product.series,
             category: product.category,
             itemOrder: product.itemOrder,

@@ -32,6 +32,7 @@ export function useProductManagement() {
             description: photoData.description,
             price: photoData.price,
             size: photoData.size,
+            dimensions: photoData.dimensions,
             tags: photoData.tags,
             imageUrl: photoData.imageUrl,
             id: id,

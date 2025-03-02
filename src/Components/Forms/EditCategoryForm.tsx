@@ -10,6 +10,7 @@ import editFile from "../../firebase/editfile";
 import { resizeFile } from "../../util/resizeFile";
 import { editDoc } from "../../firebase/editDoc";
 import { usePhotosContext } from "../../Context/PhotosContext";
+import { NEW_PRODUCT_IMAGE_QUALITY } from "../../util/constants";
 
 export default function EditCategoryForm() {
     const { product } = useProductManagementContext();
@@ -36,7 +37,12 @@ export default function EditCategoryForm() {
         if (!product) return;
         let downloadUrl = "";
         if (file) {
-            const resizedFile = await resizeFile(file, 1200, 1400);
+            const resizedFile = await resizeFile(file, {
+                maxWidth: 1200,
+                maxHeight: 1400,
+                maintainAspectRatio: true,
+                quality: NEW_PRODUCT_IMAGE_QUALITY
+            });
             const fileToEdit = {
                 id: product.id,
                 title: product.title,
@@ -45,6 +51,7 @@ export default function EditCategoryForm() {
                 tags: product.tags,
                 url: product.imageUrl,
                 size: product.size ?? "",
+                dimensions: product.dimensions ?? "",
                 category,
                 series: product.series ?? "",
                 itemOrder: product.itemOrder ?? 0,
