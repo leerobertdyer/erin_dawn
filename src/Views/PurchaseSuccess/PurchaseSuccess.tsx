@@ -18,8 +18,7 @@ export default function PurchaseSuccess() {
 
     const { allPhotos, setAllPhotos } = usePhotosContext();
     const { cartProducts, setCartProducts } = useProductManagementContext();
-
-    const inventory = allPhotos.filter((photo: IProductInfo) => photo.tags.includes('inventory'));
+    const [inventoryPhotos, setInventoryPhotos] = useState<IProductInfo[]>([]);
 
     const [showConffeeti, setShowConfetti] = useState(true);
 
@@ -34,14 +33,14 @@ export default function PurchaseSuccess() {
             }
 
             for (const item of allSeriesForAllProducts) {
-                const nextTags = ['sold', 'edc']
                 console.log('Editing item:', item.title);
                 await editDoc({
                     ...item,
-                    tags: nextTags
+                    tags: ['sold', 'edc']
                 });
             }
             const nextPhotos = allPhotos.filter((photo: IProductInfo) => !allSeriesForAllProducts.some(soldItem => soldItem.id === photo.id));
+            setInventoryPhotos(nextPhotos.filter((photo: IProductInfo) => photo.tags.includes('inventory')));
             setAllPhotos(nextPhotos);
             setCartProducts([]);
         }
@@ -55,7 +54,7 @@ export default function PurchaseSuccess() {
             if (resp) console.log('resp.status:', resp.status);
             const data = await resp.json();
             if (data) {
-                console.log(data)
+                // console.log(data)
                 const shippingAddress = data.shipping_details.address
                 const customerName = data.shipping_details.name;
                 const totalSales = Number(data.metadata.saleTotal);
@@ -103,8 +102,8 @@ export default function PurchaseSuccess() {
                         flex justify-center items-center 
                         border-2 border-white"><IoIosClose size={80} /></Link>
                 </div>
-                <div className="flex flex-row justify-center items-center w-screen p-2 bg-edcBlue-40 bg-opacity-45 overflow-auto flex-wrap">
-                    {inventory.map((item: IProductInfo) => {
+                {inventoryPhotos.length > 0 && <div className="flex flex-row justify-center items-center w-screen p-2 bg-edcBlue-40 bg-opacity-45 overflow-auto flex-wrap">
+                    {inventoryPhotos.map((item: IProductInfo) => {
                         return (
                             <div className="w-[10rem] h-[10rem] border-white border-2 overflow-hidden relative" key={item.id}>
                                 <img className="w-full h-full object-cover object-center" src={item.imageUrl} alt={item.title} />
@@ -113,8 +112,7 @@ export default function PurchaseSuccess() {
                             </div>
                         )
                     })}
-
-                </div>
+                </div>}
             </div>
         </div>
     )

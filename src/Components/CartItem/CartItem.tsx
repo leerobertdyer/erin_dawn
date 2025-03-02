@@ -13,7 +13,7 @@ export default function CartItem({ item }: ICartItem) {
         flex flex-col items-center justify-between 
         p-2 border-2 border-black rounded-md gap-4 bg-cover bg-center"
         style={{ backgroundImage: `url(${item.imageUrl})` }}>
-            <p className="bg-white border-2 border-black px-2 rounded-md font-retro rotate-6 text-2xl ">${item.price}<span className="text-xs">.00</span></p>
+            <p className="bg-white border-2 border-black px-2 rounded-md font-retro rotate-6 text-2xl ">${Number(item.price).toFixed(2)}</p>
             <div className="flex flex-col items-center justify-center gap-4">
                 <h1 className="bg-white border-2 border-black p-2 rounded-md text-wrap w-full text-center">"{item.title}"</h1>
                 <button className="bg-rose-600 text-white p-1 rounded-md"
