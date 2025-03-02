@@ -68,7 +68,7 @@ export default function Shop() {
         for (const key in photoMap) {
             groupedPhotos.push(photoMap[key]);
         }
-        if (user) groupedPhotos.push([{ id: "new", itemName: "card", title: "New Product", description: "Add a new product to the inventory", size: "", imageUrl: "images/card.jpg", price: 0, series: "uncategorized", tags: ["inventory"], stripePriceId: "", stripeProductId: "", order: -10 }])
+        if (user) groupedPhotos.push([{ id: "new", itemName: "card", title: "New Product", description: "Add a new product to the inventory", size: "", dimensions: "", imageUrl: "images/card.jpg", price: 0, series: "uncategorized", tags: ["inventory"], stripePriceId: "", stripeProductId: "", order: -10 }])
         setInventory(groupedPhotos.sort((a, b) => (a[0].order ?? 0) - (b[0].order ?? 0))) // TODO: Apply order to all products to place them in desired page area
         if (groupedPhotos.length > 0) setIsLoading(false)
     }, [user, filteredInventory])
@@ -121,7 +121,7 @@ export default function Shop() {
                             ? user && series[0].id === "new" ?
                                 <div className="flex flex-col justify-between items-center h-full w-full">
                                     <div className={`w-full h-fit overflow-hidden rounded-md border-2 border-black`}>
-                                        <img src="/images/card.jpg" alt="Add a new product" className="object-contain object-center" />
+                                        <img src="/images/card.jpg" alt="Add a new product" className="w-full h-full object-contain object-center" />
                                     </div>
                                     Add New Product
                                     <AdminButtons addProduct={true} />
@@ -129,7 +129,7 @@ export default function Shop() {
                                 :
                                 <div className="flex flex-col justify-between items-center h-full w-full">
                                     <div className={`w-full ${imageHeight} rounded-md overflow-hidden border-2 border-black`}>
-                                        <img src={series[0].imageUrl} alt={series[0].title} className="object-cover object-center" />
+                                        <img src={series[0].imageUrl} alt={series[0].title} className="w-full h-full object-cover object-center" />
                                     </div>
                                     {user && series[0].series && <AdminButtons addPhotoToSeries={() => handleAddPhotoToSeries(series[0])} handleEdit={() => handleEdit(series[0].id)} />}
                                     <ShoppingButtons product={series[0]} handleDetails={() => handleClickProductDetails(index)} />

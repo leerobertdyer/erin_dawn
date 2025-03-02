@@ -11,7 +11,7 @@ import { usePhotosContext } from "../../Context/PhotosContext";
 import { editDoc } from "../../firebase/editDoc";
 import editFile from "../../firebase/editfile";
 import { resizeFile } from "../../util/resizeFile";
-import { BACKEND_URL } from "../../util/constants";
+import { BACKEND_URL, NEW_PRODUCT_DEFAULT_HEIGHT, NEW_PRODUCT_DEFAULT_WIDTH, NEW_PRODUCT_IMAGE_QUALITY } from "../../util/constants";
 
 export default function EditProductForm() {
     const { product, isEditing, setIsEditing, handleDelete, previousUrl, handleBack } = useProductManagementContext();
@@ -69,7 +69,12 @@ export default function EditProductForm() {
         const { stripeProductId, stripePriceId } = await editStripeProduct()
         const nextPhotos = [];
         if (file) { // if file is present, edit the file then update doc for that specific photo
-            const resizedFile = await resizeFile(file, 400, 600);
+            const resizedFile = await resizeFile(file, {
+                maxWidth: NEW_PRODUCT_DEFAULT_WIDTH,
+                maxHeight: NEW_PRODUCT_DEFAULT_HEIGHT,
+                maintainAspectRatio: true,
+                quality: NEW_PRODUCT_IMAGE_QUALITY
+            });
             downloadUrl = await editFile({
                 file: resizedFile,
                 id: product.id,
@@ -111,7 +116,7 @@ export default function EditProductForm() {
             // if file is not present, update metadata only
             const newPhoto = {
                 id: photo.id,
-                imageUrl: undefined,
+                imageUrl: photo.imageUrl,
                 title,
                 description,
                 price,
@@ -137,11 +142,11 @@ export default function EditProductForm() {
             }
             return photo;
         })
-        console.log("CHECK THIS ONE!", nextAllPhotos)
-
+        console.log("Allphotos After editing:", nextAllPhotos)
         setAllPhotos(nextAllPhotos);
 
         setIsEditing(false);
+
         navigate('/shop');
     }
 
@@ -175,9 +180,17 @@ export default function EditProductForm() {
                
                 <MainFormTemplate product={product} handleClickBack={handleBack} resetState={resetState} handleDelete={onClickDelete}>
                     <CustomInput type="text" label="Product Name" placeholder="Product Name" value={title} onChange={(e) => setTitle(e.target.value)} />
-                    <CustomInput type="text" label="Product Description" placeholder="Product Description" value={description} onChange={(e) => setDescription(e.target.value)} />
-                    <CustomInput type="number" label="Product Price" placeholder="Product Price" value={price.toString()} onChange={(e) => setPrice(Number(Number((e.target.value)).toFixed(0)))} />
-                    <CustomInput type="text" label="General Size (sm/med/lg/etc)" placeholder="Product Sizing" value={size} onChange={(e) => setSize(e.target.value)} />
+                    <CustomInput type="textarea" label="Product Description" placeholder="Product Description" value={description} onChange={(e) => setDescription(e.target.value)} />
+                    <CustomInput type="number" label="Product Price" placeholder="Product Price" value={price.toString()} onChange={(e) => setPrice(Number(Number((e.target.value)).toFixed(2)))} />
+                        <select className="border-2 border-black rounded-md p-2 w-full" onChange={(e) => setSize(e.target.value)} value={size}>
+                            <option value="" disabled>Select Size</option>
+                            <option value="sm">Small</option>
+                            <option value="md">Medium</option>
+                            <option value="lg">Large</option>
+                            <option value="xl">XL</option>
+                            <option value="2xl">2XL</option>
+                            <option value="3xl">3XL</option>
+                        </select>
                     <CustomInput type="text" label="Dimensions" placeholder="Dimensions" value={dimensions} onChange={(e) => setDimensions(e.target.value)} />
 
                     <div className="flex flex-col gap-2">

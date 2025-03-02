@@ -119,6 +119,7 @@ async function addNewSale({ customerName, shippingAddressString, sessionId, isSh
     const safeName = customerName.replace(/\s/g, "_");
     const customId = safeName + "_" + sessionId;
     await setDoc(doc(db, "sales", customId), {
+      createdAt: new Date(),
       customerName,
       shippingAddressString,
       sessionId,

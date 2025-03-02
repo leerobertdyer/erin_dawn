@@ -8,13 +8,7 @@ Currently selling at [Grandmother Goods](https://www.gmother.com/)
 
 ## MUST HAVE
 
-- Get and add the text for "Keeping it clean" in the details section
-
 - Send email/text notification when sale is made
-
-- Fix style PHOTO not filling inside of details view
-
-- Make description input a rich text editor or at least make it so you can add spaces....
 
 - Add note about free shipping in US
 
@@ -25,7 +19,10 @@ Currently selling at [Grandmother Goods](https://www.gmother.com/)
 - Rotate Credentials
 
 
+
 ## NICE TO HAVE
+
+- Email Collection of some kind for repeat customers. Perhaps give them 10% off next purchase?
 
 - Admin panel still looks ameture could use some style updates
 

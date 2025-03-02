@@ -48,7 +48,7 @@ export default function HeroPhotos() {
                             flex-shrink-0
                             w-[10rem] md:w-[12rem] lg:w-[14rem] p-4 h-full">
                             <Frame >
-                                <img src={photo.imageUrl} alt={photo.title} className="rounded-md h-full w-auto object-cover object-center" />
+                                <img src={photo.imageUrl} alt={photo.title} className="rounded-md h-full w-full object-cover object-center" />
                                 {user && <AdminButtons handleEdit={() => handleEdit(photo.id)} />}
                             </Frame>
                         </div>

@@ -62,6 +62,7 @@ export default function PurchaseSuccess() {
                 const itemsSold = data.metadata.items.split(',');
                 const shippingAddressString = `${shippingAddress.line1}, ${shippingAddress.line2 ? shippingAddress.line2 + ' ' : ''}${shippingAddress.city}, ${shippingAddress.state} ${shippingAddress.postal_code} ${shippingAddress.country}`;
                 await addNewSale({ customerName, shippingAddressString, sessionId, isShipped: false, totalSales, itemsSold });
+                await sendEmailNotification({ customerName, shippingAddressString, itemsSold});
             }
 
         }
@@ -75,6 +76,17 @@ export default function PurchaseSuccess() {
             setShowConfetti(false);
         }, 4000);
     }, [])
+
+    async function sendEmailNotification({ customerName, shippingAddressString, itemsSold}: { customerName: string, shippingAddressString: string, itemsSold: string[] }) {
+        const resp = await fetch(`${BACKEND_URL}/send-email`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ customerName, shippingAddressString, itemsSold }),
+        });
+        if (resp) console.log('resp.status:', resp.status);
+    }
 
     return (
         <div style={{ backgroundImage: 'url(/images/background.jpg)' }}
@@ -95,7 +107,7 @@ export default function PurchaseSuccess() {
                     {inventory.map((item: IProductInfo) => {
                         return (
                             <div className="w-[10rem] h-[10rem] border-white border-2 overflow-hidden relative" key={item.id}>
-                                <img className="object-cover object-center" src={item.imageUrl} alt={item.title} />
+                                <img className="w-full h-full object-cover object-center" src={item.imageUrl} alt={item.title} />
                                 <div className="absolute bottom-0 w-full">
                                 </div>
                             </div>

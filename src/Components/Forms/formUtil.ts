@@ -12,6 +12,14 @@ function handleFileChange(e: React.ChangeEvent<HTMLInputElement>, setFile: React
 
 }
 
-const preventEnterFromSubmitting = (e: React.KeyboardEvent<HTMLFormElement>) => { if (e.key === "Enter") e.preventDefault(); }
+const preventEnterFromSubmitting = (e: React.KeyboardEvent<HTMLFormElement>) => { 
+    // Allow enter key in textareas
+    if (e.key === "Enter" && e.target instanceof HTMLElement) {
+        const tagName = e.target.tagName.toLowerCase();
+        if (tagName !== 'textarea') {
+            e.preventDefault();
+        }
+    }
+}
 
 export { handleFileChange, preventEnterFromSubmitting }

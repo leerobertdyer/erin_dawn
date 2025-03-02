@@ -103,7 +103,7 @@ export default function Nav() {
                     </Link>
             }  
                 <div className="text-right">
-                    <Link to="/">
+                    <Link to={user ? "/admin" : "/"}>
                         <h1 className="font-retro text-[1.25rem] md:text-[2.5rem] m-0 p-0">ERIn DaWn cAmPbELl</h1>
                     </Link>
                     <h2 className="text-[.5rem] md:text-[1rem] text-gray-400 m-0 md:pb-4">Handmade Clothing & Upcycled Vintage</h2>

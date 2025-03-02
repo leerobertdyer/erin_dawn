@@ -98,7 +98,7 @@ export default function BatchEdit({ products, handleBack }: IBatchEdit) {
             <div className="flex flex-col md:flex-row justify-center items-center gap-[1rem] w-full h-fit">
                 {products.map((product) =>
                     <Frame key={product.id} additionalClass="w-[15rem] h-[24rem]">
-                        <img src={product.imageUrl} id={product.id} className="rounded-md object-cover h-[80%]" />
+                        <img src={product.imageUrl} id={product.id} className="rounded-md object-cover w-full h-full " />
                         {isSettingKey
                             ? product.itemOrder === 1
                                 ? <AdminButtons moveProductRight={() => moveProductRight(product)} />

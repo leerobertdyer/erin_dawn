@@ -9,6 +9,7 @@ import LoadingBar from "../LoadingBar/LoadingBar";
 import { useNavigate } from "react-router-dom";
 import { usePhotosContext } from "../../Context/PhotosContext";
 import { resizeFile } from "../../util/resizeFile";
+import { NEW_PRODUCT_DEFAULT_HEIGHT, NEW_PRODUCT_DEFAULT_WIDTH, NEW_PRODUCT_IMAGE_QUALITY } from "../../util/constants";
 
 export default function NewSeriesPhotoForm() {
     const [background, setBackground] = useState("/images/background.jpg");
@@ -37,7 +38,12 @@ export default function NewSeriesPhotoForm() {
 
         const safeTitle = `${product.title.replace(/ /g, "_")}${nextIndex}`
 
-        const rezisedFile = await resizeFile(file, 400, 600);
+        const rezisedFile = await resizeFile(file, {
+            maxWidth: NEW_PRODUCT_DEFAULT_WIDTH,
+            maxHeight: NEW_PRODUCT_DEFAULT_HEIGHT,
+            maintainAspectRatio: true,
+            quality: NEW_PRODUCT_IMAGE_QUALITY
+        });
 
         const fileToUpload = {
             reference: safeTitle,
@@ -55,6 +61,7 @@ export default function NewSeriesPhotoForm() {
             description: product.description,
             price: product.price,
             size: product.size,
+            dimensions: product.dimensions,
             category: product.category ?? "uncategorized",
             tags: product.tags,
             series: product.series!,
@@ -75,6 +82,7 @@ export default function NewSeriesPhotoForm() {
                 description: product.description,
                 price: product.price,
                 size: product.size,
+                dimensions: product.dimensions,
                 tags: product.tags,
                 series: product.series!,
                 itemName: product.itemName,

@@ -27,7 +27,7 @@ export default function Carousel({ photos, children }: ICarouselParams) {
             className="flex flex-col justify-center gap-4 h-full w-full relative select-none">
             {photos.length > 1 && <>
                 <div
-                    className="p-2 bg-black bg-opacity-35 rounded-md text-white absolute right-0 top-4">
+                    className="p-2 bg-black bg-opacity-35 rounded-md text-white absolute right-4 top-4">
                     {currentPhotoIndex + 1} / {photos.length}
                 </div>
                 <div
@@ -40,9 +40,9 @@ export default function Carousel({ photos, children }: ICarouselParams) {
                 </div>
             </>}
             {photos.length > 0 && photos[currentPhotoIndex] && (
-                <div className={`w-auto ${imageHeight} rounded-md overflow-hidden border-2 border-black`}>
+                <div className={`w-full h-full ${imageHeight} rounded-md overflow-hidden border-2 border-black`}>
                     <img src={photos[currentPhotoIndex].url} alt={photos[currentPhotoIndex].title}
-                        className="object-cover object-center" />
+                        className="w-full h-full object-cover object-center" />
                 </div>
             )}
             {children}

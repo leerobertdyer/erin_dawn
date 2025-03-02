@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { handleFileChange, preventEnterFromSubmitting } from "./formUtil";
 import MainFormTemplate from "./MainFormTemplate";
 import { resizeFile } from "../../util/resizeFile";
+import { NEW_PRODUCT_DEFAULT_HEIGHT, NEW_PRODUCT_DEFAULT_WIDTH, NEW_PRODUCT_IMAGE_QUALITY } from "../../util/constants";
 
 const defaultSeries = "--Select Series--";
 const newSeries = "--NEW SERIES--";
@@ -22,6 +23,8 @@ const defaultCategory = {
     name: "--Select Category--",
     series: [defaultSeries]
 }
+
+
 
 export default function NewProductForm() {
     const { allPhotos, setAllPhotos } = usePhotosContext();
@@ -94,7 +97,12 @@ export default function NewProductForm() {
 
         // now add the photo for the new category
         const safeName = newCategoryName.replace(/ /g, "_") + Date.now().toString();
-        const resizedFile = await resizeFile(file, 1200, 1400);
+        const resizedFile = await resizeFile(file, {
+            maxWidth: 1200,
+            maxHeight: 1400,
+            maintainAspectRatio: true,
+            quality: NEW_PRODUCT_IMAGE_QUALITY
+        });
         const fileToUpload = {
             reference: safeName,
             file: resizedFile,
@@ -147,7 +155,12 @@ export default function NewProductForm() {
             await handleNewSeries();
 
         // resize incoming photo
-        const rezisedFile = await resizeFile(file, 400, 600);
+        const rezisedFile = await resizeFile(file, {
+            maxWidth: NEW_PRODUCT_DEFAULT_WIDTH,
+            maxHeight: NEW_PRODUCT_DEFAULT_HEIGHT,
+            maintainAspectRatio: true,
+            quality: NEW_PRODUCT_IMAGE_QUALITY  // Good balance between quality and file size
+        });
 
         const fileToUpload = {
             reference: `${title.replace(/ /g, "_")}${Date.now().toString()}`,
@@ -248,12 +261,30 @@ export default function NewProductForm() {
                     {series !== defaultSeries && (newSeriesName || series !== newSeriesName) &&
                         <>
                             <CustomInput label="Price" value={price ? price.toString() : ""} onChange={(e) => setPrice(Number(e.target.value))} min={.01} type="number" placeholder="Price" required={true} />
-                            {Number(price) > 0 && <CustomInput label="Description" value={description} onChange={(e) => setDescription(e.target.value)} type="text" placeholder="Description" required={true} />}
-                            {description && <CustomInput type="checkbox" value={''} label="Add Size Info?" onChange={(e) => setSizeChecked(e.target.checked)} />}
-                           {sizeChecked && <CustomInput label="General Size (small/med/lg/etc)" value={size} onChange={(e) => setSize(e.target.value)} type="text" placeholder="Sizing" required={true} />}
+                            {Number(price) > 0 && <CustomInput label="Description" value={description} onChange={(e) => setDescription(e.target.value)} type="textarea" placeholder="Description" required={true} />}
+                            {description && <CustomInput 
+                                type="checkbox" 
+                                value={''} 
+                                label="Add Size Info?" 
+                                onChange={(e) => {
+                                    if ('checked' in e.target) {
+                                        setSizeChecked(e.target.checked);
+                                    }
+                                }} 
+                            />}
+                            {sizeChecked && 
+                                <select className="border-2 border-black rounded-md p-2 w-full" onChange={(e) => setSize(e.target.value)} value={size}>
+                                    <option value="" disabled>Select Size</option>
+                                    <option value="sm">Small</option>
+                                    <option value="md">Medium</option>
+                                    <option value="lg">Large</option>
+                                    <option value="xl">XL</option>
+                                    <option value="2xl">2XL</option>
+                                    <option value="3xl">3XL</option>
+                                </select>}
                             <CustomInput label="Dimensions" value={dimensions} onChange={(e) => setDimensions(e.target.value)} type="text" placeholder="Dimensions" required={true} />
-                                    <label htmlFor="fileInput" className="w-full bg-gray-200 p-2 rounded-md text-center cursor-pointer flex justify-center items-center gap-4 border-2 border-edcPurple-60">Select Photo<IoIosCamera /></label>
-                                    <input id="fileInput" hidden onChange={(e) => handleFileChange(e, setFile, setBackground)} type="file" required={true} />
+                            <label htmlFor="fileInput" className="w-full bg-gray-200 p-2 rounded-md text-center cursor-pointer flex justify-center items-center gap-4 border-2 border-edcPurple-60">Select Photo<IoIosCamera /></label>
+                            <input id="fileInput" hidden onChange={(e) => handleFileChange(e, setFile, setBackground)} type="file" required={true} />
                             {file && <button type="submit"
                                 disabled={isSubmitting}
                                 className="
