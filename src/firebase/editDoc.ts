@@ -7,6 +7,7 @@ interface IEditDoc {
     description: string;
     price: number;
     size: string;
+    dimensions: string;
     tags: string[];
     imageUrl?: string;
     series?: string;
@@ -17,7 +18,7 @@ interface IEditDoc {
     stripePriceId: string;
 }
 
-async function editDoc({ id, title, description, price, tags, imageUrl, series, category, itemOrder = 0, itemName, stripeProductId, stripePriceId, size }: IEditDoc) {
+async function editDoc({ id, title, description, price, tags, imageUrl, series, category, itemOrder = 0, itemName, stripeProductId, stripePriceId, size, dimensions }: IEditDoc) {
     try {
         const docRef = doc(db, "photos", id);
         console.log('editing doc', docRef.path);
@@ -29,6 +30,7 @@ async function editDoc({ id, title, description, price, tags, imageUrl, series, 
                 description,
                 price,
                 size,
+                dimensions,
                 tags,
                 imageUrl,
                 series,
@@ -47,6 +49,7 @@ async function editDoc({ id, title, description, price, tags, imageUrl, series, 
                 description,
                 price,
                 size,
+                dimensions,
                 tags,
                 category,
                 series,

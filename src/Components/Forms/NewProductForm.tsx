@@ -36,6 +36,7 @@ export default function NewProductForm() {
     const [newSeriesName, setNewSeriesName] = useState("");
     const [price, setPrice] = useState<number | null>();
     const [size, setSize] = useState("");
+    const [dimensions, setDimensions] = useState("");
     const [description, setDescription] = useState("");
     const [file, setFile] = useState<File | null | undefined>();
     const [background, setBackground] = useState("");
@@ -72,6 +73,7 @@ export default function NewProductForm() {
         setNewSeriesName("")
         setPrice(null)
         setSize("")
+        setDimensions("")
         setDescription("")
         setFile(null)
         setBackground("")
@@ -107,6 +109,7 @@ export default function NewProductForm() {
             description: newCategoryName,
             price: 0,
             size: "",
+            dimensions: "",
             tags: ["edc", "mainPage"],
             series: newSeriesName,
             itemName: safeName,
@@ -169,6 +172,7 @@ export default function NewProductForm() {
             description,
             price: Number(price),
             size: sizeChecked ? size : "",
+            dimensions,
             category: categoryNameToSave,
             tags,
             series: series === newSeries ? newSeriesName : series,
@@ -188,6 +192,7 @@ export default function NewProductForm() {
             category: categoryNameToSave,
             tags,
             size: sizeChecked ? size : "",
+            dimensions,
             price: Number(price),
             series: series === newSeries ? newSeriesName : series,
             itemName: title,
@@ -245,7 +250,8 @@ export default function NewProductForm() {
                             <CustomInput label="Price" value={price ? price.toString() : ""} onChange={(e) => setPrice(Number(e.target.value))} min={.01} type="number" placeholder="Price" required={true} />
                             {Number(price) > 0 && <CustomInput label="Description" value={description} onChange={(e) => setDescription(e.target.value)} type="text" placeholder="Description" required={true} />}
                             {description && <CustomInput type="checkbox" value={''} label="Add Size Info?" onChange={(e) => setSizeChecked(e.target.checked)} />}
-                           {sizeChecked && <CustomInput label="Sizing Description" value={size} onChange={(e) => setSize(e.target.value)} type="text" placeholder="Sizing" required={true} />}
+                           {sizeChecked && <CustomInput label="General Size (small/med/lg/etc)" value={size} onChange={(e) => setSize(e.target.value)} type="text" placeholder="Sizing" required={true} />}
+                            <CustomInput label="Dimensions" value={dimensions} onChange={(e) => setDimensions(e.target.value)} type="text" placeholder="Dimensions" required={true} />
                                     <label htmlFor="fileInput" className="w-full bg-gray-200 p-2 rounded-md text-center cursor-pointer flex justify-center items-center gap-4 border-2 border-edcPurple-60">Select Photo<IoIosCamera /></label>
                                     <input id="fileInput" hidden onChange={(e) => handleFileChange(e, setFile, setBackground)} type="file" required={true} />
                             {file && <button type="submit"

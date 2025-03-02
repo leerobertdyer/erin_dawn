@@ -22,6 +22,7 @@ export default function EditProductForm() {
     const [description, setDescription] = useState(product?.description ?? "");
     const [price, setPrice] = useState(product?.price ?? 0.00);
     const [size, setSize] = useState(product?.size ?? "");
+    const [dimensions, setDimensions] = useState(product?.dimensions ?? "");
     const [file, setFile] = useState<File | null>(null);
     const [background, setBackground] = useState(product?.imageUrl ?? "");
     const [isDeleting, setIsDeleting] = useState(false);
@@ -77,6 +78,7 @@ export default function EditProductForm() {
                 description,
                 price,
                 size,
+                dimensions,
                 tags: product.tags,
                 category: product.category,
                 series: product.series,
@@ -92,6 +94,7 @@ export default function EditProductForm() {
                 description,
                 price,
                 size,
+                dimensions,
                 tags: product.tags,
                 category: product.category,
                 series: product.series,
@@ -113,6 +116,7 @@ export default function EditProductForm() {
                 description,
                 price,
                 size,
+                dimensions,
                 tags: photo.tags,
                 series: photo.series,
                 category: photo.category,
@@ -167,19 +171,14 @@ export default function EditProductForm() {
 
             <form onSubmit={handleSubmit} onKeyDown={preventEnterFromSubmitting}
                 className="bg-white flex flex-col justify-center m-auto items-center w-[85vw] h-screen border-2 border-black rounded-md p-4 mt-4 gap-4"
-                style={{ backgroundImage: `url(${background})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
-            >
-
-
+                style={{ backgroundImage: `url(${background})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+               
                 <MainFormTemplate product={product} handleClickBack={handleBack} resetState={resetState} handleDelete={onClickDelete}>
-
                     <CustomInput type="text" label="Product Name" placeholder="Product Name" value={title} onChange={(e) => setTitle(e.target.value)} />
-
                     <CustomInput type="text" label="Product Description" placeholder="Product Description" value={description} onChange={(e) => setDescription(e.target.value)} />
-
                     <CustomInput type="number" label="Product Price" placeholder="Product Price" value={price.toString()} onChange={(e) => setPrice(Number(Number((e.target.value)).toFixed(0)))} />
-
-                    <CustomInput type="text" label="Size" placeholder="Product Sizing" value={size} onChange={(e) => setSize(e.target.value)} />
+                    <CustomInput type="text" label="General Size (sm/med/lg/etc)" placeholder="Product Sizing" value={size} onChange={(e) => setSize(e.target.value)} />
+                    <CustomInput type="text" label="Dimensions" placeholder="Dimensions" value={dimensions} onChange={(e) => setDimensions(e.target.value)} />
 
                     <div className="flex flex-col gap-2">
                         <label htmlFor="file"
@@ -197,7 +196,6 @@ export default function EditProductForm() {
                         hover:bg-yellow-500 hover:text-edcPurple-60 
                         rounded-md p-2 w-full">
                         Submit</button>
-
                 </MainFormTemplate>
 
             </form>

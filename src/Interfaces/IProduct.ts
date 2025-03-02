@@ -13,4 +13,5 @@ export interface IProductInfo {
     stripeProductId: string;
     category?: string;
     size: string;
+    dimensions: string;
 }

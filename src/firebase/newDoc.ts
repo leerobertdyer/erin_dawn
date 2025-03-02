@@ -9,6 +9,7 @@ interface INewDoc {
   description: string;
   price: number;
   size: string;
+  dimensions: string;
   tags: string[];
   series: string;
   category: string;
@@ -17,7 +18,7 @@ interface INewDoc {
   stripePriceId: string;
 }
 
-async function newDoc({ downloadUrl, title, description, price, size, tags, series, itemOrder, stripeProductId, stripePriceId, itemName, category }: INewDoc): Promise<string | null> {
+async function newDoc({ downloadUrl, title, description, price, size, dimensions, tags, series, itemOrder, stripeProductId, stripePriceId, itemName, category }: INewDoc): Promise<string | null> {
   if (!itemName) itemName = title;
   if (!category) category = "uncategorized";
   const customDocId = title.replace(/\s/g, "_") + "_" + new Date().getTime();
@@ -31,6 +32,7 @@ async function newDoc({ downloadUrl, title, description, price, size, tags, seri
         description,
         price,
         size,
+        dimensions,
         tags,
         series,
         itemName,
@@ -82,9 +84,6 @@ async function addNewSeries({ series, category }: { series: string, category: st
     const categories = query.docs[0].data().categories;
 
     if (categories.length > 0) {
-      console.log('categories found: ', categories);
-      console.log('category to add to: ', category);
-      console.log('series to add: ', series);
 
       // Find the index of the category to update
       const categoryIndex = categories.findIndex((cat: any) => cat.name === category);
