@@ -8,8 +8,6 @@ Currently selling at [Grandmother Goods](https://www.gmother.com/)
 
 ## MUST HAVE
 
-- Send email/text notification when sale is made
-
 - Add note about free shipping in US
 
 - Add a HIDE button for adminButtons to swap out inventory with hide in tags
@@ -18,9 +16,15 @@ Currently selling at [Grandmother Goods](https://www.gmother.com/)
 
 - Rotate Credentials
 
+- Fix KEY ISSUE
+
+- show new products on the top by default. 
 
 
 ## NICE TO HAVE
+
+- Select more than one photo at a time. 
+
 
 - Email Collection of some kind for repeat customers. Perhaps give them 10% off next purchase?
 

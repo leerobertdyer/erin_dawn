@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { IProductInfo } from '../Interfaces/IProduct';
 import removeProduct from '../firebase/removeProduct';
 import { removeFile } from '../firebase/removeFile';
-import { getPhoto } from '../firebase/getFiles';
+import { getPhoto, getPhotos } from '../firebase/getFiles';
+import { editDoc } from '../firebase/editDoc';
 
 export function useProductManagement() {
 
@@ -48,13 +49,40 @@ export function useProductManagement() {
         })
     };
     
+   async function cleanupSeriesNumbers(id: string) {
+        // If this is part of a series (has itemName and itemOrder), update other items first
+        const photoData = await getPhoto({id});  // Get current photo data
+        if (photoData.itemName && photoData.itemOrder) {
+            const seriesPhotos = (await getPhotos({tags: ["inventory"]})).filter(photo => photo.itemName === photoData.itemName);
+            console.log('seriesPhotos inside useProductMgmt cleanupSeriesNumbers', seriesPhotos);
+            // Update itemOrder for all photos after the deleted one
+            const updates = seriesPhotos
+                .filter(p => p.itemOrder > photoData.itemOrder)
+                .map(photo => 
+                    editDoc({
+                        ...photo,
+                        size: photo.size,
+                        itemOrder: photo.itemOrder - 1
+                    })
+                );
+            
+            if (updates.length > 0) {
+                await Promise.all(updates);
+            }
+        } else {
+            console.log("No series information found for product.id", id);
+        }
+
+    }
 
     const handleDelete = async (url: string, id: string) => {
+        await cleanupSeriesNumbers(id);
+
         const success = await removeProduct({ url, id });
         setIsEditing(false);
         
-        if (!success) { 
-            try { // TODO remove this trycatch after development to avoid data mismanagement
+        if (!success) {  // fallback to remove individual files
+            try {  
                 await removeFile({ url });
                 await removeProduct({ url, id });
             } catch (error) {

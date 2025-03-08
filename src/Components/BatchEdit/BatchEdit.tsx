@@ -25,39 +25,49 @@ export default function BatchEdit({ products, handleBack }: IBatchEdit) {
         setIsDeleting(true);
     }
 
-    function onFinalDelete(product: IProductInfo) {
-        if (product.itemOrder === 1) {
-            const itemName = product.itemName;
-            const itemPhotos = allPhotos.filter((photo) => photo.itemName === itemName);
-            console.log('deleteing all photos in series', itemPhotos);
-            itemPhotos.forEach(async (photo) => {
-                handleDelete(photo.imageUrl, photo.id);
-            });
-            setAllPhotos(allPhotos.filter((photo) => photo.itemName !== product.itemName))
-
-        } else {
-            setAllPhotos(allPhotos.filter((photo) => photo.id !== product.id))
-            handleDelete(product.imageUrl, product.id);
+    async function onFinalDelete(product: IProductInfo) {
+        try {
+            if (product.itemOrder === 1) {
+                const itemName = product.itemName;
+                const itemPhotos = allPhotos.filter((photo) => photo.itemName === itemName);
+                console.log('deleteing all photos in series', itemPhotos);
+                await Promise.all(itemPhotos.map(photo => 
+                    handleDelete(photo.imageUrl, photo.id)
+                ));
+                setAllPhotos(allPhotos.filter((photo) => photo.itemName !== product.itemName))
+    
+            } else {
+                 handleDelete(product.imageUrl, product.id);
+                setAllPhotos(allPhotos.filter((photo) => photo.id !== product.id))
+            }
+            setIsDeleting(false);
+            setIsBatchEdit(false);
+        } catch (error) {
+            console.error(`Error during onFinalDelete in BatchEdit: ${error}`);
         }
-        setIsDeleting(false);
-        setIsBatchEdit(false);
     }
 
     function onKeyChange() {
         setIsSettingKey(true);
     }
 
-    function handleEditBothDocs(product: IProductInfo, otherProduct: IProductInfo, otherIndex: number) {
-        editDoc({
-            ...product,
-            size: product.size,
-            itemOrder: otherIndex
-        })
-        editDoc({
-            ...otherProduct,
-            size: otherProduct.size,
-            itemOrder: product.itemOrder
-        })
+    async function handleEditBothDocs(product: IProductInfo, otherProduct: IProductInfo, otherIndex: number) {
+        try {
+            await Promise.all([
+                editDoc({
+                    ...product,
+                    size: product.size,
+                    itemOrder: otherIndex
+                }),
+                editDoc({
+                    ...otherProduct,
+                    size: otherProduct.size,
+                    itemOrder: product.itemOrder
+                })
+            ])
+        } catch (error) {
+            console.error(`Error editing both docs in BatchEdit: ${error}`)
+        }
         setAllPhotos(allPhotos.map((photo) => {
           return photo.id === product.id 
                 ? {...photo, itemOrder: otherIndex} 
@@ -66,18 +76,20 @@ export default function BatchEdit({ products, handleBack }: IBatchEdit) {
                     : photo}));
         }
 
-    function moveProductLeft(product: IProductInfo) {
+    async function moveProductLeft(product: IProductInfo) {
+        if (!product?.itemOrder || product.itemOrder <= 1) return;
         const prevIndex = product.itemOrder - 1;
-        const prevProduct = products.find((product) => product.itemOrder === prevIndex);
+        const prevProduct = products.find((p) => p.itemOrder === prevIndex);
         if (!prevProduct) return;
-        handleEditBothDocs(product, prevProduct, prevIndex);
+        await handleEditBothDocs(product, prevProduct, prevIndex);
     }
 
-    function moveProductRight(product: IProductInfo) {
+    async function moveProductRight(product: IProductInfo) {
+        if (!product?.itemOrder || product.itemOrder >= products.length) return;
         const index = product.itemOrder + 1;
-        const nextProduct = products.find((product) => product.itemOrder === index);
+        const nextProduct = products.find((p) => p.itemOrder === index);
         if (!nextProduct) return;
-        handleEditBothDocs(product, nextProduct, index);
+        await handleEditBothDocs(product, nextProduct, index);
     }
 
     function handleFinishKey() {
@@ -102,7 +114,7 @@ export default function BatchEdit({ products, handleBack }: IBatchEdit) {
                         {isSettingKey
                             ? product.itemOrder === 1
                                 ? <AdminButtons moveProductRight={() => moveProductRight(product)} />
-                                : product.itemOrder === products.length - 1
+                                : product.itemOrder < products.length 
                                     ? <AdminButtons moveProductLeft={() => moveProductLeft(product)} moveProductRight={() => moveProductRight(product)} />
                                     : <AdminButtons moveProductLeft={() => moveProductLeft(product)}  />
 
