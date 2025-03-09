@@ -10,8 +10,6 @@ Currently selling at [Grandmother Goods](https://www.gmother.com/)
 
 - Add note about free shipping in US
 
-- Add a HIDE button for adminButtons to swap out inventory with hide in tags
-
 - Show total by cart icon
 
 - Rotate Credentials
@@ -22,7 +20,6 @@ Currently selling at [Grandmother Goods](https://www.gmother.com/)
 ## NICE TO HAVE
 
 - Select more than one photo at a time. 
-
 
 - Email Collection of some kind for repeat customers. Perhaps give them 10% off next purchase?
 

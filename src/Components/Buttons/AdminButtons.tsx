@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom"
 import { useProductManagementContext } from "../../Context/ProductMgmtContext";
 import AdminButtonWrapper from "./AdminButtonWrapper";
-import { editDoc } from "../../firebase/editDoc";
 
 interface IAdminButtons {
     handleEdit?: () => void

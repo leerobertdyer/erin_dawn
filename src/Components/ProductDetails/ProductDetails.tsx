@@ -18,7 +18,7 @@ export default function ProductDetails({ product, handleCloseProductDetails }: I
             w-[90%] min-h-fit m-auto p-4 border-y-2 mb-4 border-y-black">
                 <div className="w-full lg:w-1/2 max-w-[650px]">
                     <Carousel
-                        photos={product.map(photo => ({ id: photo.id, url: photo.imageUrl, title: photo.title, itemOrder: photo.itemOrder ?? 0 }))} >
+                        photos={product.map(photo => ({ id: photo.id, url: photo.imageUrl, title: photo.title, tags: photo.tags, itemOrder: photo.itemOrder ?? 0 }))} >
                         <div className="flex justify-center w-full p-2 gap-2 text-edcPurple-80">
                             <button onClick={handleCloseProductDetails}
                                 className="p-2 bg-edcPurple-60 rounded-md text-white w-[8rem]">
