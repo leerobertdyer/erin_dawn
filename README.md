@@ -16,8 +16,6 @@ Currently selling at [Grandmother Goods](https://www.gmother.com/)
 
 - Rotate Credentials
 
-- Fix KEY ISSUE
-
 - show new products on the top by default. 
 
 

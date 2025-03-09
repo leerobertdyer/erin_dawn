@@ -106,7 +106,7 @@ export default function BatchEdit({ products, handleBack }: IBatchEdit) {
     )
 
     return (
-        <div className="fixed top-0 left-0 z-10 w-screen h-screen py-[2rem] overflow-auto bg-white flex flex-col items-center">
+        <div className="fixed top-0 left-0 z-10 w-screen h-screen py-[4rem] overflow-auto bg-white flex flex-col items-center relative">
             <div className="flex flex-col md:flex-row justify-center items-center gap-[1rem] w-full h-fit">
                 {products.map((product) =>
                     <Frame key={product.id} additionalClass="w-[15rem] h-[24rem]">
@@ -125,8 +125,10 @@ export default function BatchEdit({ products, handleBack }: IBatchEdit) {
                     </Frame>
                 )}
             </div>
+            <div className="fixed top-0 w-full flex justify-center items-start bg-white h-[5rem]">
             <button onClick={isSettingKey ? () => handleFinishKey() : handleBack}
-                className="w-[10rem] mx-auto mt-6 bg-edcPurple-60 text-white  p-2 rounded-md">{isSettingKey ? "Done" : "Back"}</button>
+                className="w-[10rem] mx-auto my-[1rem] bg-edcPurple-60 text-white  p-2 rounded-md ">{isSettingKey ? "Done" : "Back"}</button>
+                </div>
         </div>
     )
 }

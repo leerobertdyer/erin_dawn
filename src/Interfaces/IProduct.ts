@@ -14,4 +14,5 @@ export interface IProductInfo {
     category?: string;
     size: string;
     dimensions: string;
+    createdAt?: string;
 }

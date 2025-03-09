@@ -3,4 +3,5 @@ export interface ICarouselPhoto {
     url: string;
     title: string;
     itemOrder: number;
+    tags: string[];
 }

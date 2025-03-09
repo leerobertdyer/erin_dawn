@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom"
 import { useProductManagementContext } from "../../Context/ProductMgmtContext";
 import AdminButtonWrapper from "./AdminButtonWrapper";
+import { editDoc } from "../../firebase/editDoc";
 
 interface IAdminButtons {
     handleEdit?: () => void
@@ -11,9 +12,11 @@ interface IAdminButtons {
     onKeyChange?: () => void
     moveProductLeft?: () => void
     moveProductRight?: () => void
+    hideProduct?: () => void
+    hidden?: boolean;
 }
 
-export default function AdminButtons({ handleEdit, addProduct, addPhotoToSeries, removePhotoFromSeries, onDelete, onKeyChange, moveProductLeft, moveProductRight }: IAdminButtons) {
+export default function AdminButtons({ handleEdit, addProduct, addPhotoToSeries, removePhotoFromSeries, onDelete, onKeyChange, moveProductLeft, moveProductRight, hideProduct, hidden }: IAdminButtons) {
     const { setProduct } = useProductManagementContext();
     const navigate = useNavigate();
 
@@ -36,8 +39,13 @@ export default function AdminButtons({ handleEdit, addProduct, addPhotoToSeries,
         navigate('/add-product')
     }
 
+
     return (
         <div className="flex justify-center items-center w-full p-2 gap-4">
+            {hideProduct && <AdminButtonWrapper 
+                onclickFunction={hideProduct} 
+                content={hidden ? "Show Product" : "Hide Product"} 
+            />}
             {addProduct && <AdminButtonWrapper onclickFunction={handleAddProduct} content={"Add Product"} />}
             {onKeyChange && <AdminButtonWrapper onclickFunction={onKeyChange} content={"KEY"} />}
             {handleEdit && <AdminButtonWrapper onclickFunction={handleEdit} content={"Edit"} />}

@@ -12,12 +12,13 @@ import { useProductManagementContext } from "../../Context/ProductMgmtContext";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useUserContext } from "../../Context/UserContext";
 import { cardHeight, imageHeight } from "../../util/constants";
+import { editDoc } from "../../firebase/editDoc";
 
 export default function Shop() {
     const { handleBack, handleEdit, isEditing, isBatchEdit, setFilteredInventory, filteredInventory, setIsBatchEdit, setPreviousUrl, setProduct } = useProductManagementContext();
     const { user } = useUserContext();
     const location = useLocation();
-    const { allPhotos } = usePhotosContext();
+    const { allPhotos, setAllPhotos } = usePhotosContext();
     const [inventory, setInventory] = useState<IProductInfo[][]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [showDetails, setShowDetails] = useState(false)
@@ -48,13 +49,20 @@ export default function Shop() {
             else setFilteredInventory(allPhotos.filter(photo => photo.tags.includes("inventory")));
         } else {
             setIsFiltered(false)
-            setFilteredInventory(allPhotos.filter(photo => photo.tags.includes("inventory")));
+            const filteredPhotosArray = allPhotos.filter(photo => 
+                photo.tags.includes('inventory') || (user && photo.tags.includes('hidden'))
+            ).sort((a, b) => {
+                const dateA = a.createdAt ? Date.parse(a.createdAt.toString()) : 0;
+                const dateB = b.createdAt ? Date.parse(b.createdAt.toString()) : 0;
+                return dateA - dateB;  // Oldest first
+            });
+            setFilteredInventory(filteredPhotosArray);
         }
-    }, [location.search, allPhotos, setFilteredInventory]);
+    }, [location.search, allPhotos, setFilteredInventory, user]);
 
 
     useEffect(() => {
-        const nextInventory = filteredInventory.filter(photo => photo.tags.includes("inventory"))
+    const nextInventory = [...filteredInventory]
         const groupedPhotos: IProductInfo[][] = []
         const photoMap: { [key: string]: IProductInfo[] } = {};
         nextInventory.forEach(photo => {
@@ -69,7 +77,11 @@ export default function Shop() {
             groupedPhotos.push(photoMap[key]);
         }
         if (user) groupedPhotos.push([{ id: "new", itemName: "card", title: "New Product", description: "Add a new product to the inventory", size: "", dimensions: "", imageUrl: "images/card.jpg", price: 0, series: "uncategorized", tags: ["inventory"], stripePriceId: "", stripeProductId: "", order: -10 }])
-        setInventory(groupedPhotos.sort((a, b) => (a[0].order ?? 0) - (b[0].order ?? 0))) // TODO: Apply order to all products to place them in desired page area
+        setInventory(groupedPhotos.sort((a, b) => {
+            const dateA = a[0].createdAt ? Date.parse(a[0].createdAt.toString()) : 0;
+            const dateB = b[0].createdAt ? Date.parse(b[0].createdAt.toString()) : 0;
+            return dateA - dateB;  // Oldest first
+        }))
         if (groupedPhotos.length > 0) setIsLoading(false)
     }, [user, filteredInventory])
 
@@ -89,6 +101,19 @@ export default function Shop() {
     function handleAddPhotoToSeries(product: IProductInfo) {
         setProduct(product)
         setIsAddingPhoto(true)
+    }
+
+    async function hideProduct(p: IProductInfo) {
+        const photosToEdit = allPhotos.filter(photo => photo.itemName === p.itemName);
+        let newTags = []
+        p.tags.includes('hidden')
+            ? newTags = [...new Set(['inventory', ...p.tags.filter(tag => tag !== 'hidden')])]
+            : newTags = [...new Set(['hidden', ...p.tags.filter(tag => tag !== 'inventory')])]
+        await Promise.all(photosToEdit.map(photo2edit => editDoc({...photo2edit, size: photo2edit.size, tags: newTags})))
+        setAllPhotos(allPhotos.map(photo => photo.itemName !== p?.itemName 
+            ? photo 
+            : {...photo, tags: newTags}
+        ));
     }
 
     if (isBatchEdit) {
@@ -128,14 +153,16 @@ export default function Shop() {
                                 </div>
                                 :
                                 <div className="flex flex-col justify-between items-center h-full w-full">
-                                    <div className={`w-full ${imageHeight} rounded-md overflow-hidden border-2 border-black`}>
+                                    <div className={`w-full ${imageHeight} rounded-md overflow-hidden border-2 border-black ${series[0].tags.includes('hidden') ? 'bg-black bg-opacity-50' : ''}`}>
                                         <img src={series[0].imageUrl} alt={series[0].title} className="w-full h-full object-cover object-center" />
                                     </div>
-                                    {user && series[0].series && <AdminButtons addPhotoToSeries={() => handleAddPhotoToSeries(series[0])} handleEdit={() => handleEdit(series[0].id)} />}
+                                    {user && series[0].series && <AdminButtons hidden={series[0].tags.includes("hidden")} hideProduct={() => hideProduct(series[index])} addPhotoToSeries={() => handleAddPhotoToSeries(series[0])} handleEdit={() => handleEdit(series[0].id)} />}
                                     <ShoppingButtons product={series[0]} handleDetails={() => handleClickProductDetails(index)} />
                                 </div>
-                            : <Carousel photos={series.map(photo => ({ id: photo.id, url: photo.imageUrl, title: photo.itemName, itemOrder: photo.itemOrder ?? 0 }))} >
+                            : <Carousel photos={series.map(photo => ({ id: photo.id, url: photo.imageUrl, title: photo.itemName, itemOrder: photo.itemOrder ?? 0, tags: photo.tags }))} >
                                 {user && <AdminButtons
+                                    hidden={series[0].tags.includes("hidden")}
+                                    hideProduct={() => hideProduct(series[0])}
                                     addPhotoToSeries={() => handleAddPhotoToSeries(series[0])}
                                     handleEdit={() => handleBatchEdit(index)} />}
                                 <ShoppingButtons product={series[0]} handleDetails={() => handleClickProductDetails(index)} />
