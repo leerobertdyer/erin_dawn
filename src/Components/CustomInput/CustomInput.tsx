@@ -2,26 +2,34 @@ interface ICustomInput {
     label: string;
     value: string;
     onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-    type: string;
+    type?: string;
     placeholder?: string;
     required?: boolean;
     disabled?: boolean;
-    error?: string;
+    error?: boolean;
     onBlur?: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
     min?: number;
     rows?: number;
+    checked?: boolean;
 }
 
 export default function CustomInput(props: ICustomInput) {
-    const { label, value, onChange, type, placeholder, required, disabled, error, onBlur, min, rows = 4 } = props;
+    const { label, value, onChange, type, placeholder, required, disabled, error, onBlur, min, rows = 4, checked } = props;
     
     const baseClassName = `w-full p-2 border-[1px] border-black rounded-md 
         ${error && "border-rose-600"} ${value && "bg-gray-300"}`;
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        // For checkbox inputs, we need to handle the event differently
-        if (type === 'checkbox' && 'checked' in e.target) {
-            onChange(e as React.ChangeEvent<HTMLInputElement>);
+        if (type === 'checkbox' && e.target instanceof HTMLInputElement) {
+            // Create a new event with the checked value as the value
+            const newEvent = {
+                ...e,
+                target: {
+                    ...e.target,
+                    value: e.target.checked.toString()
+                }
+            };
+            onChange(newEvent);
         } else {
             onChange(e);
         }
@@ -42,6 +50,17 @@ export default function CustomInput(props: ICustomInput) {
                     onBlur={onBlur}
                     rows={rows}
                 />
+            ) : type === "checkbox" ? (
+                <div className="flex items-center gap-2">
+                    <input 
+                        className="w-4 h-4"
+                        type={type}
+                        checked={checked}
+                        onChange={handleChange}
+                        id={label}
+                    />
+                    <label htmlFor={label}>{label}</label>
+                </div>
             ) : (
                 <input 
                     className={baseClassName}

@@ -1,30 +1,24 @@
 import { ref, deleteObject } from "firebase/storage";
 import { storage } from "./firebaseConfig";
 
- async function removeFile({ url }: { url: string }): Promise<boolean> {
-
-    const file = ref(storage, url);
-
-    deleteObject(file).then(async () => {
-        console.log('File deleted successfully')
-    }).catch((error) => {
-        console.log("Error deleting file: ", error)
+// Handles only the file removal for one or more files
+async function removeFiles({ urls }: { urls: string | string[] }): Promise<boolean> {
+    try {
+        // Handle both single string and array of strings
+        const urlArray = Array.isArray(urls) ? urls : [urls];
+        
+        // Use Promise.all to wait for all deletions
+        await Promise.all(urlArray.map(async (url) => {
+            const file = ref(storage, url);
+            await deleteObject(file);
+        }));
+        
+        return true;
+    } catch (error) {
+        console.error("Error removing files:", error);
         return false;
-    });
-    return true;
+    }
 }
 
-async function removeAllFiles({ urls }: { urls: string[] }): Promise<boolean> {
-    urls.forEach(async (url) => {
-        const file = ref(storage, url);
-        deleteObject(file).then(async () => {
-            console.log('File deleted successfully')
-        }).catch((error) => {
-            console.log("Error deleting file: ", error)
-            return false;
-        });
-    });
-    return true;
-}
 
-export { removeFile, removeAllFiles };
+export { removeFiles };

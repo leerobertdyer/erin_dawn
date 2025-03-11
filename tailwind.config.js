@@ -19,10 +19,17 @@ export const theme = {
         80: '#2b022b'
       },
       edcBlue: {
+        10: '#c1eaf7',
         20: '#96e2fa',
         40: '#7ad7f5',
         60: '#3eccfa',
         80: '#009ed1'
+      },
+      edcYellow: {
+        20: '#ffd470',
+        40: '#f7bb36',  
+        60: '#ffb30f',
+        80: '#fcad00'
       }
 
     },

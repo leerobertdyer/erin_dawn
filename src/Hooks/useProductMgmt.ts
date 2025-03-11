@@ -1,114 +1,138 @@
 import { useEffect, useState } from 'react';
 import { IProductInfo } from '../Interfaces/IProduct';
-import removeProduct from '../firebase/removeProduct';
-import { removeFile } from '../firebase/removeFile';
-import { getPhoto, getPhotos } from '../firebase/getFiles';
-import { editDoc } from '../firebase/editDoc';
+import removePhotoFromProduct from '../firebase/removePhoto';
+import { getPhotos, getProducts } from '../firebase/getFiles';
+import { editProductDoc } from '../firebase/editDoc';
+import { IGeneralPhoto } from '../Interfaces/IPhotos';
+import { ICategory } from '../Interfaces/ICategory';
+import { removeFiles } from '../firebase/removeFile';
+import { removeProductDoc } from '../firebase/removeDoc';
+import { getCategories } from '../firebase/getCategories';
+import { IHero } from '../Interfaces/IHero';
+import { getHero } from '../firebase/getHero';
 
 export function useProductManagement() {
 
     const [isEditing, setIsEditing] = useState(false);
-    const [isBatchEdit, setIsBatchEdit] = useState(false);
-    const [product, setProduct] = useState<IProductInfo | null>(null);
+    const [productToEdit, setProductToEdit] = useState<IProductInfo | null>(null);
     const [previousUrl, setPreviousUrl] = useState<string>('/');
+    const [allProducts, setAllProducts] = useState<IProductInfo[]>([]);
     const [filteredInventory, setFilteredInventory] = useState<IProductInfo[]>([]);
+    const [allCategories, setAllCategories] = useState<ICategory[]>([]);
+    const [heroPhotos, setHeroPhotos] = useState<IHero[]>([]);
     const [cartProducts, setCartProducts] = useState<IProductInfo[]>(() => {
         const savedProducts = localStorage.getItem('cartProducts');
         return savedProducts ? JSON.parse(savedProducts) : [];
     });
 
     useEffect(() => {
+        async function fetchCategories() {
+            const categories = await getCategories();
+            setAllCategories(categories);
+        }
+        fetchCategories();
+    }, [])
+
+    useEffect(() => {
+        async function fetchHeroPhotos() {
+            const heroPhotos = await getHero();
+            setHeroPhotos(heroPhotos);
+        }
+        fetchHeroPhotos();
+    }, [])
+
+    useEffect(() => {
         if (cartProducts.length > 0) {
+            localStorage.setItem('cartProducts', JSON.stringify(cartProducts));
             localStorage.setItem('cartProducts', JSON.stringify(cartProducts));
         } else {
             localStorage.removeItem('cartProducts');
         }
     }, [cartProducts])
 
-    const handleEdit = async (id: string) => {
-        const photoData = await getPhoto({id});
-        setIsBatchEdit(false);
+    useEffect(() => {
+        async function fetchProducts() {
+            const products = await getProducts();
+            setAllProducts(products);
+        }
+        fetchProducts();
+    }, [])
+
+    const handleEditProduct = async (product: IProductInfo) => {
         const productData = {
-            title: photoData.title,
-            description: photoData.description,
-            price: photoData.price,
-            size: photoData.size,
-            dimensions: photoData.dimensions,
-            tags: photoData.tags,
-            imageUrl: photoData.imageUrl,
-            id: id,
-            series: photoData.series,
-            itemName: photoData.itemName,
-            itemOrder: photoData.itemOrder,
-            stripePriceId: photoData.stripePriceId,
-            stripeProductId: photoData.stripeProductId
+            title: product.title,
+            sold: product.sold,
+            description: product.description,
+            price: product.price,
+            size: product.size,
+            dimensions: product.dimensions,
+            photos: product.photos,
+            id: product.id,
+            series: product.series,
+            stripePriceId: product.stripePriceId,
+            stripeProductId: product.stripeProductId,
+            hidden: product.hidden  
         };
         setIsEditing(() => {
-            setProduct(productData);
+            setProductToEdit(productData);
             return true;
         })
     };
     
-   async function cleanupSeriesNumbers(id: string) {
-        // If this is part of a series (has itemName and itemOrder), update other items first
-        const photoData = await getPhoto({id});  // Get current photo data
-        if (photoData.itemName && photoData.itemOrder) {
-            const seriesPhotos = (await getPhotos({tags: ["inventory"]})).filter(photo => photo.itemName === photoData.itemName);
-            console.log('seriesPhotos inside useProductMgmt cleanupSeriesNumbers', seriesPhotos);
-            // Update itemOrder for all photos after the deleted one
-            const updates = seriesPhotos
-                .filter(p => p.itemOrder > photoData.itemOrder)
-                .map(photo => 
-                    editDoc({
-                        ...photo,
-                        size: photo.size,
-                        itemOrder: photo.itemOrder - 1
-                    })
-                );
-            
-            if (updates.length > 0) {
-                await Promise.all(updates);
-            }
-        } else {
-            console.log("No series information found for product.id", id);
-        }
+   async function cleanupSeriesNumbers(product: IProductInfo, photo: IGeneralPhoto) {
+    // If the order is above the deleted file, this decrements it to avoid gaps in the series order
+        const seriesPhotos = product.photos.map((p: IGeneralPhoto) => {
+               return p.order > photo.order ? {
+                    ...p,
+                    order: p.order - 1
+                } : p
+            })
+        editProductDoc({
+            ...product,
+            photos: seriesPhotos
+        })
 
     }
 
-    const handleDelete = async (url: string, id: string) => {
-        await cleanupSeriesNumbers(id);
+    const handleDeletePhoto = async (product: IProductInfo, photo: IGeneralPhoto) => {
+        await cleanupSeriesNumbers(product, photo);
 
-        const success = await removeProduct({ url, id });
-        setIsEditing(false);
-        
-        if (!success) {  // fallback to remove individual files
-            try {  
-                await removeFile({ url });
-                await removeProduct({ url, id });
-            } catch (error) {
-                console.error("Error in cleanup:", error);
-                return false;
-            }
+        try {  
+            await removePhotoFromProduct({ url: photo.url, id: product.id });
+            setIsEditing(false);
+        } catch (error) {
+            console.error("Error in cleanup:", error);
+            setIsEditing(false);
             return false;
         }
         return true;
     };
 
-
-    const handleBack = () => {
-        setIsBatchEdit(false);
-        setIsEditing(false);
+    const handleDeleteProduct = async (product: IProductInfo) => {
+        try {
+            // First get all files associated with this product
+            const photoIds = product.photos.map((p: IGeneralPhoto) => p.id);
+            const photos = await getPhotos({ids: photoIds});
+            const photoUrls = photos.map((p: IGeneralPhoto) => p.url);
+            await removeFiles({urls: photoUrls});
+            await removeProductDoc({ id: product.id });
+            console.log("Product Deleted Successfully")
+        } catch (error) {
+            console.error(`Error during cleanup in handleDeleteProduct: ${error}`)
+        }
     }
+
 
     return {
         isEditing, setIsEditing,
-        isBatchEdit, setIsBatchEdit,
-        product, setProduct,
-        filteredInventory, setFilteredInventory,
+        heroPhotos, setHeroPhotos,
+        productToEdit, setProductToEdit,
         cartProducts, setCartProducts,
         previousUrl, setPreviousUrl,
-        handleEdit,
-        handleDelete,
-        handleBack,
+        filteredInventory, setFilteredInventory,
+        allCategories, setAllCategories,
+        allProducts, setAllProducts,
+        handleEditProduct,
+        handleDeletePhoto, handleDeleteProduct,
     };
 }

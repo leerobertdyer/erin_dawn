@@ -1,17 +1,25 @@
 import { createContext, useContext, ReactNode } from 'react';
 import { usePhotos } from '../Hooks/usePhotos';
-import { IProductInfo } from '../Interfaces/IProduct';
+import { IGeneralPhoto } from '../Interfaces/IPhotos';
 
 interface PhotosContextType {
-    allPhotos: IProductInfo[];
-    setAllPhotos: (photos: IProductInfo[]) => void;
+    generalPhotos: IGeneralPhoto[];
+    setGeneralPhotos: (photos: IGeneralPhoto[]) => void;
+    photoToEdit: IGeneralPhoto | null;
+    setPhotoToEdit: (photo: IGeneralPhoto | null) => void;
     isLoading: boolean;
+    setIsLoading: (isLoading: boolean) => void;
+    handleEditPhoto: (photo: IGeneralPhoto) => void;
 }
 
 const defaultValue: PhotosContextType = {
-    allPhotos: [],
-    setAllPhotos: (_: IProductInfo[]) => {},
+    generalPhotos: [],
+    setGeneralPhotos: (_: IGeneralPhoto[]) => {},
+    photoToEdit: null,
+    setPhotoToEdit: (_: IGeneralPhoto | null) => {},
     isLoading: true,
+    setIsLoading: (_: boolean) => {},
+    handleEditPhoto: (_: IGeneralPhoto) => {},
 };
 
 const PhotosContext = createContext(defaultValue);

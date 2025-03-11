@@ -1,8 +1,8 @@
 import { collection, doc, getDoc, getDocs, query, where, DocumentData, Query, } from "firebase/firestore";
-import { db, storage } from "./firebaseConfig";
+import { db } from "./firebaseConfig";
 import { IProductInfo } from "../Interfaces/IProduct";
 import shuffleArray from "../util/shuffle";
-import { getDownloadURL, ref } from "firebase/storage";
+import { IGeneralPhoto } from "../Interfaces/IPhotos";
 
 interface IGetPhotos {
     tags?: string[],
@@ -10,20 +10,8 @@ interface IGetPhotos {
     shuffle?: boolean
 }
 
-// Fetch download URL with a timestamp for cache-busting
-async function getFreshDownloadURL(imageUrl: string): Promise<string> {
-    try {
-        const storagePath = decodeURIComponent(imageUrl.split("?")[0].split("/o/")[1]); // Extract path
-        const storageRef = ref(storage, storagePath);
-        const url = await getDownloadURL(storageRef);
-        return url
-    } catch (error) {
-        console.error("Error fetching new download URL:", error);
-        return imageUrl; // Fallback to the stored URL
-    }
-}
 
-export async function getPhotos({ tags, ids, shuffle }: IGetPhotos): Promise<IProductInfo[]> {
+export async function getPhotos({ tags, ids, shuffle }: IGetPhotos): Promise<IGeneralPhoto[]> {
     const c = collection(db, "photos");
     let q: Query<DocumentData> | null = null;
     if (tags) {
@@ -37,28 +25,55 @@ export async function getPhotos({ tags, ids, shuffle }: IGetPhotos): Promise<IPr
     const querySnapshot = await getDocs(q);
     const photosData = await Promise.all(querySnapshot.docs.map(async (doc) => {
         const data = doc.data();
-        const freshUrl = await getFreshDownloadURL(data.imageUrl);
+        // const freshUrl = await getFreshDownloadURL(data.url);
         return {
             id: doc.id,
             ...data,
-            imageUrl: freshUrl
+            url: data.url,
+            tags: data.tags || [],
+            title: data.title || ""
         };
     }));
 
     shuffle && shuffleArray(photosData);
-    return photosData as IProductInfo[];
+    return photosData as IGeneralPhoto[];
+}
+export async function getProducts(): Promise<IProductInfo[]> {
+    const c = collection(db, "product");
+    const querySnapshot = await getDocs(c);
+    const productsData = await Promise.all(querySnapshot.docs.map(async (doc) => {
+        const data = doc.data();
+        return {
+            id: doc.id,
+            ...data
+        } as IProductInfo;
+    }));
+    return productsData;
 }
 
-export async function getPhoto({ id }: { id: string }): Promise<IProductInfo> {
+export async function getProduct({ id }: { id: string }): Promise<IProductInfo> {
+    const docRef = doc(db, "product", id);
+    const product = await getDoc(docRef);
+
+    if (product.exists()) {
+        return {
+            id: product.id,
+            ...product.data()
+        } as IProductInfo;
+    } else {
+        throw new Error("No such document!");
+    }
+}
+
+export async function getPhoto({ id }: { id: string }): Promise<IGeneralPhoto> {
     const docRef = doc(db, "photos", id);
     const photo = await getDoc(docRef);
 
     if (photo.exists()) {
         return {
             id: photo.id,
-            imageUrl: photo.data().imageUrl ? photo.data().imageUrl + '?t=' + new Date().getTime() : '',
             ...photo.data()
-        } as IProductInfo;
+        } as IGeneralPhoto;
     } else {
         throw new Error("No such document!");
     }

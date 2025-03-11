@@ -1,16 +1,17 @@
 import { useEffect, useState } from "react";
-import { IProductInfo } from "../Interfaces/IProduct";
 import { getPhotos } from "../firebase/getFiles";
+import { IGeneralPhoto } from "../Interfaces/IPhotos";
 
 export function usePhotos() {
-    const [allPhotos, setAllPhotos] = useState<IProductInfo[]>([]);
+    const [generalPhotos, setGeneralPhotos] = useState<IGeneralPhoto[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [photoToEdit, setPhotoToEdit] = useState<IGeneralPhoto | null>(null);
 
     useEffect(() => {
         async function fetchPhotos() {
             const resp = await getPhotos({ tags: ["edc"], shuffle: false });
             if (resp) {
-                setAllPhotos(resp);
+                setGeneralPhotos(resp);
                 setIsLoading(false);
             }
         }
@@ -18,9 +19,15 @@ export function usePhotos() {
         fetchPhotos();
     }, []);
 
+
+    const handleEditPhoto = (Photo: IGeneralPhoto) => {
+        setPhotoToEdit(Photo);
+    }
+
     return {
-        allPhotos,
-        isLoading,
-        setAllPhotos,
+        generalPhotos, setGeneralPhotos, 
+        isLoading, setIsLoading,
+        photoToEdit, setPhotoToEdit,
+        handleEditPhoto
     };
 }

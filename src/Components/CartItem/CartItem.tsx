@@ -12,7 +12,7 @@ export default function CartItem({ item }: ICartItem) {
         w-full h-fit
         flex flex-col items-center justify-between 
         p-2 border-2 border-black rounded-md gap-4 bg-cover bg-center"
-        style={{ backgroundImage: `url(${item.imageUrl})` }}>
+        style={{ backgroundImage: `url(${item.photos[0].url})` }}>
             <p className="bg-white border-2 border-black px-2 rounded-md font-retro rotate-6 text-2xl ">${Number(item.price).toFixed(2)}</p>
             <div className="flex flex-col items-center justify-center gap-4">
                 <h1 className="bg-white border-2 border-black p-2 rounded-md text-wrap w-full text-center">"{item.title}"</h1>

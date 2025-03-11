@@ -1,40 +1,84 @@
 import { useEffect, useState } from "react";
 import { useProductManagementContext } from "../../Context/ProductMgmtContext";
-import { handleFileChange, preventEnterFromSubmitting } from "./formUtil";
-import { IoIosCamera, } from "react-icons/io";
-import { useNavigate } from "react-router-dom";
+import { preventEnterFromSubmitting } from "./formUtil";
 import MainFormTemplate from "./MainFormTemplate";
 import CustomInput from "../CustomInput/CustomInput";
 import WarningDialogue from "../WarningDialogue/WarningDialogue";
+import { editProductDoc, editCategoryDoc } from "../../firebase/editDoc";
+import { addNewCategory } from "../../firebase/newDoc";
+import { BACKEND_URL } from "../../util/constants";
+import PhotoManager from "../PhotoManager/PhotoManager";
 import { IProductInfo } from "../../Interfaces/IProduct";
-import { usePhotosContext } from "../../Context/PhotosContext";
-import { editDoc } from "../../firebase/editDoc";
-import editFile from "../../firebase/editfile";
-import { resizeFile } from "../../util/resizeFile";
-import { BACKEND_URL, NEW_PRODUCT_DEFAULT_HEIGHT, NEW_PRODUCT_DEFAULT_WIDTH, NEW_PRODUCT_IMAGE_QUALITY } from "../../util/constants";
+import { IGeneralPhoto } from "../../Interfaces/IPhotos";
+import SubmitBtn from "../Buttons/SubmitBtn";
+import { ICategory } from "../../Interfaces/ICategory";
 
-export default function EditProductForm() {
-    const { product, isEditing, setIsEditing, handleDelete, previousUrl, handleBack } = useProductManagementContext();
-    const { allPhotos, setAllPhotos } = usePhotosContext();
+interface IEditProductFormProps {
+    onClose: () => void;
+    product: IProductInfo;
+}
 
-    const navigate = useNavigate();
-    const [title, setTitle] = useState(product?.title ?? "");
-    const [description, setDescription] = useState(product?.description ?? "");
-    const [price, setPrice] = useState(product?.price ?? 0.00);
-    const [size, setSize] = useState(product?.size ?? "");
-    const [dimensions, setDimensions] = useState(product?.dimensions ?? "");
-    const [file, setFile] = useState<File | null>(null);
-    const [background, setBackground] = useState(product?.imageUrl ?? "");
+export default function EditProductForm({ onClose, product }: IEditProductFormProps) {
+    const { handleDeleteProduct, allProducts, setAllProducts, allCategories, setAllCategories } = useProductManagementContext();
+
+    const [title, setTitle] = useState(product.title ?? "");
+    const [description, setDescription] = useState(product.description ?? "");
+    const [price, setPrice] = useState(product.price ?? 0.00);
+    const [size, setSize] = useState(product.size ?? "");
+    const [dimensions, setDimensions] = useState(product.dimensions ?? "");
+    const [background, setBackground] = useState(product.photos[0].url ?? "");
     const [isDeleting, setIsDeleting] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showPhotoManager, setShowPhotoManager] = useState(false);
+    const [categoryName, setCategoryName] = useState(product.category ?? "");
+    const [series, setSeries] = useState(product.series ?? "");
+    const [hidden, setHidden] = useState(product.hidden ?? false);
+    const [sold, setSold] = useState(product.sold ?? false);
+    const [productToEdit, setProductToEdit] = useState(product);
+    const [allSeries, setAllSeries] = useState([]);
+    const [allCurrentCategories, setAllCurrentCategories] = useState([]);
+    const [newSeriesName, setNewSeriesName] = useState("");
+    const [isNewSeries, setIsNewSeries] = useState(false);
+    const [isNewCategory, setIsNewCategory] = useState(false);
+
+    const newSeriesSelector = "--NEW SERIES--";
+    const newCategorySelector: ICategory ={
+        name: "--NEW CATEGORY--",
+        series: [newSeriesSelector],
+        url: ''
+    } 
 
     useEffect(() => {
-        if (!isEditing) navigate(previousUrl);
-    }, [isEditing])
+        const currentCategory = allCategories.find((cat) => cat.name === categoryName);
+        console.log(currentCategory, allCategories, categoryName)
+        setAllCurrentCategories([...allCategories, newCategorySelector]);
+        const allSeries = currentCategory?.series ? [...currentCategory.series, newSeriesSelector] : [newSeriesSelector];
+        setAllSeries(allSeries ?? [newSeriesSelector]);
+        // Reset series state when category changes
+        setIsNewSeries(false);
+        setNewSeriesName("");
+        if (categoryName === newCategorySelector.name) setIsNewCategory(true);
+    }, [categoryName, allCategories]);
 
+    async function handleAddCategory(c: ICategory) {
+        if (!isNewCategory) return;
+        await addNewCategory(c);
+        setAllCategories([...allCategories, c]);
+    }
+
+    async function handleEditCategory(c: ICategory) {
+        if (!isNewSeries) return;
+        const currentCategory = allCategories.find((cat) => cat.name === c.name);
+        if (!currentCategory) return;
+        const updatedCategory = {
+            ...currentCategory,
+            series: [...currentCategory.series, series]
+        }
+        await editCategoryDoc(updatedCategory);
+    }
     async function editStripeProduct() {
         const stripeProduct = {
-            stripeProductId: product?.stripeProductId,
+            stripeProductId: productToEdit?.stripeProductId,
             name: title,
             description: description,
             newPrice: price,
@@ -60,128 +104,115 @@ export default function EditProductForm() {
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         setIsSubmitting(true);
-        if (!product) {
+
+        if (!productToEdit) {
             setIsSubmitting(false);
             return;
         }
-        let downloadUrl = "";
+
+        if (isNewCategory) await handleAddCategory({
+            name: categoryName,
+            series: [series],
+            url: productToEdit.photos[0].url
+        });
+
+        if (isNewSeries && !isNewCategory) await handleEditCategory({
+            name: categoryName,
+            series: [series],
+            url: productToEdit.photos[0].url
+        });
 
         const { stripeProductId, stripePriceId } = await editStripeProduct()
-        const nextPhotos = [];
-        if (file) { // if file is present, edit the file then update doc for that specific photo
-            const resizedFile = await resizeFile(file, {
-                maxWidth: NEW_PRODUCT_DEFAULT_WIDTH,
-                maxHeight: NEW_PRODUCT_DEFAULT_HEIGHT,
-                maintainAspectRatio: true,
-                quality: NEW_PRODUCT_IMAGE_QUALITY
-            });
-            downloadUrl = await editFile({
-                file: resizedFile,
-                id: product.id,
-                url: product.imageUrl,
-                title,
-                description,
-                price,
-                size,
-                dimensions,
-                tags: product.tags,
-                category: product.category,
-                series: product.series,
-                itemOrder: product.itemOrder,
-                itemName: product.itemName,
-                stripeProductId,
-                stripePriceId
-            });
-            nextPhotos.push({
-                id: product.id,
-                imageUrl: downloadUrl,
-                title,
-                description,
-                price,
-                size,
-                dimensions,
-                tags: product.tags,
-                category: product.category,
-                series: product.series,
-                itemOrder: product.itemOrder,
-                itemName: product.itemName,
-                stripeProductId,
-                stripePriceId
-            });
-        }
-        const allPhotosWithItemName = allPhotos.filter((photo) => photo.itemName === product.itemName);
-        console.log("All photos with item name: ", allPhotosWithItemName)
-        for (const photo of allPhotosWithItemName) { // this loops over the whole series.
-            if (photo.id === product.id && file) continue; // skip the photo that was just edited
-            // if file is not present, update metadata only
-            const newPhoto = {
-                id: photo.id,
-                imageUrl: photo.imageUrl,
-                title,
-                description,
-                price,
-                size,
-                dimensions,
-                tags: photo.tags,
-                series: photo.series,
-                category: photo.category,
-                itemOrder: photo.itemOrder,
-                itemName: photo.itemName,
-                stripeProductId,
-                stripePriceId
-            }
-            await editDoc(newPhoto);
-            nextPhotos.push(newPhoto);
+        
+        const productUpdate = {
+            id: productToEdit.id,
+            title,
+            description,
+            price,
+            size,
+            dimensions,
+            photos: productToEdit.photos,
+            stripeProductId,
+            stripePriceId,
+            sold,
+            category: categoryName,
+            series,
+            hidden
         }
 
-        const nextAllPhotos = allPhotos.map((photo) => {
-            const editedPhoto = nextPhotos.find((ePhoto) => ePhoto.id === photo.id);
-            if (editedPhoto) {
-                console.log('FOUND PHOTO IN ALLPHOTO STAT UPDATE: ', editedPhoto.title)
-                return editedPhoto;
-            }
-            return photo;
+        await editProductDoc(productUpdate);
+
+        const nextProducts = allProducts.map((product) => {
+            return product.id === productToEdit.id ? productUpdate : product
         })
-        console.log("Allphotos After editing:", nextAllPhotos)
-        setAllPhotos(nextAllPhotos);
 
-        setIsEditing(false);
-
-        navigate('/shop');
+        setAllProducts(nextProducts);
+        // if isNewCategory, add new category to allCategories
+        // if isNewSeries !isNewCategory editCategoryDoc
+        onClose();
     }
 
     function resetState() {
-        setTitle(product?.title ?? "")
-        setDescription(product?.description ?? "")
-        setPrice(product?.price ?? 0.00)
-        setFile(null);
-        setBackground(product?.imageUrl ?? "");
+        setTitle(productToEdit?.title ?? "")
+        setDescription(productToEdit?.description ?? "")
+        setPrice(productToEdit?.price ?? 0.00)
+        setBackground(productToEdit?.photos[0].url ?? "");
+        setProductToEdit(product);
+        setIsSubmitting(false);
+        setCategoryName(productToEdit?.category ?? "");
+        setSeries(productToEdit?.series ?? "");
+        setSize(productToEdit?.size ?? "");
+        setDimensions(productToEdit?.dimensions ?? "");
+        setSold(productToEdit?.sold ?? false);
+        setHidden(productToEdit?.hidden ?? false);
     }
 
     function onClickDelete() {
         setIsDeleting(true);
     }
 
-    function onFinalDelete(product: IProductInfo) {
-        setAllPhotos(allPhotos.filter((photo) => photo.id !== product.id))
-        handleDelete(product.imageUrl, product.id);
+    function onFinalDelete(productToDelete: IProductInfo) {
+        setAllProducts(allProducts.filter((p) => p.id !== productToDelete.id))
+        handleDeleteProduct(productToDelete);
+        setIsDeleting(false);
+        onClose();
     }
 
-    if (isDeleting && product) return <WarningDialogue closeDialogue={() => setIsDeleting(false)} onYes={() => onFinalDelete(product)} />
+    // PhotoManager callback
+    function handlePhotoUpdate(updatedPhotos: IGeneralPhoto[]) {
+        setProductToEdit({ ...productToEdit, photos: updatedPhotos });
+        setShowPhotoManager(false);
+    };
 
-    if (product) return (
+    // Handle edit category
 
-        <div className="flex flex-col justify-center items-center w-screen h-fit overflow-scroll">
-            <h2 className="text-2xl p-2 rounded-md bg-white ">Edit Product</h2>
+    // Handle edit series
 
-            <form onSubmit={handleSubmit} onKeyDown={preventEnterFromSubmitting}
-                className="bg-white flex flex-col justify-center m-auto items-center w-[85vw] h-screen border-2 border-black rounded-md p-4 mt-4 gap-4"
-                style={{ backgroundImage: `url(${background})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
-               
-                <MainFormTemplate product={product} handleClickBack={handleBack} resetState={resetState} handleDelete={onClickDelete}>
-                    <CustomInput type="text" label="Product Name" placeholder="Product Name" value={title} onChange={(e) => setTitle(e.target.value)} />
-                    <CustomInput type="textarea" label="Product Description" placeholder="Product Description" value={description} onChange={(e) => setDescription(e.target.value)} />
-                    <CustomInput type="number" label="Product Price" placeholder="Product Price" value={price.toString()} onChange={(e) => setPrice(Number(Number((e.target.value)).toFixed(2)))} />
+    if (showPhotoManager) {
+        return <PhotoManager
+            product={productToEdit}
+            handleBack={() => setShowPhotoManager(false)}
+            onSave={handlePhotoUpdate} />
+    }
+
+    if (isDeleting) return <WarningDialogue closeDialogue={() => setIsDeleting(false)} onYes={() => onFinalDelete(productToEdit)} />
+
+    return (
+        <MainFormTemplate product={productToEdit} handleClickBack={onClose} resetState={resetState} handleDelete={onClickDelete}>
+            <div className="fixed inset-0 flex flex-col items-center h-screen bg-gray-50 overflow-y-auto">
+                <h2 className="text-2xl p-2 text-center bg-white sticky top-0 z-10 mb-4 w-full">Edit Product</h2>
+
+                <form onSubmit={handleSubmit} onKeyDown={preventEnterFromSubmitting}
+                    className="relative flex flex-col justify-center items-center w-[85vw] md:w-[65vw] h-fit border-2 border-black rounded-md p-4 mt-4 mb-[7rem] gap-4 backdrop-blur-sm"
+                    style={{
+                        backgroundImage: `url('${background}')`,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                    }}>
+                    <div className="relative z-10 flex flex-col w-full gap-4">
+                        <CustomInput type="text" label="Product Name" placeholder="Product Name" value={title} onChange={(e) => setTitle(e.target.value)} />
+                        <CustomInput type="textarea" label="Product Description" placeholder="Product Description" value={description} onChange={(e) => setDescription(e.target.value)} />
+                        <CustomInput type="number" label="Product Price" placeholder="Product Price" value={price.toString()} onChange={(e) => setPrice(Number(Number((e.target.value)).toFixed(2)))} />
                         <select className="border-2 border-black rounded-md p-2 w-full" onChange={(e) => setSize(e.target.value)} value={size}>
                             <option value="" disabled>Select Size</option>
                             <option value="sm">Small</option>
@@ -191,27 +222,66 @@ export default function EditProductForm() {
                             <option value="2xl">2XL</option>
                             <option value="3xl">3XL</option>
                         </select>
-                    <CustomInput type="text" label="Dimensions" placeholder="Dimensions" value={dimensions} onChange={(e) => setDimensions(e.target.value)} />
+                        <CustomInput type="text" label="Dimensions" placeholder="Dimensions" value={dimensions} onChange={(e) => setDimensions(e.target.value)} />
 
-                    <div className="flex flex-col gap-2">
-                        <label htmlFor="file"
-                            className="p-4 bg-green-500 text-white cursor-pointer rounded-md flex justify-center gap-4">Upload Image <IoIosCamera />
-                        </label>
-                        <input type="file" id="file" placeholder="Product Image"
-                            className="hidden" onChange={(e) => handleFileChange(e, setFile, setBackground)} />
-                        <p className="text-center w-full m-auto py-1 px-2 rounded-md text-xs text-gray-400 bg-white">{file ? file.name : "No File Selected"}</p>
+                        <CustomInput 
+                            type="checkbox" 
+                            label="Hidden" 
+                            value={hidden.toString()} 
+                            checked={hidden}
+                            onChange={(e) => setHidden(e.target.value === "true")} 
+                        />
+
+                        <CustomInput 
+                            type="checkbox" 
+                            label="Sold" 
+                            value={sold.toString()} 
+                            checked={sold}
+                            onChange={(e) => setSold(e.target.value === "true")} 
+                        />
+                        
+                        {/* Categories */}
+                        <select className="border-2 border-black rounded-md p-2 w-full" onChange={(e) => setCategoryName(e.target.value)} value={categoryName}>
+                            {allCurrentCategories.map((category) => (
+                                <option key={category.name} value={category.name}>
+                                    {category.name}
+                                </option>
+                            ))}
+                        </select>
+
+                        {/* Series */}
+                        <select className="border-2 border-black rounded-md p-2 w-full" onChange={(e) => setSeries(e.target.value)} value={series}>
+                            {allSeries.map((series) => (
+                                <option key={series} value={series}>
+                                    {series}
+                                </option>
+                            ))}
+                        </select>
+
+                        {series === newSeriesSelector && (
+                            <CustomInput type="text" label="Series" placeholder="Series" value={newSeriesName} onChange={(e) => setNewSeriesName(e.target.value)} />
+                        )}
+
+                        {/* Preview current photos with manage button */}
+                        <div className="relative w-full max-w-2xl mb-4">
+                            <img
+                                src={productToEdit.photos[0]?.url}
+                                alt={title}
+                                className="w-full h-64 object-cover rounded-md"
+                            />
+                            <button
+                                onClick={() => setShowPhotoManager(true)}
+                                className="absolute bottom-4 right-4 bg-black bg-opacity-50 text-white px-4 py-2 rounded-md hover:bg-opacity-75"
+                            >
+                                Manage Photos ({productToEdit.photos.length})
+                            </button>
+                        </div>
+
+                        <SubmitBtn progress={isSubmitting ? 1 : 0} />
+
                     </div>
-
-                    <button type="submit"
-                        disabled={isSubmitting}
-                        className="
-                        bg-edcPurple-60 text-white 
-                        hover:bg-yellow-500 hover:text-edcPurple-60 
-                        rounded-md p-2 w-full">
-                        Submit</button>
-                </MainFormTemplate>
-
-            </form>
-        </div>
+                </form>
+            </div>
+        </MainFormTemplate>
     )
 }

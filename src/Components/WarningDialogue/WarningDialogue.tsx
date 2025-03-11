@@ -3,7 +3,7 @@ interface IWarningDialogueProps {
     closeDialogue: () => void;
     message?: string;
 }
-const defaultMessage = "This will remove the item and all associated photos from store.";
+const defaultMessage = "This will remove the product and all associated photos from store.";
 export default function WarningDialogue({ onYes, closeDialogue, message=defaultMessage }: IWarningDialogueProps) {
     return (
         <>

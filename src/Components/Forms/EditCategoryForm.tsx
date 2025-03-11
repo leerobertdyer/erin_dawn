@@ -5,142 +5,153 @@ import { useProductManagementContext } from "../../Context/ProductMgmtContext";
 import { IoIosCamera } from "react-icons/io";
 import LoadingBar from "../LoadingBar/LoadingBar";
 import CustomInput from "../CustomInput/CustomInput";
-import { useNavigate } from "react-router-dom";
 import editFile from "../../firebase/editfile";
 import { resizeFile } from "../../util/resizeFile";
-import { editDoc } from "../../firebase/editDoc";
-import { usePhotosContext } from "../../Context/PhotosContext";
+import { editCategoryDoc, editProductDoc } from "../../firebase/editDoc";
 import { NEW_PRODUCT_IMAGE_QUALITY } from "../../util/constants";
+import { ICategory } from "../../Interfaces/ICategory";
+import SubmitBtn from "../Buttons/SubmitBtn";
 
-export default function EditCategoryForm() {
-    const { product } = useProductManagementContext();
-    const { allPhotos, setAllPhotos } = usePhotosContext();
-    const navigate = useNavigate();
-    const [background, setBackground] = useState(product?.imageUrl ?? "");
-    const [category, setCategory] = useState(product?.category ?? "");
-    const [file, setFile] = useState<File | null>();
-    const [progress, setProgress] = useState(0);
+interface ICategeroyFormProps {
+  categoryToEdit: ICategory;
+  onClose: () => void;
+}
 
-    // TODO - wondering if we change a category name, if we need to update then all the products that use that category name.....
+export default function EditCategoryForm({
+  categoryToEdit,
+  onClose,
+}: ICategeroyFormProps) {
+  const { allProducts, setAllProducts, setAllCategories, allCategories } =
+    useProductManagementContext();
 
-    function onProgress(percent: number) {
-        setProgress(percent);
+  const [background, setBackground] = useState(categoryToEdit?.url ?? "");
+  const [category, setCategory] = useState<ICategory>({ ...categoryToEdit });
+  const [file, setFile] = useState<File | null>();
+  const [progress, setProgress] = useState(0);
+
+  function onProgress(percent: number) {
+    setProgress(percent);
+  }
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!categoryToEdit) return;
+
+    // Create the updated category object
+    const updatedCategory = { ...category };
+
+    // Handle file upload if needed
+    if (file) {
+      const resizedFile = await resizeFile(file, {
+        maxWidth: 1200,
+        maxHeight: 1400,
+        maintainAspectRatio: true,
+        quality: NEW_PRODUCT_IMAGE_QUALITY,
+      });
+
+      const downloadUrl = await editFile({
+        url: categoryToEdit.url,
+        file: resizedFile,
+        title: categoryToEdit.name,
+        onProgress,
+      });
+
+      if (!downloadUrl) throw new Error("Failed to upload file");
+      setBackground(downloadUrl);
+      updatedCategory.url = downloadUrl;
     }
 
-    function handleBack() {
-        navigate('/')
+    // Update the category in Firestore
+    await editCategoryDoc(updatedCategory);
+
+    // Update products that use this category
+    const productsWithCategory = allProducts.filter(
+      (p) => p.category === categoryToEdit.name
+    );
+    for (const p of productsWithCategory) {
+      if (p.category === categoryToEdit.name) {
+        await editProductDoc({
+          ...p,
+          category: updatedCategory.name,
+        });
+      }
     }
 
-    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-        e.preventDefault();
-        // todo: implement handleSubmit
-        if (!product) return;
-        let downloadUrl = "";
-        if (file) {
-            const resizedFile = await resizeFile(file, {
-                maxWidth: 1200,
-                maxHeight: 1400,
-                maintainAspectRatio: true,
-                quality: NEW_PRODUCT_IMAGE_QUALITY
-            });
-            const fileToEdit = {
-                id: product.id,
-                title: product.title,
-                description: product.description ?? category,
-                price: product.price ?? 1,
-                tags: product.tags,
-                url: product.imageUrl,
-                size: product.size ?? "",
-                dimensions: product.dimensions ?? "",
-                category,
-                series: product.series ?? "",
-                itemOrder: product.itemOrder ?? 0,
-                itemName: product.itemName ?? category,
-                stripePriceId: product.stripePriceId ?? "na",
-                stripeProductId: product.stripeProductId ?? "na",
-                file: resizedFile,
-                onProgress,
-            }
+    // Update local state
+    setAllProducts(
+      allProducts.map((p) =>
+        p.category === categoryToEdit.name
+          ? { ...p, category: updatedCategory.name }
+          : p
+      )
+    );
 
-            downloadUrl = await editFile(fileToEdit);
-            if (!downloadUrl) return;
-        } else { // if no file just edit the category name for all products with that category
-            const productsWithCategory = allPhotos.filter(photo => photo.category === product.category)
+    setAllCategories(
+      allCategories.map((c) =>
+        c.name === categoryToEdit.name ? updatedCategory : c
+      )
+    );
 
-            for (const photo of productsWithCategory) {
-                if (photo.id === product.id) continue;
-                await editDoc({
-                    ...photo,
-                    itemName: photo.itemName ?? photo.category,
-                    itemOrder: photo.itemOrder ?? 1,
-                    imageUrl: file ? downloadUrl : undefined,
-                    size: photo.size ?? "",
-                    category,
-                })
-            }
-        }
+    onClose();
+  }
 
-        setAllPhotos(allPhotos.map(photo => {
-            if (photo.id === product.id) {
-                return {
-                    ...photo,
-                    category,
-                    imageUrl: file ? downloadUrl : photo.imageUrl,
-                    stripeProductId: "na",
-                    stripePriceId: "na",
-                }
-            } if (photo.category === product.category) {
-                console.log('updating category in ', photo.title)
-                return {
-                    ...photo,
-                    category,
-                }
-            }
-            return photo
-        }));
+  function resetState() {
+    setBackground(categoryToEdit?.url ?? "");
+    setFile(null);
+    setCategory({ ...categoryToEdit });
+  }
 
-        handleBack();
-    }
+  return (
+    <MainFormTemplate
+      handleClickBack={onClose}
+      resetState={resetState}
+    >
+      <div className="fixed inset-0 flex flex-col items-center h-screen bg-gray-50 overflow-y-auto">
+        <h2 className="text-2xl p-2 text-center bg-white sticky top-0 z-10 mb-4 w-full">
+          Editing {category.name}
+        </h2>
 
+        <form
+          onSubmit={handleSubmit} onKeyDown={preventEnterFromSubmitting}
+          className="bg-white flex flex-col justify-center m-auto items-center w-[85vw] md:w-[65vw] h-fit border-2 border-black rounded-md p-4 mt-4 gap-[4rem]"
+          style={{
+            backgroundImage: `url(${background})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
+            
+            <CustomInput
+              type="text"
+              label="Category Name"
+              placeholder="Category Name"
+              value={category.name}
+              onChange={(e) =>
+                setCategory({ ...category, name: e.target.value })
+              }
+            />
+            <label
+              htmlFor="file"
+              className="p-4 bg-edcPurple-60 text-white cursor-pointer rounded-md flex justify-center gap-4"
+            >
+              Upload Image <IoIosCamera />
+            </label>
+            <input
+              type="file"
+              id="file"
+              placeholder="Product Image"
+              className="hidden"
+              onChange={(e) => handleFileChange(e, setFile, setBackground)}
+            />
+            <p className="text-center w-full m-auto py-1 px-2 rounded-md text-xs text-gray-400 bg-white">
+              {file ? file.name : "No File Selected"}
+            </p>
 
-    function resetState() {
-        setBackground(product?.imageUrl ?? "");
-        setFile(null);
-    }
+          <SubmitBtn progress={progress} />
 
-    return (
-        <div className="flex flex-col justify-center items-center w-screen h-fit overflow-scroll">
-            <h2 className="text-2xl p-2 rounded-md bg-white ">Change The Category </h2>
-
-            <form onSubmit={handleSubmit} onKeyDown={preventEnterFromSubmitting}
-                className="bg-white flex flex-col justify-center m-auto items-center w-[85vw] h-screen border-2 border-black rounded-md p-4 mt-4 gap-4"
-                style={{ backgroundImage: `url(${background})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
-                <MainFormTemplate product={product} handleClickBack={handleBack} resetState={resetState}>
-                    <div className="flex flex-col gap-2">
-                        <div className="bg-white bg-opacity-50 p-4 w-full h-full flex flex-col justify-center items-center">
-                            This form edits the home page photo and the name of the category.
-                        </div>
-
-                        <CustomInput type="text" label="Category Name" placeholder="Category Name" value={category} onChange={(e) => setCategory(e.target.value)} />
-                        <label htmlFor="file"
-                            className="p-4 bg-green-500 text-white cursor-pointer rounded-md flex justify-center gap-4">Upload Image <IoIosCamera />
-                        </label>
-                        <input type="file" id="file" placeholder="Product Image"
-                            className="hidden" onChange={(e) => handleFileChange(e, setFile, setBackground)} />
-                        <p className="text-center w-full m-auto py-1 px-2 rounded-md text-xs text-gray-400 bg-white">{file ? file.name : "No File Selected"}</p>
-                    </div>
-
-                    <button type="submit"
-                        disabled={progress > 0}
-                        className="
-                    bg-edcPurple-60 text-white 
-                    hover:bg-yellow-500 hover:text-edcPurple-60 
-                    rounded-md p-2 w-full">
-                        Submit</button>
-
-                </MainFormTemplate>
-                {progress > 0 && <LoadingBar progress={progress} />}
-            </form>
-        </div>
-    )
+          {progress > 0 && <LoadingBar progress={progress} />}
+        </form>
+      </div>
+    </MainFormTemplate>
+  );
 }

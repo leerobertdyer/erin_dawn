@@ -1,36 +1,23 @@
 import uploadFile from "./uploadFile";
-import { removeFile } from "./removeFile";
-import { editDoc } from "./editDoc";
+import { removeFiles } from "./removeFile";
 
 // There is no firebase function to edit a file. Instead the solution is to: 
 //  1. delete file
 //  2. upload new file
-//  3. update doc with new file reference
+//  3. update doc with new file reference (This needs to be done separately)
 
 interface IEditFile {
-    id: string;
-    file: File;
-    title: string;
-    description: string;
-    price: number;
-    size: string;
-    dimensions: string;
-    tags: string[];
     url: string;
-    category?: string;
-    series?: string;
-    itemOrder?: number;  
-    itemName?: string;
+    title: string;
+    file: File;
     onProgress?: (progress: number) => void;
-    stripePriceId: string;
-    stripeProductId: string;
 }
 
-export default async function editFile({ url, id, title, description, price, tags, file, onProgress, series, category, itemOrder, itemName, stripePriceId, stripeProductId, size, dimensions }: IEditFile): Promise<string> {
+export default async function editFile({ url, title, file, onProgress }: IEditFile): Promise<string> {
 
     try {
         // delete file
-        const deleteFile = await removeFile({ url });
+        const deleteFile = await removeFiles({ urls: url });
         if (!deleteFile) {
             throw new Error("Issue: No original file found to delete");
         }
@@ -39,12 +26,6 @@ export default async function editFile({ url, id, title, description, price, tag
         const imageUrl = await uploadFile({ reference: title.replace(/ /g, '_'), file, onProgress });
         if (!imageUrl) {
             throw new Error("Issue uploading new file");
-        }
-        // update doc with new file url
-        try {
-            await editDoc({ id, title, description, price, tags, imageUrl, series, category, itemOrder, itemName, stripePriceId, stripeProductId, size, dimensions });
-        } catch (error) {
-            throw new Error("Issue updating document: " + error);
         }
 
         return imageUrl;

@@ -1,7 +1,11 @@
-export interface ICarouselPhoto {
-    id: string;
+export interface IBasePhoto {
     url: string;
-    title: string;
-    itemOrder: number;
-    tags: string[];
+}
+
+export interface IGeneralPhoto extends IBasePhoto {
+    title?: string;
+    category?: string;
+    order?: number;
+    id?: string;
+    tags?: string[];
 }
