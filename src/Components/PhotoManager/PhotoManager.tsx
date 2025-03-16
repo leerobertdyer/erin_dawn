@@ -2,7 +2,7 @@ import { IProductInfo } from "../../Interfaces/IProduct";
 import Frame from "../Frame/Frame";
 import AdminButtons from "../Buttons/AdminButtons";
 import { useProductManagementContext } from "../../Context/ProductMgmtContext";
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useRef, useEffect,  } from "react";
 import WarningDialogue from "../WarningDialogue/WarningDialogue";
 import { editProductDoc } from "../../firebase/editDoc";
 import { IGeneralPhoto } from "../../Interfaces/IPhotos";
@@ -61,26 +61,23 @@ export default function PhotoManager({ product, handleBack, onSave }: IPhotoMana
             }));
     }
 
-    const handleDrag = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    const stopDefaultPropagation = (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         e.stopPropagation();
-    }, []);
+    }
 
-    const handleDragIn = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        e.stopPropagation();
+    const handleFileDragIn = (e: React.DragEvent<HTMLDivElement>) => {
+        stopDefaultPropagation(e);
         setIsDragging(true);
-    }, []);
+    };
 
-    const handleDragOut = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        e.stopPropagation();
+    const handleFileDragOut = (e: React.DragEvent<HTMLDivElement>) => {
+        stopDefaultPropagation(e);
         setIsDragging(false);
         setDragOverIndex(null);
-    }, []);
+    };
 
     const handlePhotoDragStart = (e: React.DragEvent<HTMLDivElement>, photo: IGeneralPhoto) => {
-        console.log('Drag start:', photo.title, photo.id);
         e.stopPropagation();
         setDraggedPhoto(photo);
         // Store the dragged photo's ID in the dataTransfer
@@ -96,25 +93,21 @@ export default function PhotoManager({ product, handleBack, onSave }: IPhotoMana
     };
 
     const handlePhotoDragOver = (e: React.DragEvent<HTMLDivElement>, index: number) => {
-        e.preventDefault();
-        e.stopPropagation();
+        stopDefaultPropagation(e);
         
         // Only update if we're dragging over a new target
         if (dragOverIndex !== index) {
-            console.log('Dragging over index:', index);
             setDragOverIndex(index);
         }
     };
 
     const handlePhotoDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        e.stopPropagation();
+        stopDefaultPropagation(e);
         setDragOverIndex(null);
     };
 
     const handlePhotoDrop = (e: React.DragEvent<HTMLDivElement>, targetIndex: number) => {
-        e.preventDefault();
-        e.stopPropagation();
+        stopDefaultPropagation(e);
         
         const draggedPhotoId = e.dataTransfer.getData('text/plain');
         if (!draggedPhotoId) return;
@@ -149,9 +142,8 @@ export default function PhotoManager({ product, handleBack, onSave }: IPhotoMana
         setIsUpdatedPhotoState(true);
     };
 
-    const handleDrop = useCallback(async (e: React.DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        e.stopPropagation();
+    const handleFileDrop = (e: React.DragEvent<HTMLDivElement>) => {
+        stopDefaultPropagation(e);
         setIsDragging(false);
 
         const droppedFiles = Array.from(e.dataTransfer.files);
@@ -165,7 +157,7 @@ export default function PhotoManager({ product, handleBack, onSave }: IPhotoMana
                 reader.readAsDataURL(droppedFiles[0]);
             }
         }
-    }, []);
+    };
 
     const handleFileSelect = () => {
         fileInputRef.current?.click();
@@ -293,6 +285,7 @@ export default function PhotoManager({ product, handleBack, onSave }: IPhotoMana
                     className="w-[10rem] mx-auto my-[1rem] bg-edcPurple-60 text-white p-2 rounded-md">Back</button>
             </div>
             <div className="flex flex-col flex-wrap md:flex-row justify-center items-center gap-[1rem] w-full h-fit mb-8">
+                {/* Drag and drop for existing photos */}
                 {currentPhotos.map((photo, index) => (
                     <div
                         key={photo.id}
@@ -328,13 +321,13 @@ export default function PhotoManager({ product, handleBack, onSave }: IPhotoMana
                 ))}
             </div>
 
-            {/* Drag and drop zone */}
+            {/* Drag and drop zone for new files*/}
             <div
                 ref={dropZoneRef}
-                onDragEnter={handleDragIn}
-                onDragLeave={handleDragOut}
-                onDragOver={handleDrag}
-                onDrop={handleDrop}
+                onDragEnter={handleFileDragIn}
+                onDragLeave={handleFileDragOut}
+                onDragOver={stopDefaultPropagation}
+                onDrop={handleFileDrop}
                 onClick={handleFileSelect}
                 className={`w-full max-w-[20rem] h-[12rem] m-auto mt-[2rem] border-2 border-dashed rounded-lg flex flex-col justify-center items-center cursor-pointer transition-all ${isDragging ? 'border-edcPurple-60 bg-edcPurple-10' : 'border-gray-300'}`}
             >
@@ -365,7 +358,7 @@ export default function PhotoManager({ product, handleBack, onSave }: IPhotoMana
             </div>
 
             {(files || isUpdatedPhotoState) && <button
-                className="w-[10rem] m-auto bg-edcPurple-60 p-2 text-white rounded-md text-center cursor-pointer flex justify-center items-center gap-4 border-2 border-edcPurple-60 py-4 my-4"
+                className="w-[10rem] m-auto bg-edcYellow-80 p-2 fixed bottom-10 left-0 right-0 text-edcPurple-80 rounded-md text-center cursor-pointer flex justify-center items-center gap-4 border-2 border-white py-4 my-4"
                 onClick={() => files ? handleSendPhotosToForm() : handleSaveReorderedPhotos()}>
                 {files ? 'Upload' : 'Save Changes'}
             </button>}
