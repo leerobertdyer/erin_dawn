@@ -34,7 +34,7 @@ export default function About() {
     return (
         <div className="bg-white w-screen h-fit flex flex-col items-center justify-start text-pink-300 py-4">
             <div className="w-full h-[80%] my-auto flex justify-evenly items-center bg-cover bg-center py-[5rem]"
-                style={{ backgroundImage: 'url(images/background2.png)' }}>
+                style={{ backgroundImage: 'url(images/background.jpg)' }}>
                 <div className="w-[85%] bg-[#272727] bg-opacity-90 rounded-md p-8 flex flex-col justify-evenly items-center gap-2">
 
                     <h1 className="text-[1.5rem] md:text-[4rem] font-bold">Erin Dawn Campbell</h1>
@@ -80,7 +80,7 @@ export default function About() {
                                 className="w-full h-[22rem] bg-white text-black rounded-md p-4"
                                 value={aboutLongText}
                                 onChange={(e) => setAboutLongText(e.target.value)}></textarea>
-                            : <div className="leading-7 tracking-wide">{aboutLongText}</div>}
+                            : <div className="leading-7 tracking-wide whitespace-pre-line">{aboutLongText}</div>}
 
                         {/* LINKS */}
                         <div className="w-full flex flex-col items-center justify-center bg-[#272727] bg-opacity-90 rounded-md p-4 mt-4">

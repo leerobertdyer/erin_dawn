@@ -19,7 +19,8 @@ export default function Cart() {
                 <div className="w-full h-fit bg-white p-2 border-2 border-black rounded-md text-center">
                     <p>Total: ${Number(cartProducts.reduce((acc, product) => acc + product.price, 0)).toFixed(2)}</p>
                 </div>
-                <CheckoutButton salesItems={cartProducts.map((item) => ({ id: item.id, quantity: 1, title: item.title, stripePriceId: item.stripePriceId, price: item.price }))} />
+               { cartProducts.length > 0 && <CheckoutButton salesItems={cartProducts.map((item) => ({ id: item.id, quantity: 1, title: item.title, stripePriceId: item.stripePriceId, price: item.price }))} />}
+                { cartProducts.length === 0 && <p className="text-rose-300 bg-black p-2 bg-opacity-60 text-center w-[20rem] rounded-md">No items in cart :(</p>}
             </div>
             <div className="w-full h-fit flex flex-col items-center justify-start gap-4">
 
