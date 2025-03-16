@@ -161,7 +161,7 @@ export default function PhotoManager({ product, handleBack, onSave }: IPhotoMana
                 <button onClick={isSettingKey ? () => handleFinishKey() : handleBack}
                     className="w-[10rem] mx-auto my-[1rem] bg-edcPurple-60 text-white  p-2 rounded-md ">{isSettingKey ? "Done" : "Back"}</button>
             </div>
-            <div className="flex flex-col md:flex-row justify-center items-center gap-[1rem] w-full h-fit">
+            <div className="flex flex-col flex-wrap md:flex-row justify-center items-center gap-[1rem] w-full h-fit">
                 {currentPhotos.map((photo) =>
                     <Frame key={photo.id} additionalClass="w-[15rem] h-[24rem]">
                         <img src={photo.url} id={photo.id} className="rounded-md object-cover w-full h-full " />
