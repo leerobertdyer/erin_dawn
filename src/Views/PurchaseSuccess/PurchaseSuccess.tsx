@@ -1,8 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
-import { usePhotosContext } from "../../Context/PhotosContext";
 import { useProductManagementContext } from "../../Context/ProductMgmtContext";
 import { IProductInfo } from "../../Interfaces/IProduct";
-import { editDoc } from "../../firebase/editDoc";
+import { editProductDoc } from "../../firebase/editDoc";
 import { useEffect, useState } from "react";
 import { BACKEND_URL } from "../../util/constants";
 import { addNewSale } from "../../firebase/newDoc";
@@ -16,36 +15,29 @@ export default function PurchaseSuccess() {
     const sessionId = queryParams.get('session');
     const { width, height } = useWindowSize();
 
-    const { allPhotos, setAllPhotos } = usePhotosContext();
-    const { cartProducts, setCartProducts } = useProductManagementContext();
+    const { cartProducts, setCartProducts, allProducts, setAllProducts } = useProductManagementContext();
     const [inventoryPhotos, setInventoryPhotos] = useState<IProductInfo[]>([]);
 
     const [showConffeeti, setShowConfetti] = useState(true);
 
     useEffect(() => {
         async function handleSoldItems() {
-            let allSeriesForAllProducts = [];
-            for (const item of cartProducts) {
+            const allProductsToUpdate = [...cartProducts];
 
-                const allProductPhotos = allPhotos
-                    .filter((photo: IProductInfo) => photo.itemName === item.itemName);
-                allSeriesForAllProducts = allSeriesForAllProducts.concat(allProductPhotos);
-            }
-
-            for (const item of allSeriesForAllProducts) {
-                console.log('Editing item:', item.title);
-                await editDoc({
-                    ...item,
-                    tags: ['sold', 'edc']
+            for (const cartItem of allProductsToUpdate) {
+                console.log('Editing item:', cartItem.title);
+                await editProductDoc({
+                    ...cartItem,
+                    sold: true
                 });
             }
-            const nextPhotos = allPhotos.filter((photo: IProductInfo) => !allSeriesForAllProducts.some(soldItem => soldItem.id === photo.id));
-            setInventoryPhotos(nextPhotos.filter((photo: IProductInfo) => photo.tags.includes('inventory')));
-            setAllPhotos(nextPhotos);
+            const nextProducts = allProducts.filter((p: IProductInfo) => !cartProducts.some(cartItem => cartItem.id === p.id));
+            setInventoryPhotos(nextProducts.filter((p: IProductInfo) => !p.sold && !p.hidden));
+            setAllProducts(nextProducts);
             setCartProducts([]);
         }
-        if (cartProducts.length > 0 && allPhotos.length > 0) handleSoldItems();
-    }, [cartProducts, allPhotos]);
+        if (cartProducts.length > 0 && allProducts.length > 0) handleSoldItems();
+    }, [cartProducts, allProducts]);
 
     useEffect(() => {
         // Fetch session details using the session ID
@@ -103,10 +95,11 @@ export default function PurchaseSuccess() {
                         border-2 border-white"><IoIosClose size={80} /></Link>
                 </div>
                 {inventoryPhotos.length > 0 && <div className="flex flex-row justify-center items-center w-screen p-2 bg-edcBlue-40 bg-opacity-45 overflow-auto flex-wrap">
-                    {inventoryPhotos.map((item: IProductInfo) => {
+                    <p className="w-full p-2 text-center">Here are a few other items in stock:</p>
+                    {inventoryPhotos.map((product: IProductInfo) => {
                         return (
-                            <div className="w-[10rem] h-[10rem] border-white border-2 overflow-hidden relative" key={item.id}>
-                                <img className="w-full h-full object-cover object-center" src={item.imageUrl} alt={item.title} />
+                            <div className="w-[10rem] h-[10rem] border-white border-2 overflow-hidden relative" key={product.id}>
+                                <img className="w-full h-full object-cover object-center" src={product.photos[0].url} alt={product.title} />
                                 <div className="absolute bottom-0 w-full">
                                 </div>
                             </div>

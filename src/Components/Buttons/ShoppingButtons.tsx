@@ -4,7 +4,7 @@ import { IProductInfo } from "../../Interfaces/IProduct";
 
 interface IShoppingButons {
     product: IProductInfo,
-    handleDetails?: (index: number) => void
+    handleDetails?: (product: IProductInfo) => void
 }
 export default function ShoppingButtons({ product, handleDetails }: IShoppingButons) {
     const { setCartProducts, cartProducts } = useProductManagementContext();
@@ -15,7 +15,6 @@ export default function ShoppingButtons({ product, handleDetails }: IShoppingBut
     }, [cartProducts, product.id])
 
     function handleAddToCart(product: IProductInfo) {
-        console.log("Adding this url to fucking cart", product.imageUrl)
         const nextProducts = [...cartProducts, product]
         setCartProducts(nextProducts)
     }
@@ -28,7 +27,7 @@ export default function ShoppingButtons({ product, handleDetails }: IShoppingBut
   return (
         <div className="flex flex-col justify-center items-center w-full pb-2 px-2 gap-2">
             <div className="flex justify-around w-full flex-wrap gap-2 bg-white p-0 rounded-md text-edcPurple-80">
-                <p>{product.itemName}</p>
+                <p>{product.title}</p>
                 <p className="font-retro rotate-6 text-2xl p-0">${product.price}<span className="text-xs">.00</span></p>
             </div>
             {handleDetails && <button
@@ -36,7 +35,7 @@ export default function ShoppingButtons({ product, handleDetails }: IShoppingBut
                             transition:all duration-[10ms]
                             hover:bg-yellow-500 
                             bg-edcPurple-60 text-white px-2 rounded-md w-[100%]"
-                onClick={() => handleDetails(Number(product.itemOrder) - 1)}
+                onClick={() => handleDetails(product)}
             >Details</button>}
             <button
 

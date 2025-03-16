@@ -2,40 +2,51 @@ import { createContext, useContext, ReactNode } from 'react';
 import { useProductManagement } from '../Hooks/useProductMgmt';
 
 import { IProductInfo } from '../Interfaces/IProduct';
+import { IGeneralPhoto } from '../Interfaces/IPhotos';
+import { ICategory } from '../Interfaces/ICategory';
+import { IHero } from '../Interfaces/IHero';
 
 interface ProductManagementContextType {
     isEditing: boolean;
     setIsEditing: (isEditing: boolean) => void;
-    isBatchEdit: boolean;
-    setIsBatchEdit: (isBatchEdit: boolean) => void;
-    product: IProductInfo | null;
-    setProduct: (product: IProductInfo | null) => void;
+    productToEdit: IProductInfo | null;
+    setProductToEdit: (product: IProductInfo | null) => void;
     cartProducts: IProductInfo[];
     setCartProducts: (products: IProductInfo[]) => void;
-    handleEdit: (id: string) => void;
-    handleDelete: (url: string, id: string) => void;
-    handleBack: () => void;
+    handleEditProduct: (product: IProductInfo) => void;
+    handleDeletePhoto: (product: IProductInfo, photo: IGeneralPhoto) => Promise<boolean>; 
     previousUrl: string;
     setPreviousUrl: (url: string) => void;
-    setFilteredInventory: (inventory: IProductInfo[]) => void;
+    allProducts: IProductInfo[];
+    setAllProducts: (products: IProductInfo[]) => void;
     filteredInventory: IProductInfo[];
-    }
+    setFilteredInventory: (products: IProductInfo[]) => void;
+    allCategories: ICategory[];
+    setAllCategories: (categories: ICategory[]) => void;
+    handleDeleteProduct: (product: IProductInfo) => void;
+    heroPhotos: IHero[];
+    setHeroPhotos: (photos: IHero[]) => void;
+}
 
 const defaultValue: ProductManagementContextType = {
     isEditing: false,
     setIsEditing: () => {},
-    setIsBatchEdit: () => {},
-    isBatchEdit: false,
-    product: null,
-    setProduct: () => {},
+    productToEdit: null,
+    setProductToEdit: () => {},
     cartProducts: [], setCartProducts: () => {},
-    handleEdit: () => {},
-    handleDelete: () => {},
-    handleBack: () => {},
+    handleEditProduct: () => {},
+    handleDeletePhoto: async () => {return false},
     previousUrl: '/',
     setPreviousUrl: () => {},
+    allProducts: [],
+    setAllProducts: () => {},
+    filteredInventory: [],
     setFilteredInventory: () => {},
-    filteredInventory: []
+    allCategories: [],
+    setAllCategories: () => {},
+    handleDeleteProduct: () => {},
+    heroPhotos: [],
+    setHeroPhotos: () => {},
 };
 
 const ProductManagementContext = createContext<ProductManagementContextType>(defaultValue);

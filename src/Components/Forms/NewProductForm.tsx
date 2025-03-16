@@ -1,301 +1,350 @@
-import { useEffect, useState } from "react";
-import { getCategories, ICategory } from "../../firebase/getProductInfo";
+import { useState } from "react";
+import { ICategory } from "../../Interfaces/ICategory";
 import CustomInput from "../CustomInput/CustomInput";
 import { IoIosCamera } from "react-icons/io";
 import uploadFile from "../../firebase/uploadFile";
-import { newDoc, addNewCategory, addNewSeries } from "../../firebase/newDoc";
+import { addNewProductDoc, addNewCategory } from "../../firebase/newDoc";
+import { editCategoryDoc } from "../../firebase/editDoc";
 import { createStripeProduct } from "../../Stripe/newStripe";
-import { usePhotosContext } from "../../Context/PhotosContext";
 import LoadingBar from "../LoadingBar/LoadingBar";
-import { useNavigate } from "react-router-dom";
-import { handleFileChange, preventEnterFromSubmitting } from "./formUtil";
+import { handleMultipleFileChange, preventEnterFromSubmitting } from "./formUtil";
 import MainFormTemplate from "./MainFormTemplate";
 import { resizeFile } from "../../util/resizeFile";
 import { NEW_PRODUCT_DEFAULT_HEIGHT, NEW_PRODUCT_DEFAULT_WIDTH, NEW_PRODUCT_IMAGE_QUALITY } from "../../util/constants";
+import { useProductManagementContext } from "../../Context/ProductMgmtContext";
+import getProductPhotosToUpload from "../../util/getProductPhotosToUpload";
+import SubmitBtn from "../Buttons/SubmitBtn";
 
-const defaultSeries = "--Select Series--";
-const newSeries = "--NEW SERIES--";
-const newCategorySelector: ICategory = {
-    name: "--NEW CATEGORY--",
-    series: []
-}
-const defaultCategory = {
-    name: "--Select Category--",
-    series: [defaultSeries]
+interface INewProductForm {
+    onClose: () => void;
 }
 
+export default function NewProductForm({ onClose }: INewProductForm) {
+    const { allProducts, setAllProducts, allCategories, setAllCategories } = useProductManagementContext();
 
-
-export default function NewProductForm() {
-    const { allPhotos, setAllPhotos } = usePhotosContext();
-    const navigate = useNavigate();
-
-    const [categories, setCategories] = useState<ICategory[]>([defaultCategory]);
-    const [allSeries, setAllSeries] = useState<string[]>([defaultCategory.series[0]]);
+    // Basic product info
     const [title, setTitle] = useState("");
-    const [category, setCategory] = useState(defaultCategory.name);
-    const [newCategoryName, setNewCategoryName] = useState("");
-    const [series, setSeries] = useState(defaultSeries);
-    const [newSeriesName, setNewSeriesName] = useState("");
-    const [price, setPrice] = useState<number | null>();
+    const [description, setDescription] = useState("");
+    const [price, setPrice] = useState<number | null>(null);
     const [size, setSize] = useState("");
     const [dimensions, setDimensions] = useState("");
-    const [description, setDescription] = useState("");
-    const [file, setFile] = useState<File | null | undefined>();
+    const [files, setFiles] = useState<File[] | null>(null);
     const [background, setBackground] = useState("");
-    const [tags, setTags] = useState<string[]>(["edc", "inventory"]);
     const [progress, setProgress] = useState(0);
-    const [isSubmitting, setIsSubmitting] = useState(false);
     const [sizeChecked, setSizeChecked] = useState(false);
 
-    useEffect(() => {
-        async function setup() {
-            //TODO: match how I store data in local storage so I am not making so many db calls....
-            const c = await getCategories()
-            setCategories([...categories, newCategorySelector, ...c]);
+    // Category and Series handling
+    const [selectedCategoryName, setSelectedCategoryName] = useState("");
+    const [isAddingNewCategory, setIsAddingNewCategory] = useState(false);
+    const [newCategory, setNewCategory] = useState<ICategory>({
+        name: "",
+        series: [],
+        url: ""
+    });
+    const [selectedSeries, setSelectedSeries] = useState("");
+    const [isAddingNewSeries, setIsAddingNewSeries] = useState(false);
+    const [newSeriesName, setNewSeriesName] = useState("");
+
+    // Direct category lookup
+    const selectedCategory = allCategories.find(c => c.name === selectedCategoryName);
+    const availableSeries = selectedCategory?.series || [];
+
+    // Category handling
+    const handleCategorySelection = (action: 'select' | 'add-new') => {
+        if (action === 'add-new') {
+            setIsAddingNewCategory(true);
+            setSelectedCategoryName("");
+            setNewCategory({ name: "", series: [], url: "" });
+            // Reset series when switching to new category
+            setSelectedSeries("");
+            setIsAddingNewSeries(false);
+            setNewSeriesName("");
+        } else {
+            setIsAddingNewCategory(false);
+            setNewCategory({ name: "", series: [], url: "" });
         }
-        if (categories.length === 1) setup();
-        else {
-            for (const cat of categories) {
-                if (cat.name !== "--Select Category--") {
-                    if (category === cat.name) {
-                        setAllSeries([defaultCategory.series[0], newSeries, ...cat.series]);
-                        break
-                    }
-                    setAllSeries([defaultCategory.series[0]]);
-                }
-            }
+    };
+
+    // Series handling
+    const handleSeriesSelection = (action: 'select' | 'add-new') => {
+        if (action === 'add-new') {
+            setIsAddingNewSeries(true);
+            setSelectedSeries("");
+            setNewSeriesName("");
+        } else {
+            setIsAddingNewSeries(false);
+            setNewSeriesName("");
         }
-    }, [categories, category])
+    };
 
-    function resetState() {
-        setTitle("")
-        setCategory(defaultCategory.name)
-        setNewCategoryName("")
-        setSeries(defaultSeries)
-        setNewSeriesName("")
-        setPrice(null)
-        setSize("")
-        setDimensions("")
-        setDescription("")
-        setFile(null)
-        setBackground("")
-        setTags(["edc", "inventory"])
-        setProgress(0)
-        setSizeChecked(false)
-    }
-
-    function onProgress(percent: number) {
-        setProgress(percent)
-    }
-
-    async function handleNewCategory() {
-        // Add new category to db
-        const success = await addNewCategory({ category: newCategoryName, series: newSeriesName })
-        if (success) console.log('Category added successfully')
-        else throw new Error("Error adding new category")
-
-        // now add the photo for the new category
-        const safeName = newCategoryName.replace(/ /g, "_") + Date.now().toString();
+    async function handleUploadCategoryPhoto(file: File) {
         const resizedFile = await resizeFile(file, {
             maxWidth: 1200,
             maxHeight: 1400,
             maintainAspectRatio: true,
             quality: NEW_PRODUCT_IMAGE_QUALITY
         });
+
         const fileToUpload = {
-            reference: safeName,
+            reference: newCategory.name.replace(/\s/g, "_") + Date.now().toString(),
             file: resizedFile,
-            onProgress: onProgress,
+            onProgress
         }
-        const downloadUrl = await uploadFile(fileToUpload)
-        if (!downloadUrl) throw new Error("Error uploading new category photo")
 
-        const newPhoto = {
-            downloadUrl,
-            title: newCategoryName,
-            description: newCategoryName,
-            price: 0,
-            size: "",
-            dimensions: "",
-            tags: ["edc", "mainPage"],
-            series: newSeriesName,
-            itemName: safeName,
-            itemOrder: 0,
-            category: newCategoryName,
-            stripeProductId: "",
-            stripePriceId: "",
-        }
-        const newId = await newDoc(newPhoto)
-        if (!newId) throw new Error("Error creating new category photo")
-        setAllPhotos([...allPhotos, { ...newPhoto, imageUrl: downloadUrl, id: newId }])
-
-    }
-
-    async function handleNewSeries() {
-        // Add series to db
-        const success = await addNewSeries({ category: newCategoryName.length > 0 ? newCategoryName : category, series: newSeriesName })
-        if (success) console.log('Series added successfully')
-        else throw new Error("Error adding new series")
-        console.log('adding new series to db...')
+        const downloadUrl = await uploadFile(fileToUpload);
+        if (!downloadUrl) throw new Error("Error uploading category photo");
+        
+        // Update the newCategory object with the URL
+        setNewCategory(prev => ({ ...prev, url: downloadUrl }));
+        return downloadUrl;
     }
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        setIsSubmitting(true);
+        if (!files) return;
 
-        if (!file) {
-            setIsSubmitting(false);
-            return;
+        let categoryToUse = selectedCategory;
+        let seriesToUse = selectedSeries;
+
+        // Handle new category creation
+        if (isAddingNewCategory && newCategory.name) {
+            // Upload category photo first
+            const downloadUrl = await handleUploadCategoryPhoto(files[0]);
+            
+            // Create the complete category object
+            const completeCategory: ICategory = {
+                name: newCategory.name,
+                series: isAddingNewSeries && newSeriesName ? [newSeriesName] : [],
+                url: downloadUrl
+            };
+            
+            // Create category and update state
+            await addNewCategory(completeCategory);
+            setAllCategories([...allCategories, completeCategory]);
+            categoryToUse = completeCategory;
+            seriesToUse = newSeriesName;
+        }
+        
+        // Handle new series for existing category
+        if (!isAddingNewCategory && isAddingNewSeries && newSeriesName) {
+            const updatedCategory = {
+                ...selectedCategory!,
+                series: [...selectedCategory!.series, newSeriesName]
+            };
+            await editCategoryDoc(updatedCategory);
+            setAllCategories(allCategories.map(c => c.name === selectedCategoryName ? updatedCategory : c));
+            categoryToUse = updatedCategory;
+            seriesToUse = newSeriesName;
         }
 
-        if (newCategoryName.length > 0) await handleNewCategory();
-        // if newSeriesName is present but not new category:
-        if (newSeriesName.length > 0 && newCategoryName !== newCategorySelector.name)
-            await handleNewSeries();
+        // Create product
+        const photosUploaded = await getProductPhotosToUpload(files, title, ["edc", "inventory"], NEW_PRODUCT_DEFAULT_WIDTH, NEW_PRODUCT_DEFAULT_HEIGHT, setProgress);
+        const { stripeProductId, stripePriceId } = await createStripeProduct(title, description, Number(price));
 
-        // resize incoming photo
-        const rezisedFile = await resizeFile(file, {
-            maxWidth: NEW_PRODUCT_DEFAULT_WIDTH,
-            maxHeight: NEW_PRODUCT_DEFAULT_HEIGHT,
-            maintainAspectRatio: true,
-            quality: NEW_PRODUCT_IMAGE_QUALITY  // Good balance between quality and file size
-        });
-
-        const fileToUpload = {
-            reference: `${title.replace(/ /g, "_")}${Date.now().toString()}`,
-            file: rezisedFile as File,
-            onProgress: onProgress,
-        }
-
-        // Upload file to storage return download url
-        const downloadUrl = await uploadFile(fileToUpload);
-        console.log("Download URL: ", downloadUrl)
-
-        // Create new product in stripe account
-        const { stripeProductId, stripePriceId } = await createStripeProduct(title, description, Number(price))
-
-        const categoryNameToSave = newCategoryName.length > 0 ? newCategoryName : category;
-        console.log("Category to save: ", categoryNameToSave)
-
-        // Create new product in firestore
-        const newProductId = await newDoc({
-            downloadUrl,
+        const newProduct = {
             title,
             description,
             price: Number(price),
-            size: sizeChecked ? size : "",
+            size,
             dimensions,
-            category: categoryNameToSave,
-            tags,
-            series: series === newSeries ? newSeriesName : series,
-            itemName: title,
-            itemOrder: 1, // new product is always first in series
+            photos: photosUploaded,
             stripeProductId,
             stripePriceId,
-        })
-        if (!newProductId) throw new Error("Error creating new product");
+            category: categoryToUse.name,
+            series: seriesToUse,
+            hidden: false,
+            sold: false
+        };
 
-        //Update the current photo state
-        const updatedPhotos = [...allPhotos, {
-            id: newProductId,
-            imageUrl: downloadUrl,
-            title,
-            description,
-            category: categoryNameToSave,
-            tags,
-            size: sizeChecked ? size : "",
-            dimensions,
-            price: Number(price),
-            series: series === newSeries ? newSeriesName : series,
-            itemName: title,
-            itemOrder: 1, // new product is always first in series
-            stripeProductId,
-            stripePriceId,
-        }]
-        setAllPhotos(updatedPhotos)
+        const newProductId = await addNewProductDoc(newProduct);
+        if (!newProductId) throw new Error("Failed to create product");
 
-        navigate("/shop")
-        //TODO: Clear form & success message
+        setAllProducts([...allProducts, { ...newProduct, id: newProductId }]);
+        onClose();
     }
 
+    function resetState() {
+        setTitle("");
+        setNewCategory({
+            id: "",
+            name: "",
+            url: "",
+            series: []
+        });
+    }
+
+    function onProgress(p: number) { setProgress(p) }
 
     return (
-        <form onSubmit={handleSubmit} onKeyDown={preventEnterFromSubmitting}
-            className="bg-white flex flex-col justify-center m-auto items-center w-[85vw] border-2 border-black rounded-md p-4 mt-4 gap-4"
-            style={{ backgroundImage: `url(${background})`, backgroundSize: "cover", backgroundPosition: "center" }}>
-            <MainFormTemplate handleClickBack={() => navigate("/shop")} resetState={resetState} >
+        <MainFormTemplate handleClickBack={onClose} resetState={resetState}> 
+            <div className="fixed inset-0 flex flex-col items-center h-screen bg-gray-50 overflow-y-auto">
+            <h2 className="text-2xl p-2 text-center bg-white sticky top-0 z-10 mb-4 w-full">Add Product</h2>
 
-                <h2 className="text-2xl p-2 rounded-md bg-white">Add Product</h2>
+            <form onSubmit={handleSubmit} onKeyDown={preventEnterFromSubmitting}
+                style={
+                    {
+                        backgroundImage: `url('${background}')`,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                    }
+                }
+                className="bg-white flex flex-col justify-center m-auto items-center w-[85vw] md:w-[65vw] h-fit border-2 border-black rounded-md p-4 mt-4 mb-[7rem] gap-4 text-xs sm:text-sm md:text-base">
+            <CustomInput 
+                label="Product Name" 
+                value={title} 
+                onChange={(e) => setTitle(e.target.value)} 
+                type="text" 
+                placeholder="Product Name" 
+                required 
+            />
 
-                <CustomInput label="Product Name" value={title} onChange={(e) => setTitle(e.target.value)} type="text" placeholder="Product Name" required={true} />
+            {/* Category Selection */}
+            <div className="flex flex-col w-full gap-4">
+                <div className="flex gap-2 ">
+                    <button 
+                        type="button"
+                        onClick={() => handleCategorySelection('select')}
+                        className={`flex-1 p-2 rounded-md w-[13rem] ${!isAddingNewCategory ? 'bg-edcPurple-60 text-white' : 'bg-gray-200'}`}
+                    >
+                        Select Category
+                    </button>
+                    <button 
+                        type="button"
+                        onClick={() => handleCategorySelection('add-new')}
+                        className={`flex-1 p-2 rounded-md w-[13rem] ${isAddingNewCategory ? 'bg-edcPurple-60 text-white' : 'bg-gray-200'}`}
+                    >
+                        Add New Category
+                    </button>
+                </div>
 
-                {title && <div className="w-full">
-                    <label htmlFor="categorySelector" className="w-full select-none">Category</label>
-                    <select className={`border-2 border-black rounded-md p-2 w-full 
-            ${category !== defaultCategory.name && "bg-gray-200"}`}
-                        onChange={(e) => setCategory(e.target.value)} id="categorySelector">
-                        {categories.map((category, key) => {
-                            return <option key={key} value={category.name}>{category.name}</option>
-                        })}
+                {isAddingNewCategory ? (
+                    <CustomInput 
+                        label="New Category Name"
+                        value={newCategory.name}
+                        onChange={(e) => setNewCategory(prev => ({ ...prev, name: e.target.value }))}
+                        type="text"
+                        placeholder="Enter category name"
+                        required
+                    />
+                ) : (
+                    <select 
+                        className="w-full p-2 border-2 border-black rounded"
+                        value={selectedCategoryName}
+                        onChange={(e) => setSelectedCategoryName(e.target.value)}
+                        required
+                    >
+                        <option value="">Select a category</option>
+                        {allCategories.map(cat => (
+                            <option key={cat.name} value={cat.name}>
+                                {cat.name}
+                            </option>
+                        ))}
                     </select>
-                </div>}
+                )}
+            </div>
 
-                {category === newCategorySelector.name && <CustomInput label="New Category Name" value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} type="text" placeholder="New Category" required={true} />}
-                {category !== defaultCategory.name && <>
+            {/* Series Selection - Only show if category is selected or being created */}
+            {(selectedCategoryName || isAddingNewCategory) && (
+                <div className="flex flex-col w-full gap-4">
+                    <div className="flex gap-2">
+                        <button 
+                            type="button"
+                            onClick={() => handleSeriesSelection('select')}
+                            className={`flex-1 p-2 rounded-md w-[13rem] ${!isAddingNewSeries ? 'bg-edcPurple-60 text-white' : 'bg-gray-200'}`}
+                        >
+                            Select Series
+                        </button>
+                        <button 
+                            type="button"
+                            onClick={() => handleSeriesSelection('add-new')}
+                            className={`flex-1 p-2 rounded-md w-[13rem] ${isAddingNewSeries ? 'bg-edcPurple-60 text-white' : 'bg-gray-200'}`}
+                        >
+                            Add New Series
+                        </button>
+                    </div>
 
-                    {(newCategoryName || category !== newCategorySelector.name) && <div className="w-full">
-                        <label htmlFor="seriesSelector" className="w-full select-none">Series</label>
-                        <select
-                            id="seriesSelector"
-                            className={`border-2 border-black rounded-md p-2 w-full 
-                            ${series !== defaultSeries && "bg-gray-200"}`}
-                            onChange={(e) => setSeries(e.target.value)}>
-                            {allSeries.map((s, key) => {
-                                return <option key={key} value={s}>{s}</option>
-                            })}
+                    {isAddingNewSeries ? (
+                        <CustomInput 
+                            label="New Series Name"
+                            value={newSeriesName}
+                            onChange={(e) => setNewSeriesName(e.target.value)}
+                            type="text"
+                            placeholder="Enter series name"
+                            required
+                        />
+                    ) : (
+                        <select 
+                            className="w-full p-2 border-2 border-black rounded"
+                            value={selectedSeries}
+                            onChange={(e) => setSelectedSeries(e.target.value)}
+                            required
+                        >
+                            <option value="">Select a series</option>
+                            {availableSeries.map(series => (
+                                <option key={series} value={series}>
+                                    {series}
+                                </option>
+                            ))}
                         </select>
-                    </div>}
+                    )}
+                </div>
+            )}
 
-                    {series === newSeries && <CustomInput label="New Series Name" value={newSeriesName} onChange={(e) => setNewSeriesName(e.target.value)} type="text" placeholder="New Series" required={true} />}
-                    {series !== defaultSeries && (newSeriesName || series !== newSeriesName) &&
-                        <>
-                            <CustomInput label="Price" value={price ? price.toString() : ""} onChange={(e) => setPrice(Number(e.target.value))} min={.01} type="number" placeholder="Price" required={true} />
-                            {Number(price) > 0 && <CustomInput label="Description" value={description} onChange={(e) => setDescription(e.target.value)} type="textarea" placeholder="Description" required={true} />}
-                            {description && <CustomInput 
-                                type="checkbox" 
-                                value={''} 
-                                label="Add Size Info?" 
-                                onChange={(e) => {
-                                    if ('checked' in e.target) {
-                                        setSizeChecked(e.target.checked);
-                                    }
-                                }} 
-                            />}
-                            {sizeChecked && 
-                                <select className="border-2 border-black rounded-md p-2 w-full" onChange={(e) => setSize(e.target.value)} value={size}>
-                                    <option value="" disabled>Select Size</option>
-                                    <option value="sm">Small</option>
-                                    <option value="md">Medium</option>
-                                    <option value="lg">Large</option>
-                                    <option value="xl">XL</option>
-                                    <option value="2xl">2XL</option>
-                                    <option value="3xl">3XL</option>
-                                </select>}
-                            <CustomInput label="Dimensions" value={dimensions} onChange={(e) => setDimensions(e.target.value)} type="text" placeholder="Dimensions" required={true} />
-                            <label htmlFor="fileInput" className="w-full bg-gray-200 p-2 rounded-md text-center cursor-pointer flex justify-center items-center gap-4 border-2 border-edcPurple-60">Select Photo<IoIosCamera /></label>
-                            <input id="fileInput" hidden onChange={(e) => handleFileChange(e, setFile, setBackground)} type="file" required={true} />
-                            {file && <button type="submit"
-                                disabled={isSubmitting}
-                                className="
-                                    bg-edcPurple-60 text-white 
-                                    hover:bg-yellow-500 hover:text-edcPurple-60 
-                                    rounded-md p-2 w-full">
-                                Submit</button>}
-                        </>}
-                </>}
-                {progress > 0 && <LoadingBar progress={progress} />}
-            </MainFormTemplate>
+            <CustomInput 
+                label="Price" 
+                value={price ? price.toString() : ""} 
+                onChange={(e) => setPrice(Number(e.target.value))} 
+                min={.01} 
+                type="number" 
+                placeholder="Price" 
+                required 
+            />
+            {Number(price) > 0 && <CustomInput 
+                label="Description" 
+                value={description} 
+                onChange={(e) => setDescription(e.target.value)} 
+                type="textarea" 
+                placeholder="Description" 
+                required 
+            />}
+            {description && <CustomInput 
+                type="checkbox" 
+                value={''} 
+                label="Add Size Info?" 
+                onChange={(e) => {
+                    if ('checked' in e.target) {
+                        setSizeChecked(e.target.checked);
+                    }
+                }} 
+            />}
+
+            {sizeChecked && 
+                <select className="border-2 border-black rounded-md p-2 w-full" onChange={(e) => setSize(e.target.value)} value={size}>
+                    <option value="" disabled>Select Size</option>
+                    <option value="sm">Small</option>
+                    <option value="md">Medium</option>
+                    <option value="lg">Large</option>
+                    <option value="xl">XL</option>
+                    <option value="2xl">2XL</option>
+                    <option value="3xl">3XL</option>
+                </select>}
+
+            <CustomInput 
+                label="Dimensions" 
+                value={dimensions} 
+                onChange={(e) => setDimensions(e.target.value)} 
+                type="text" 
+                placeholder="Dimensions" 
+                required 
+            />
+            
+            <label htmlFor="fileInput" className="w-full bg-gray-200 p-2 rounded-md text-center cursor-pointer flex justify-center items-center gap-4 border-2 border-edcPurple-60">Select Photo<IoIosCamera /></label>
+            <input id="fileInput" hidden multiple onChange={(e) => handleMultipleFileChange(e, setFiles, setBackground)} type="file" required={true} />
+            {files && files.length > 0 && <SubmitBtn progress={progress} />}
+            {progress > 0 && <LoadingBar progress={progress} />}
         </form>
+        </div>
+
+        </MainFormTemplate>
     )
 }

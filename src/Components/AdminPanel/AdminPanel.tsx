@@ -5,12 +5,14 @@ import { useEffect, useState } from "react";
 import { getOrders } from "../../firebase/getFiles";
 import { IoIosCopy } from "react-icons/io";
 import { shipOrder } from "../../firebase/editDoc";
+import NewProductForm from "../Forms/NewProductForm";
 
 export default function AdminPanel() {
     const [allOrders, setAllOrders] = useState([]);
     const [unshippedOrders, setUnshippedOrders] = useState([]);
     const [showCopyMessage, setShowCopyMessage] = useState(false); 
     const [addressCopied, setAddressCopied] = useState("");
+    const [showProductForm, setShowProductForm] = useState(false);
     const currentYear = new Date().getFullYear();
 
     useEffect(() => {
@@ -59,6 +61,7 @@ export default function AdminPanel() {
 
     return (
         <>
+        {showProductForm && <NewProductForm onClose={() => setShowProductForm(false)} />}
             <div
                 className="
             flex flex-col sm:flex-row gap-4 flex-wrap
@@ -76,7 +79,7 @@ export default function AdminPanel() {
                 w-full sm:w-[18rem]
                 flex justify-center items-center
                 gap-4 mt-4">
-                        <AddProductCard />
+                        <AddProductCard addProduct={() => setShowProductForm(true)}/>
                     </div>
 
             </div>

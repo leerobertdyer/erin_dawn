@@ -9,9 +9,18 @@ function handleFileChange(e: React.ChangeEvent<HTMLInputElement>, setFile: React
     } catch (error) {
         console.log(error)
     }
-
 }
 
+function handleMultipleFileChange(e: React.ChangeEvent<HTMLInputElement>, setFiles: React.Dispatch<React.SetStateAction<File[] | undefined>>, setBackground: React.Dispatch<React.SetStateAction<string>>) {
+    const files = Array.from(e.target.files || []);
+    const validFiles = files.filter(file => 
+        file.type.startsWith('image/')
+    );
+
+    const fileURL = URL.createObjectURL(validFiles[0]);
+    setBackground(fileURL);
+    setFiles(validFiles);
+}
 const preventEnterFromSubmitting = (e: React.KeyboardEvent<HTMLFormElement>) => { 
     // Allow enter key in textareas
     if (e.key === "Enter" && e.target instanceof HTMLElement) {
@@ -22,4 +31,4 @@ const preventEnterFromSubmitting = (e: React.KeyboardEvent<HTMLFormElement>) => 
     }
 }
 
-export { handleFileChange, preventEnterFromSubmitting }
+export { handleFileChange, preventEnterFromSubmitting, handleMultipleFileChange }

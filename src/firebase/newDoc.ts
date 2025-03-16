@@ -1,43 +1,28 @@
-import { collection, doc, getDocs, setDoc, updateDoc } from "firebase/firestore";
+import {  doc, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "./firebaseConfig";
 import IAddNewSale from "../Interfaces/IAddNewSale";
+import { INewProduct } from "../Interfaces/IProduct";
+import { IGeneralPhoto } from "../Interfaces/IPhotos";
+import { buildPhotoUpdateData } from "./editDoc";
+import { ICategory } from "../Interfaces/ICategory";
 
-interface INewDoc {
-  downloadUrl: string;
-  title: string;
-  itemName?: string;
-  description: string;
-  price: number;
-  size: string;
-  dimensions: string;
-  tags: string[];
-  series: string;
-  category: string;
-  itemOrder: number;
-  stripeProductId: string;
-  stripePriceId: string;
-}
-
-async function newDoc({ downloadUrl, title, description, price, size, dimensions, tags, series, itemOrder, stripeProductId, stripePriceId, itemName, category }: INewDoc): Promise<string | null> {
-  if (!itemName) itemName = title;
-  if (!category) category = "uncategorized";
+async function addNewProductDoc({ title, description, price, size, dimensions, hidden, series, stripeProductId, stripePriceId, category, photos, sold }: INewProduct): Promise<string | null> {
   const customDocId = title.replace(/\s/g, "_") + "_" + new Date().getTime();
   try {
     console.log("Adding document to firestore: ", customDocId);
     let id = '';
     try {
-      await setDoc(doc(db, "photos", customDocId), {
-        imageUrl: downloadUrl,
+      await setDoc(doc(db, "product", customDocId), {
         title,
         description,
         price,
         size,
         dimensions,
-        tags,
+        hidden,
         series,
-        itemName,
         category,
-        itemOrder,
+        photos,
+        sold,
         createdAt: new Date(),
         stripeProductId,
         stripePriceId
@@ -48,70 +33,53 @@ async function newDoc({ downloadUrl, title, description, price, size, dimensions
       console.error("Error adding document: ", error);
     }
     return id;
-  } catch (e) {
+  } catch (e) { 
     console.error("Error adding document: ", e);
     return null;
   }
 }
 
-async function addNewCategory({ category, series }: { category: string, series: string }): Promise<boolean> {
-  let success = false;
-  try {
-    console.log("Adding category to firestore: ", category);
-    const docRef = await getDocs(collection(db, "categories"));
-    const categories = docRef.docs[0].data().categories;
-    const updatedCategories = [...categories, { name: category, series: [series] }];
-
-    await updateDoc(docRef.docs[0].ref, {
-      categories: updatedCategories
-    });
-    success = true;
-  } catch (e) {
-    console.error("Error adding category: ", e);
-    success = false;
-  }
-  return success;
-}
-
-async function addNewSeries({ series, category }: { series: string, category: string }): Promise<boolean> {
-  let success = false;
+async function addNewPhotoDoc({  url, tags, order, category }: IGeneralPhoto): Promise<string | null> {
+  const customDocId = category.replace(/\s/g, "_") + "_" + new Date().getTime();
+  const photoUpdateData = buildPhotoUpdateData({ url, tags, order, category });
 
   try {
-    // Query the categories collection to find the document with the matching category name
-    const categoriesRef = collection(db, "categories");
-    const query = await getDocs(categoriesRef);
-    const categoryDocRef = query.docs[0].ref;
-    const categories = query.docs[0].data().categories;
-
-    if (categories.length > 0) {
-
-      // Find the index of the category to update
-      const categoryIndex = categories.findIndex((cat: any) => cat.name === category);
-      if (categoryIndex === -1) {
-        console.error("Category not found");
-        return false;
-      }
-
-      // Update the series array for the matching category
-      const updatedCategories = [...categories];
-      updatedCategories[categoryIndex].series = [...(updatedCategories[categoryIndex].series || []), series];
-
-      // Update the document with the modified categories array
-      await updateDoc(categoryDocRef, {
-        categories: updatedCategories
-      });
-
-      success = true;
-    } else {
-      console.error("No categories document found");
+    console.log("Adding photo to firestore: ", customDocId);
+    let id = '';
+    try {
+      await setDoc(doc(db, "photos", customDocId), photoUpdateData);
+      id = customDocId;
+      console.log("Document successfully written with ID: ", id);
+    } catch (error) {
+      console.error("Error adding document: ", error);
     }
-  } catch (error) {
-    console.error("Error adding series: ", error);
-    success = false;
+    return id;
+  } catch (e) { 
+    console.error("Error adding document: ", e);
+    return null;
   }
-
-  return success;
 }
+
+
+async function addNewCategory(category: ICategory): Promise<boolean> {
+    console.log("Creating doc in category collection with ID:", category.name);
+    let success = false;
+    try {
+      const safeId = category.name.replace(/\s/g, "_") + "_" + new Date().getTime();
+      const docRef = doc(db, "category", safeId);
+      await setDoc(docRef, {
+        name: category.name,
+        series: category.series,
+        url: category.url
+      });
+      success = true;
+      console.log("Category document created successfully");
+    } catch (error) {
+      console.error("Error in addNewCategory:", error);
+    }
+    return success;
+}
+
 
 async function addNewSale({ customerName, shippingAddressString, sessionId, isShipped, totalSales, itemsSold }: IAddNewSale ) {
   try {
@@ -144,4 +112,4 @@ async function editSale({ id }: { id: string }) {
 }
 
 
-export { newDoc, addNewCategory, addNewSeries, addNewSale, editSale };
+export { addNewProductDoc, addNewCategory, addNewSale, editSale, addNewPhotoDoc };
