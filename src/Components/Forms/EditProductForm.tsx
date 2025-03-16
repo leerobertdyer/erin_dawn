@@ -203,12 +203,7 @@ export default function EditProductForm({ onClose, product }: IEditProductFormPr
                 <h2 className="text-2xl p-2 text-center bg-white sticky top-0 z-10 mb-4 w-full">Edit Product</h2>
 
                 <form onSubmit={handleSubmit} onKeyDown={preventEnterFromSubmitting}
-                    className="relative flex flex-col justify-center items-center w-[85vw] md:w-[65vw] h-fit border-2 border-black rounded-md p-4 mt-4 mb-[7rem] gap-4 backdrop-blur-sm"
-                    style={{
-                        backgroundImage: `url('${background}')`,
-                        backgroundSize: "cover",
-                        backgroundPosition: "center",
-                    }}>
+                    className="relative flex flex-col justify-center items-center w-[85vw] md:w-[65vw] h-fit border-2 border-black rounded-md p-4 mt-4 mb-[7rem] gap-4">
                     <div className="relative z-10 flex flex-col w-full gap-4">
                         <CustomInput type="text" label="Product Name" placeholder="Product Name" value={title} onChange={(e) => setTitle(e.target.value)} />
                         <CustomInput type="textarea" label="Product Description" placeholder="Product Description" value={description} onChange={(e) => setDescription(e.target.value)} />
@@ -263,9 +258,9 @@ export default function EditProductForm({ onClose, product }: IEditProductFormPr
                         )}
 
                         {/* Preview current photos with manage button */}
-                        <div className="relative w-full max-w-2xl mb-4">
+                        <div className="relative w-full mb-4">
                             <img
-                                src={productToEdit.photos[0]?.url}
+                                src={background}
                                 alt={title}
                                 className="w-full h-64 object-cover rounded-md"
                             />
