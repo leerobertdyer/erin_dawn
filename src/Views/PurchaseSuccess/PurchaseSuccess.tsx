@@ -34,6 +34,10 @@ export default function PurchaseSuccess() {
             const nextProducts = allProducts.filter((p: IProductInfo) => !cartProducts.some(cartItem => cartItem.id === p.id));
             setInventoryPhotos(nextProducts.filter((p: IProductInfo) => !p.sold && !p.hidden));
             setAllProducts(nextProducts);
+            
+            // Explicitly clear localStorage to ensure it matches the state
+            localStorage.removeItem('cartProducts');
+            // Then clear the state
             setCartProducts([]);
         }
         if (cartProducts.length > 0 && allProducts.length > 0) handleSoldItems();
@@ -110,4 +114,3 @@ export default function PurchaseSuccess() {
         </div>
     )
 }
-
