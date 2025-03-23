@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { imageHeight } from "../../util/constants";
 import { IProductInfo } from "../../Interfaces/IProduct";
@@ -11,7 +11,13 @@ interface ICarouselParams {
 
 export default function Carousel({ product, children }: ICarouselParams) {
     const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
-    console.log(product.photos.length)
+    const [imageLoading, setImageLoading] = useState(true);
+    const placeholderImage = "/images/card.jpg";
+    
+    // Reset loading state when changing images
+    useEffect(() => {
+        setImageLoading(true);
+    }, [currentPhotoIndex]);
 
     function handleClick(direction: "left" | "right") {
         direction === "left"
@@ -45,8 +51,24 @@ export default function Carousel({ product, children }: ICarouselParams) {
                     {product.hidden && (
                         <div className="absolute inset-0 bg-black bg-opacity-50 z-10 flex justify-center items-center text-white text-2xl">Hidden</div>
                     )}
-                    <img src={product.photos[currentPhotoIndex].url} alt={product.title}
-                        className="w-full h-full object-cover object-center" />
+                    
+                    {/* Placeholder image shown while loading */}
+                    {imageLoading && (
+                        <img 
+                            src={placeholderImage} 
+                            alt="Loading..." 
+                            className="w-full h-full object-cover object-center absolute inset-0"
+                        />
+                    )}
+                    
+                    {/* Actual product image with onLoad handler */}
+                    <img 
+                        src={product.photos[currentPhotoIndex].url} 
+                        alt={product.title}
+                        className={`w-full h-full object-cover object-center ${imageLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
+                        onLoad={() => setImageLoading(false)}
+                        onError={() => setImageLoading(false)} // In case image fails to load
+                    />
                 </div>
             )}
             {children}
