@@ -22,6 +22,8 @@ interface INewProductForm {
 export default function NewProductForm({ onClose }: INewProductForm) {
     const { allProducts, setAllProducts, allCategories, setAllCategories } = useProductManagementContext();
 
+    const [showLoadingBar, setShowLoadingBar] = useState(false);
+
     // Basic product info
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
@@ -102,6 +104,7 @@ export default function NewProductForm({ onClose }: INewProductForm) {
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         if (!files) return;
+        setShowLoadingBar(true);
 
         let categoryToUse = selectedCategory;
         let seriesToUse = selectedSeries;
@@ -171,6 +174,10 @@ export default function NewProductForm({ onClose }: INewProductForm) {
             url: "",
             series: []
         });
+        setFiles(null);
+        setBackground("");
+        setShowLoadingBar(false);
+        setProgress(0);
     }
 
     function onProgress(p: number) { setProgress(p) }
@@ -341,7 +348,7 @@ export default function NewProductForm({ onClose }: INewProductForm) {
             <label htmlFor="fileInput" className="w-full bg-gray-200 p-2 rounded-md text-center cursor-pointer flex justify-center items-center gap-4 border-2 border-edcPurple-60">Select Photo<IoIosCamera /></label>
             <input id="fileInput" hidden multiple onChange={(e) => handleMultipleFileChange(e, setFiles, setBackground)} type="file" required={true} />
             {files && files.length > 0 && <SubmitBtn progress={progress} />}
-            {progress > 0 && <LoadingBar progress={progress} />}
+            {showLoadingBar && <LoadingBar progress={progress} />}
         </form>
         </div>
 

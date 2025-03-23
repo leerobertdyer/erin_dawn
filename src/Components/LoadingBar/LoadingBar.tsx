@@ -29,7 +29,7 @@ export default function LoadingBar({ progress }: LoadingBarProps) {
             {/* Background container */}
             <div className="absolute inset-0 bg-gray-200"></div>
             
-            {/* Progress fill with image or gradient */}
+            {/* Progress fill with image */}
             <div 
                 className="absolute inset-y-0 left-0 transition-all duration-300 ease-out bg-cover bg-center h-full"
                 style={{ 
