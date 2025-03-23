@@ -95,7 +95,7 @@ export default function Nav() {
                 hover:cursor-pointer
                 border-2 border-black rounded-md" />
                 <a href="https://www.instagram.com/erindawn_campbell" target="_blank" className="w-[3.5rem] flex justify-center" >
-                    <IoLogoInstagram size={iconSize} /></a>
+                    <IoLogoInstagram size={iconSize + 5} /></a>
               {cartLength > 0 
                 ? <div className="w-[3.5rem] flex justify-center"><CartIconAndNumber cartLength={cartLength} iconSize={iconSize} /></div>
                 : <Link to="/shop" className="w-[3.5rem] flex justify-center">

@@ -45,7 +45,7 @@ export default function Main() {
                     <div className="h-[70vh] w-full" onClick={() => handleCategoryClick(c.name)}>
                         <img src={c.url} alt={c.name} className="rounded-md h-full w-full object-cover object-center" />
                     </div>
-                    <button className="text-center text-lg">{c.name}</button>
+                    <button className="text-center text-2xl tracking-[.2rem] font-retro">{c.name}</button>
                     {user && <AdminButtons handleEdit={() => handleEdit(c)} />}
                 </Frame>
             ))}
