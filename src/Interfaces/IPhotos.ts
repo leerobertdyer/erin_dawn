@@ -8,4 +8,5 @@ export interface IGeneralPhoto extends IBasePhoto {
     order?: number;
     id?: string;
     tags?: string[];
+    hidden?: boolean;
 }

@@ -5,6 +5,7 @@ import { useUserContext } from "../../Context/UserContext";
 import EditHeroForm from "../Forms/EditHeroForm";
 import { IHero } from "../../Interfaces/IHero";
 import { useProductManagementContext } from "../../Context/ProductMgmtContext";
+import SpinningCard from "../SpinningCard/SpinningCard";
 
 export default function HeroPhotos() {
     const { user } = useUserContext();
@@ -23,11 +24,9 @@ export default function HeroPhotos() {
             {heroPhotos.length > 0 &&
                 heroPhotos.map((photo, key) => {
                     return (
-                        <div key={key} className="
-                            flex-shrink-0
-                            w-[10rem] md:w-[12rem] lg:w-[14rem] p-4 h-full">
-                            <Frame >
-                                <img src={photo.url} alt="Model Photo" className="rounded-md h-full w-full object-cover object-center" />
+                        <div key={key} className="flex-shrink-0 w-[10rem] md:w-[12rem] lg:w-[14rem] p-4 h-full">
+                            <Frame>
+                              <SpinningCard photo={photo} />
                                 {user && <AdminButtons handleEdit={() => handlePhotoEditClick(photo)} />}
                             </Frame>
                         </div>
