@@ -37,7 +37,7 @@ export default function CustomInput(props: ICustomInput) {
 
     return (
         <div className="flex flex-col items-center justify-start gap-1 w-full m-auto">
-            <label className="bg-white text-center px-2 rounded-sm w-fit min-w-[15rem]" htmlFor={label}>{label}</label>
+            {type !== "checkbox" && <label className="bg-white text-center px-2 rounded-sm w-fit min-w-[15rem]" htmlFor={label}>{label}</label>}
             {type === 'textarea' ? (
                 <textarea 
                     className={`${baseClassName} min-h-[100px] resize-y`}
