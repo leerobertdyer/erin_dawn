@@ -25,7 +25,7 @@ export default function Carousel({ product, children, height, width }: ICarousel
 
     return (
         <div
-            className={`flex flex-col justify-center gap-4 relative select-none `}>
+            className={`flex flex-col justify-center items-center gap-4 relative select-none `}>
            
             {/* Show arrows and count if more than one photo */}
             {product.photos.length > 1 && <>
