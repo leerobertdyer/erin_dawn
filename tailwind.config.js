@@ -12,6 +12,7 @@ export const theme = {
   extend: {
     colors: {
       edcPurple: {
+        10: '#e9b8f5',
         20: '#d478f5',
         40: '#a947cc',
         60: '#7a047a',

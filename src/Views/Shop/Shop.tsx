@@ -147,9 +147,9 @@ export default function Shop() {
 
                 {inventory.map((product) => (
                     <Frame key={product.id} additionalClass="w-[20rem] h-[30rem] relative">
+                            <p className="text-edcPurple-80 text-2xl">{product.title}</p>
                         <div className="flex flex-col justify-between items-center h-full w-full">
-
-                            <Carousel product={product}>
+                            <Carousel product={product} height="h-[15rem]" width="w-[15rem]">
                                 {user && (
                                     <AdminButtons
                                         hidden={product.hidden}
@@ -163,7 +163,6 @@ export default function Shop() {
                                     handleDetails={() => handleClickProductDetails(product)}
                                 />
                             </Carousel>
-
                         </div>
                     </Frame>
                 ))}

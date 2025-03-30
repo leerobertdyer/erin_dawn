@@ -7,10 +7,11 @@ import SpinningCard from "../SpinningCard/SpinningCard";
 interface ICarouselParams {
     product: IProductInfo;
     children: React.ReactNode;
-    isMobile?: boolean;
+    height?: string;
+    width?: string;
 }
 
-export default function Carousel({ product, children }: ICarouselParams) {
+export default function Carousel({ product, children, height, width }: ICarouselParams) {
     const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
 
     function handleClick(direction: "left" | "right") {
@@ -25,7 +26,7 @@ export default function Carousel({ product, children }: ICarouselParams) {
 
     return (
         <div
-            className="flex flex-col justify-center gap-4 h-full w-full relative select-none">
+            className={`flex flex-col justify-center gap-4 relative select-none `}>
            
             {/* Show arrows and count if more than one photo */}
             {product.photos.length > 1 && <>
@@ -45,7 +46,7 @@ export default function Carousel({ product, children }: ICarouselParams) {
 
             {/* Product image carousel */}
             {product.photos.length > 0  && (
-                <div className={`w-full h-full ${imageHeight} rounded-md overflow-hidden border-2 border-black relative`}>
+                <div className={`${height ?? ''} ${width ?? ''} rounded-md overflow-hidden border-2 border-black relative`}>
                     {product.hidden && (
                         <div className="absolute inset-0 bg-black bg-opacity-50 z-10 flex justify-center items-center text-white text-2xl">Hidden</div>
                     )}

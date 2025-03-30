@@ -31,23 +31,23 @@ export default function ProductDetails({ product, handleCloseProductDetails }: I
                         </div>
                     </Carousel>
             </div>
-        <div className="flex flex-col justify-between h-full max-w-[35rem] mx-auto border-edcPurple-80 border-2 bg-edcBlue-10 items-center rounded-md ">
+        <div className="flex flex-col justify-between h-full mx-auto max-w-[650px] border-edcPurple-80 border-2 bg-edcBlue-10 items-center rounded-md ">
             <p className="text-3xl p-2 w-full bg-edcPurple-40 rounded-t-sm text-white text-center border-b-2 border-black">"{product.title}"</p>
             <p className="text-xl p-2 w-full text-center">${product.price}<span className="text-xs">.00</span></p>
             <p className="text-lg p-6 w-[85%] bg-white rounded-md whitespace-pre-line max-h-[550px] overflow-y-auto border-2 border-black text-center">{product.description}</p>
             <p className="text-lg px-2 my-2 w-[85%] text-center bg-white rounded-md border-2 border-black">Size: <br />
-                <div className="bg-gray-400 px-2 rounded-md mb-2 w-fit m-auto">
+                <div className="bg-gray-300 px-2 rounded-md mb-2 w-fit m-auto">
                     {product.size.toUpperCase()}
                 </div>
             </p>
             <p className="text-lg px-2 my-2 w-[85%] text-center bg-white rounded-md border-2 border-black">Dimensions: <br />
-                <div className="bg-gray-400 px-2 rounded-md mb-2 text-md ">
+                <div className="bg-gray-300 px-2 rounded-md mb-2 text-md ">
                     {product.dimensions}
                 </div>
             </p>
             <div className="border-2 border-black rounded-md mb-4 p-2 w-[85%] m-auto bg-white">
                 <p className="text-lg p-2 w-full text-center">{KEEPING_IT_CLEAN}</p>
-                <p className="text-lg w-full text-center bg-gray-400 p-2 rounded-md mb-2">{KEEPING_IT_CLEAN_DETAILS}</p>
+                <p className="text-lg w-full text-center bg-gray-300 p-2 rounded-md mb-2">{KEEPING_IT_CLEAN_DETAILS}</p>
             </div>
         </div>
     </div>

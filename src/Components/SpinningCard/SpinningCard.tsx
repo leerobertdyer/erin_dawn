@@ -43,16 +43,7 @@ export default function SpinningCard({ photo }: { photo: IGeneralPhoto }) {
               alt="Card"
               className="rounded-md h-full w-full object-cover object-center"
             />
-            {/* Centered recycling icon */}
-            <div className="absolute inset-0 w-full h-full rounded-full flex z-[20] items-start mt-[2.75rem] ml-[.25rem] bg-opacity-0 justify-center">
-              <div className="w-16 h-16 rounded-full overflow-hidden">
-                <img
-                  src="/images/recycle.gif"
-                  alt="Loading"
-                  className="w-full h-full"
-                />
-              </div>
-            </div>
+
           </div>
         </div>
       </div>
