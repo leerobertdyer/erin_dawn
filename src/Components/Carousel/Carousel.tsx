@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
-import { imageHeight } from "../../util/constants";
 import { IProductInfo } from "../../Interfaces/IProduct";
 import SpinningCard from "../SpinningCard/SpinningCard";
 
