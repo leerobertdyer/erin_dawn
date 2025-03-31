@@ -14,12 +14,11 @@ Currently selling at [Grandmother Goods](https://www.gmother.com/)
 
 - Rotate Credentials
 
-- show new products on the top by default. 
+- 
 
 
 ## NICE TO HAVE
 
-- Select more than one photo at a time. 
 
 - Email Collection of some kind for repeat customers. Perhaps give them 10% off next purchase?
 
@@ -28,17 +27,9 @@ Currently selling at [Grandmother Goods](https://www.gmother.com/)
 - Hero Upgrade
     - Add +new hero option to hero bar
     - Add auto scroll back to hero
-
-- CHECK SMALLER PHONES - Esp the buttons on edit key photos should be clickable. Prob add mb- to every main page view
-
-- Fix glitch where old photo shows after editing and then re-editing on hero at least...
-
-- UPDATE DUMB ASS LOADING BAR or swap it out for spinning wheel....
+    - Make card flip to random model photo (random hero)
 
 - Add some UI when asdding to cart to encourage immediate checkout. Modal perhaps.
-
-- Separate the creation of a new category from creation of a new product. It is confusing flow. 
-    This Would mean two steps for erin she'd have to go create the category ( I could link to it in product form) THEN create product, but would alleviate some potential issues like accidental category creation
 
 - Speaking of accidental category creation - allow her to remove categories (unless they are the two main ones... vintage and handmade) but make the modal two step to really make sure she wants to do it.
 
@@ -49,8 +40,7 @@ Currently selling at [Grandmother Goods](https://www.gmother.com/)
 
 - Add ability to filter products by "series".
 
-- Drag and Drop order change for store items
-
+- Drag and Drop order change for store items MOBILE NEEDS HELP
 
 - Check different browsers. Style in safari for admin is janky 
     - Specifically in hero

@@ -18,7 +18,7 @@ export default function Hero({ children }: { children: React.ReactNode }) {
         </div>
 
         <div
-            className="w-full  
+            className="w-full 
             bg-white bg-opacity-80 
             my-10  overflow-hidden
             border-y-4 border-yellow-400 border-double border-opacity-40

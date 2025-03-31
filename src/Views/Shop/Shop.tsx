@@ -6,7 +6,6 @@ import ShoppingButtons from "../../Components/Buttons/ShoppingButtons";
 import AdminButtons from "../../Components/Buttons/AdminButtons";
 import PhotoManager from "../../Components/PhotoManager/PhotoManager";
 import Carousel from "../../Components/Carousel/Carousel";
-// import LoadPhotos from "../../Components/HeroPhotos/LoadPhotos";
 import { useProductManagementContext } from "../../Context/ProductMgmtContext";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useUserContext } from "../../Context/UserContext";
@@ -24,13 +23,13 @@ export default function Shop() {
     const navigate = useNavigate();
     const { allProducts, setAllProducts } = useProductManagementContext();
     const [inventory, setInventory] = useState<IProductInfo[]>([])
-    // const [isLoading, setIsLoading] = useState(true)
     const [showDetails, setShowDetails] = useState(false)
     const [isFiltered, setIsFiltered] = useState(false)
     const [showPhotoManager, setShowPhotoManager] = useState(false)
     const [showProductForm, setShowProductForm] = useState(false)
     const [productToEdit, setProductToEdit] = useState<IProductInfo | null>(null)
     const [showEditProductForm, setShowEditProductForm] = useState(false)
+    const [sortBy, setSortBy] = useState('newest')
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
@@ -53,7 +52,6 @@ export default function Shop() {
         }
     }, [location.search, allProducts, setFilteredInventory, user]);
 
-
     useEffect(() => {
         const nextInventory = [...filteredInventory]
 
@@ -65,8 +63,40 @@ export default function Shop() {
         });
 
         setInventory(groupedPhotos);  // Wrap in array to maintain existing component structure
-        // if (groupedPhotos.length > 0) setIsLoading(false);
     }, [user, filteredInventory]);
+
+    function sortInventory(method: string) {
+        switch (method) {
+            case "newest": 
+                setInventory([...inventory.sort((a, b) => Date.parse(a.createdAt.toString()) - Date.parse(b.createdAt.toString()))])
+                break;
+            case "oldest": 
+                setInventory([...inventory.sort((a, b) => Date.parse(b.createdAt.toString()) - Date.parse(a.createdAt.toString()))])
+                break;
+            case "low": 
+                setInventory([...inventory.sort((a, b) => a.price - b.price)])
+                break;
+            case "high": 
+                setInventory([...inventory.sort((a, b) => b.price - a.price)])
+                break;
+        }
+    }
+
+    useEffect(() => {
+        console.log(`sorting by ${sortBy}`)
+        sortInventory(sortBy)
+    }, [sortBy])
+
+    function handleSortChange(value: string) {
+        setSortBy(value)
+        setIsFiltered(value !== 'all');
+        value === "all" && navigate("/shop")
+    }
+
+    function handleClearFilter() {
+        setSortBy('all')
+        setIsFiltered(false)
+    }
 
     function handleBack() {
         setProductToEdit(null)
@@ -109,10 +139,6 @@ export default function Shop() {
         await editProductDoc({ ...productToEdit, photos: filesToUpload })
     }
 
-    // if (isLoading) {
-    //     return <LoadPhotos count={3} size="medium" />
-    // }
-
     if (showDetails) {
         return <ProductDetails
             product={productToEdit}
@@ -128,14 +154,25 @@ export default function Shop() {
         />;
     }
 
+    return (<div className="w-full">
 
-    return (<>
+        <div className="fixed top-16 w-full z-20 flex flex-col items-center p-2">
+            <select 
+                className="w-fit border-2 border-black text-center rounded-md"
+                onChange={(e) => handleSortChange(e.target.value)} value={sortBy}>
+                <option value="all">All</option>
+                <option value="newest">Newest</option>
+                <option value="oldest">Oldest</option>
+                <option value="high">Price: high-low</option>
+                <option value="low">Price: low-high</option>
+            </select>
+        </div>
         <div className="w-full min-h-screen flex flex-col items-center">
             
             {showProductForm && <NewProductForm onClose={() => setShowProductForm(false)} />}
             {showEditProductForm && <EditProductForm onClose={() => setShowEditProductForm(false)} product={productToEdit} />}
 
-            {isFiltered && <button onClick={() => navigate('/shop')}
+            {isFiltered && <button onClick={() => handleClearFilter()}
                 className="bg-white border-2 border-edcPurple-60 p-2 rounded-md z-[60] fixed bottom-[1rem] ">
                 Clear Filter</button>}
 
@@ -168,6 +205,6 @@ export default function Shop() {
                 ))}
             </div>
         </div>
-    </>
+    </div>
     );
 }

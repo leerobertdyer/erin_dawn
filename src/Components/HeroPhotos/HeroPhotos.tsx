@@ -20,11 +20,11 @@ export default function HeroPhotos() {
 
     return ( <>
     {isEditing && <EditHeroForm heroToEdit={heroToEdit} onClose={() => setIsEditing(false)} />}
-        <div className="w-[100vw] h-[45vh] flex justify-center items-center">
+        <div className="w-[100vw] h-fit flex justify-center items-center ">
             {heroPhotos.length > 0 &&
                 heroPhotos.map((photo, key) => {
                     return (
-                        <div key={key} className="flex-shrink-0 w-[10rem] md:w-[12rem] lg:w-[14rem] p-4 h-full">
+                        <div key={key} className="flex-shrink-0 w-[10rem] md:w-[12rem] lg:w-[14rem] p-4">
                             <Frame>
                               <SpinningCard photo={photo} />
                                 {user && <AdminButtons handleEdit={() => handlePhotoEditClick(photo)} />}
