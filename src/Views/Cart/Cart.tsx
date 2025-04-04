@@ -5,7 +5,7 @@ import { useProductManagementContext } from "../../Context/ProductMgmtContext";
 export default function Cart() {
 
     const { cartProducts } = useProductManagementContext();
-
+    console.log(cartProducts)
     return (
         <div className="
         w-screen h-fit min-h-screen

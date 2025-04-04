@@ -10,11 +10,12 @@ import { useProductManagementContext } from "../../Context/ProductMgmtContext";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useUserContext } from "../../Context/UserContext";
 import { editProductDoc } from "../../firebase/editDoc";
-import { sortProducts } from "../../util/productSorter";
+import { sortProducts, getDateInMillis } from "../../util/productSorter";
 import { IGeneralPhoto } from "../../Interfaces/IPhotos";
 import NewProductForm from "../../Components/Forms/NewProductForm";
 import AddProductCard from "../../Components/AddProductCard/AddProductCard";
 import EditProductForm from "../../Components/Forms/EditProductForm";
+import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 
 export default function Shop() {
     const { setFilteredInventory, filteredInventory } = useProductManagementContext();
@@ -30,6 +31,7 @@ export default function Shop() {
     const [productToEdit, setProductToEdit] = useState<IProductInfo | null>(null)
     const [showEditProductForm, setShowEditProductForm] = useState(false)
     const [sortBy, setSortBy] = useState('newest')
+    const [showSortModal, setShowSortModal] = useState(false)
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
@@ -57,9 +59,7 @@ export default function Shop() {
 
         // Sort products by creation date (newest first)
         const groupedPhotos = nextInventory.sort((a, b) => {
-            const dateA = a.createdAt ? Date.parse(a.createdAt.toString()) : 0;
-            const dateB = b.createdAt ? Date.parse(b.createdAt.toString()) : 0;
-            return dateA - dateB;  // Newest first
+            return getDateInMillis(b.createdAt) - getDateInMillis(a.createdAt);  // Newest first
         });
 
         setInventory(groupedPhotos);  // Wrap in array to maintain existing component structure
@@ -68,10 +68,14 @@ export default function Shop() {
     function sortInventory(method: string) {
         switch (method) {
             case "newest": 
-                setInventory([...inventory.sort((a, b) => Date.parse(a.createdAt.toString()) - Date.parse(b.createdAt.toString()))])
+                setInventory([...inventory.sort((a, b) => {
+                    return getDateInMillis(b.createdAt) - getDateInMillis(a.createdAt); // Newest first
+                })])
                 break;
             case "oldest": 
-                setInventory([...inventory.sort((a, b) => Date.parse(b.createdAt.toString()) - Date.parse(a.createdAt.toString()))])
+                setInventory([...inventory.sort((a, b) => {
+                    return getDateInMillis(a.createdAt) - getDateInMillis(b.createdAt); // Oldest first
+                })])
                 break;
             case "low": 
                 setInventory([...inventory.sort((a, b) => a.price - b.price)])
@@ -83,7 +87,6 @@ export default function Shop() {
     }
 
     useEffect(() => {
-        console.log(`sorting by ${sortBy}`)
         sortInventory(sortBy)
     }, [sortBy])
 
@@ -91,11 +94,13 @@ export default function Shop() {
         setSortBy(value)
         setIsFiltered(value !== 'all');
         value === "all" && navigate("/shop")
+        setShowSortModal(false)
     }
 
     function handleClearFilter() {
         setSortBy('all')
         setIsFiltered(false)
+        setShowSortModal(false)
     }
 
     function handleBack() {
@@ -154,11 +159,20 @@ export default function Shop() {
         />;
     }
 
-    return (<div className="w-full">
+    return (<div className="w-full h-fit min-h-screen bg-[url('/images/background.jpg')] bg-contain bg-repeat">
 
-        <div className="fixed top-16 w-full z-20 flex flex-col items-center p-2">
+        {showSortModal ? <div className="fixed w-full h-[20rem] bg-edcPurple-80 text-white z-20 flex flex-col items-center bottom-0">
+            <div className="w-full mb-2 flex justify-center items-center p-2" onClick={() => setShowSortModal(false)}>
+                Close <IoIosArrowDown className="w-8 h-8 rounded-full" />
+               
+                {isFiltered && <button onClick={() => handleClearFilter()}
+                className="bg-white p-2 rounded-md text-black z-[60] fixed bottom-[1rem] ">
+                Clear Filter</button>}
+
+            </div>
+            Sort Products By
             <select 
-                className="w-fit border-2 border-black text-center rounded-md"
+                className="border-2 border-white text-center rounded-md text-black min-w-[10rem]"
                 onChange={(e) => handleSortChange(e.target.value)} value={sortBy}>
                 <option value="all">All</option>
                 <option value="newest">Newest</option>
@@ -166,15 +180,14 @@ export default function Shop() {
                 <option value="high">Price: high-low</option>
                 <option value="low">Price: low-high</option>
             </select>
-        </div>
+        </div> : <div className="text-xl text-white fixed bottom-0 z-20 w-full bg-edcPurple-80 flex justify-center items-center gap-2 py-2" onClick={() => setShowSortModal(true)} >
+            Sort <IoIosArrowUp className="w-8 h-8 border-2 border-black rounded-lg" />
+        </div>}
+
         <div className="w-full min-h-screen flex flex-col items-center">
             
             {showProductForm && <NewProductForm onClose={() => setShowProductForm(false)} />}
             {showEditProductForm && <EditProductForm onClose={() => setShowEditProductForm(false)} product={productToEdit} />}
-
-            {isFiltered && <button onClick={() => handleClearFilter()}
-                className="bg-white border-2 border-edcPurple-60 p-2 rounded-md z-[60] fixed bottom-[1rem] ">
-                Clear Filter</button>}
 
             <div className="w-full flex flex-wrap justify-center gap-8 p-4">
 

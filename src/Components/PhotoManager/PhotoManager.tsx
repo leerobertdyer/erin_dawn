@@ -2,7 +2,7 @@ import { IProductInfo } from "../../Interfaces/IProduct";
 import Frame from "../Frame/Frame";
 import AdminButtons from "../Buttons/AdminButtons";
 import { useProductManagementContext } from "../../Context/ProductMgmtContext";
-import { useState, useRef, useEffect,  } from "react";
+import { useState, useRef, useEffect } from "react";
 import WarningDialogue from "../WarningDialogue/WarningDialogue";
 import { editProductDoc } from "../../firebase/editDoc";
 import { IGeneralPhoto } from "../../Interfaces/IPhotos";
@@ -28,6 +28,8 @@ export default function PhotoManager({ product, handleBack, onSave }: IPhotoMana
     const [draggedPhoto, setDraggedPhoto] = useState<IGeneralPhoto | null>(null);
     const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
     const [isUpdatedPhotoState, setIsUpdatedPhotoState] = useState(false);
+    const [touchStartY, setTouchStartY] = useState<number | null>(null);
+    const [touchedPhotoId, setTouchedPhotoId] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const dropZoneRef = useRef<HTMLDivElement>(null);
 
@@ -112,7 +114,12 @@ export default function PhotoManager({ product, handleBack, onSave }: IPhotoMana
         const draggedPhotoId = e.dataTransfer.getData('text/plain');
         if (!draggedPhotoId) return;
 
-        const draggedIndex = currentPhotos.findIndex(p => p.id === draggedPhotoId);
+        reorderPhotos(draggedPhotoId, targetIndex);
+    };
+    
+    // Common function for both drag and touch reordering
+    const reorderPhotos = (movedPhotoId: string, targetIndex: number) => {
+        const draggedIndex = currentPhotos.findIndex(p => p.id === movedPhotoId);
         if (draggedIndex === -1 || draggedIndex === targetIndex) return;
 
         // Simple array manipulation
@@ -139,6 +146,7 @@ export default function PhotoManager({ product, handleBack, onSave }: IPhotoMana
         // Reset drag states
         setDragOverIndex(null);
         setDraggedPhoto(null);
+        setTouchedPhotoId(null);
         setIsUpdatedPhotoState(true);
     };
 
@@ -204,6 +212,37 @@ export default function PhotoManager({ product, handleBack, onSave }: IPhotoMana
             // You might want to add error UI feedback here
         }
     }
+
+    // Touch event handlers for mobile devices
+    const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>, photo: IGeneralPhoto) => {
+        // Store the initial touch position
+        const touch = e.touches[0];
+        setTouchStartY(touch.clientY);
+        setTouchedPhotoId(photo.id);
+        setDraggedPhoto(photo);
+    };
+
+    const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>, index: number) => {
+        if (!touchedPhotoId || !touchStartY) return;
+        
+        // Prevent scrolling while dragging
+        e.preventDefault();
+        
+        // Update the visual indicator for the current position
+        setDragOverIndex(index);
+    };
+
+    const handleTouchEnd = (_: React.TouchEvent<HTMLDivElement>, targetIndex: number) => {
+        // If we have a touched photo, complete the reordering
+        if (touchedPhotoId) {
+            reorderPhotos(touchedPhotoId, targetIndex);
+        }
+        
+        // Reset touch states
+        setTouchStartY(null);
+        setTouchedPhotoId(null);
+        setDragOverIndex(null);
+    };
 
     async function handleSaveReorderedPhotos() {
         try {
@@ -284,7 +323,7 @@ export default function PhotoManager({ product, handleBack, onSave }: IPhotoMana
                 <button onClick={handleBack}
                     className="w-[10rem] mx-auto my-[1rem] bg-edcPurple-60 text-white p-2 rounded-md">Back</button>
             </div>
-            <div className="flex flex-col flex-wrap md:flex-row justify-center items-center gap-[1rem] w-full h-fit mb-8">
+            <div className="flex flex-row flex-wrap justify-center items-start gap-4 w-full h-fit mb-8 px-4">
                 {/* Drag and drop for existing photos */}
                 {currentPhotos.map((photo, index) => (
                     <div
@@ -295,16 +334,19 @@ export default function PhotoManager({ product, handleBack, onSave }: IPhotoMana
                         onDragOver={(e) => handlePhotoDragOver(e, index)}
                         onDragLeave={handlePhotoDragLeave}
                         onDrop={(e) => handlePhotoDrop(e, index)}
+                        onTouchStart={(e) => handleTouchStart(e, photo)}
+                        onTouchMove={(e) => handleTouchMove(e, index)}
+                        onTouchEnd={(e) => handleTouchEnd(e, index)}
                         data-photo-id={photo.id}
                         className={`transition-all cursor-move relative ${
                             dragOverIndex === index && draggedPhoto?.id !== photo.id 
                                 ? 'scale-105 border-2 border-edcPurple-60 bg-edcPurple-10' 
-                                : draggedPhoto?.id === photo.id 
+                                : draggedPhoto?.id === photo.id || touchedPhotoId === photo.id
                                 ? 'opacity-40'
                                 : ''
                         }`}
                     >
-                        <Frame additionalClass="w-[15rem] h-[24rem]">
+                        <Frame additionalClass="w-[10rem] h-[15rem]">
                             <img 
                                 src={photo.url} 
                                 id={photo.id} 

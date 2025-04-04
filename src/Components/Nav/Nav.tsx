@@ -88,7 +88,7 @@ export default function Nav() {
         w-full h-[13vh] md:h-[15vh] 
         flex justify-between items-center 
         py-0 px-[1rem] md:px-[7rem] 
-        bg-white">
+        bg-white border-b-4 border-black">
                 <IoIosMenu size={iconSize - 5}
                     onClick={() => setIsOpen(true)}
                     className="

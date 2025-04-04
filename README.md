@@ -12,13 +12,10 @@ Currently selling at [Grandmother Goods](https://www.gmother.com/)
 
 - Show total by cart icon
 
-- Rotate Credentials
-
-- 
+- Rotate Credentials 
 
 
 ## NICE TO HAVE
-
 
 - Email Collection of some kind for repeat customers. Perhaps give them 10% off next purchase?
 
