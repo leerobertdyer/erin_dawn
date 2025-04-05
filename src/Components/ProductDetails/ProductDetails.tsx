@@ -1,7 +1,9 @@
+import { useLocation, useNavigate } from "react-router-dom";
 import { useProductManagementContext } from "../../Context/ProductMgmtContext";
 import { IProductInfo } from "../../Interfaces/IProduct";
 import { KEEPING_IT_CLEAN, KEEPING_IT_CLEAN_DETAILS } from "../../util/constants";
 import Carousel from "../Carousel/Carousel";
+import { useEffect } from "react";
 
 interface IProductDetails {
     product: IProductInfo
@@ -12,6 +14,17 @@ interface IProductDetails {
 
 export default function ProductDetails({ product, handleCloseProductDetails }: IProductDetails) {
     const { cartProducts, setCartProducts } = useProductManagementContext();
+    const location = useLocation();
+    const navigate = useNavigate();
+    
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        params.set('id', product.id);
+        const newUrl = `${location.pathname}?${params.toString()}`;
+        navigate(newUrl);
+    }, [])
+
+
     return (<div
         className="flex flex-col lg:flex-row 
             justify-start items-center lg:items-start gap-4

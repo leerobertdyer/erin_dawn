@@ -33,6 +33,20 @@ export default function Shop() {
     const [sortBy, setSortBy] = useState('newest')
     const [showSortModal, setShowSortModal] = useState(false)
 
+    // UseEffect to handle URL parameters
+    useEffect(() => {
+        const url = new URLSearchParams(location.search);
+        const productId = url.get('id');
+        if (productId) {
+            console.log(productId)
+            const product = allProducts.find(p => p.id === productId);
+            if (product) {
+                console.log(product)
+                handleShowProductDetails(product);
+            } else console.log('Product not found')
+        }
+    }, [allProducts])
+
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         const category = params.get('category');
@@ -107,9 +121,10 @@ export default function Shop() {
         setProductToEdit(null)
         setShowDetails(false)
         setShowPhotoManager(false)
+        navigate('/shop')
     }
 
-    function handleClickProductDetails(product: IProductInfo) {
+    function handleShowProductDetails(product: IProductInfo) {
         setProductToEdit(product)
         setShowDetails(true)
     }
@@ -210,7 +225,7 @@ export default function Shop() {
                                 )}
                                 <ShoppingButtons
                                     product={product}
-                                    handleDetails={() => handleClickProductDetails(product)}
+                                    handleDetails={() => handleShowProductDetails(product)}
                                 />
                             </Carousel>
                         </div>
