@@ -81,12 +81,30 @@ async function addNewCategory(category: ICategory): Promise<boolean> {
 }
 
 
-async function addNewSale({ customerName, shippingAddressString, sessionId, isShipped, totalSales, itemsSold }: IAddNewSale ) {
+async function addNewSale({ customerName, shippingAddressString, sessionId, isShipped, totalSales, itemsSold }: IAddNewSale ): Promise<boolean> {
   try {
-    console.log("Adding sale to firestore: ", sessionId);
+    // Validate required fields
+    if (!sessionId) {
+      console.error('Cannot add sale: Missing sessionId');
+      return false;
+    }
+    if (!customerName) {
+      console.error('Cannot add sale: Missing customerName');
+      return false;
+    }
+    
+    console.log("Adding sale to firestore with data:", {
+      sessionId,
+      customerName,
+      totalSales,
+      itemsCount: itemsSold?.length || 0
+    });
+    
     const safeName = customerName.replace(/\s/g, "_");
     const customId = safeName + "_" + sessionId;
-    await setDoc(doc(db, "sales", customId), {
+    
+    // Create the sale document data
+    const saleData = {
       createdAt: new Date(),
       customerName,
       shippingAddressString,
@@ -94,9 +112,19 @@ async function addNewSale({ customerName, shippingAddressString, sessionId, isSh
       isShipped,
       totalSales,
       itemsSold,
-    });
+    };
+    
+    console.log('Sale document data:', JSON.stringify(saleData));
+    console.log('Target document path:', `sales/${customId}`);
+    
+    // Add the document to Firestore
+    await setDoc(doc(db, "sales", customId), saleData);
+    
+    console.log("Sale document added successfully with ID:", customId);
+    return true;
   } catch (e) {
-    console.error("Error adding sale: ", e);
+    console.error("Error adding sale:", e);
+    return false;
   }
 }
 

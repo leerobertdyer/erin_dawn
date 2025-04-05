@@ -38,7 +38,7 @@ export default function Shop() {
         const category = params.get('category');
         if (category) {
             setIsFiltered(true)
-            const filteredPhotos = allProducts.filter(p => p.category === category);
+            const filteredPhotos = allProducts.filter(p => p.category === category && !p.sold);
             if (filteredPhotos.length > 0) {
                 setFilteredInventory(filteredPhotos);
             }
@@ -46,7 +46,7 @@ export default function Shop() {
         } else {
             setIsFiltered(false)
             const filteredPhotosArray = allProducts.filter(p =>
-                !p.hidden || (user && p.hidden)
+                (!p.hidden || (user && p.hidden)) && !p.sold
             )
             const sortedArray = sortProducts(filteredPhotosArray, 'newest');
 

@@ -21,15 +21,19 @@ export default function PurchaseSuccess() {
     const [showConffeeti, setShowConfetti] = useState(true);
 
     useEffect(() => {
+        // On page load, if there are items in cart, mark them as sold
         async function handleSoldItems() {
             const allProductsToUpdate = [...cartProducts];
 
             for (const cartItem of allProductsToUpdate) {
                 console.log('Editing item:', cartItem.title);
-                await editProductDoc({
+                const success = await editProductDoc({
                     ...cartItem,
                     sold: true
                 });
+                if (!success) {
+                    console.error(`Failed to mark ${cartItem.title} as sold`);
+                }
             }
             const nextProducts = allProducts.filter((p: IProductInfo) => !cartProducts.some(cartItem => cartItem.id === p.id));
             setInventoryPhotos(nextProducts.filter((p: IProductInfo) => !p.sold && !p.hidden));

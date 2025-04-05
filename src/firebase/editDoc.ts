@@ -5,27 +5,49 @@ import { IGeneralPhoto } from "../Interfaces/IPhotos";
 import { ICategory } from "../Interfaces/ICategory";
 import { IHero } from "../Interfaces/IHero";
 
-async function editProductDoc({ id, title, description, price, series, category, photos, stripeProductId, hidden, stripePriceId, size, dimensions, sold }: IProductInfo) {
+async function editProductDoc({ id, title, description, price, series, category, photos, stripeProductId, hidden, stripePriceId, size, dimensions, sold }: IProductInfo): Promise<boolean> {
     try {
+        // Validate that we have an ID
+        if (!id) {
+            console.error('Cannot update document: Missing ID');
+            return false;
+        }
+        
         const docRef = doc(db, "product", id);
-        console.log('editing doc', docRef.path);
-            await updateDoc(docRef, {
-                title,
-                description,
-                price,
-                size,
-                dimensions,
-                hidden,
-                category,
-                series,
-                photos,
-                stripeProductId,
-                sold,
-                stripePriceId
-            });
-
+        console.log('Editing product document:', {
+            path: docRef.path,
+            id,
+            title,
+            sold // Log the sold status explicitly
+        });
+        
+        // Create the update object
+        const updateData = {
+            title,
+            description,
+            price,
+            size,
+            dimensions,
+            hidden,
+            category,
+            series,
+            photos,
+            stripeProductId,
+            sold,
+            stripePriceId
+        };
+        
+        console.log('Update data:', JSON.stringify(updateData));
+        
+        // Perform the update
+        await updateDoc(docRef, updateData);
+        
+        // If we get here, the update was successful
+        console.log(`Document successfully updated with ID: ${id}, sold status: ${sold}`);
+        return true;
     } catch (error) {
-        console.log("Error updating document: ", error);
+        console.error("Error updating document: ", error);
+        return false;
     }
 }
 

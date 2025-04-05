@@ -37,12 +37,12 @@ export default function Admin() {
             <AdminPanel />
             :
             <div className="bg-[url('/images/background.jpg')] bg-cover bg-center flex justify-center items-center w-screen h-screen">
-                <div className="border-2 border-black rounded-md p-4 w-[45vw] h-[45vw] bg-black bg-opacity-60 flex justify-center items-center mb-20">
-                    <form onSubmit={handleSubmit} className="flex flex-col gap-4 ">
+                <div className="border-2 border-black rounded-md p-4 w-[90vw] h-[90vw] md:w-[45vw] md:h-[45vw] bg-black bg-opacity-60 flex justify-center items-center mb-20">
+                    <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full text-center">
                         <h1 className="text-3xl text-white">Backdoor Login</h1>
-                        <input type="email" required placeholder="Email" className="p-2" onChange={(e) => setEmail(e.target.value)} />
-                        <input type="password" required placeholder="Password" className="p-2" onChange={(e) => setPassword(e.target.value)} />
-                        <button type="submit" className="p-2 bg-edcBlue-60 text-white">Login</button>
+                        <input type="email" required placeholder="Email" className="p-2 w-full" onChange={(e) => setEmail(e.target.value)} />
+                        <input type="password" required placeholder="Password" className="p-2 w-full" onChange={(e) => setPassword(e.target.value)} />
+                        <button type="submit" className="p-2 bg-edcBlue-60 text-white w-full">Login</button>
                     </form>
                 </div>
             </div>
