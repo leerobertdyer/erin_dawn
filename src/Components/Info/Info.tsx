@@ -26,7 +26,7 @@ export default function Info({ information }: iInfoProps) {
                     {information}
                 </div>
                 :
-                <div className=" bg-yellow-200 text-black rounded-full w-fit h-fit"
+                <div className=" bg-edcYellow-40 text-black rounded-full w-fit h-fit"
                     onMouseEnter={handleOnMouseEnter}
                     >
                     <IoIosInformation size={25} />

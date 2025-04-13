@@ -79,7 +79,41 @@ export default function Shop() {
         setInventory(groupedPhotos);  // Wrap in array to maintain existing component structure
     }, [user, filteredInventory]);
 
+    // function getSortedAndGroupedProductsBySeries() {
+    //     // Step 1: Group products by series
+    //     const seriesGroups = {};
+    //     inventory.forEach(product => {
+    //         const series = product.series;
+    //         if (!seriesGroups[series]) {
+    //             seriesGroups[series] = [];
+    //         }
+    //         seriesGroups[series].push(product);
+    //     });
+        
+    //     // Step 2: Sort the series alphabetically
+    //     const sortedSeries = Object.keys(seriesGroups).sort((a, b) => a.localeCompare(b));
+        
+    //     // Step 3: Create a flat array with products grouped by series
+    //     const groupedProducts = [];
+    //     sortedSeries.forEach(series => {
+    //         // For each series, sort products by date (newest first)
+    //         const seriesProducts = seriesGroups[series].sort((a, b) => {
+    //             return getDateInMillis(b.createdAt) - getDateInMillis(a.createdAt);
+    //         });
+            
+    //         groupedProducts.push(...seriesProducts);
+    //     });
+        
+    //     return groupedProducts;
+    // }
+
     function sortInventory(method: string) {
+        // if (method === "series") {
+        //     // For series, we'll use our grouping function directly
+        //     const groupedProducts = getSortedAndGroupedProductsBySeries();
+        //     setInventory(groupedProducts);
+        //     return;
+        // }
         switch (method) {
             case "newest": 
                 setInventory([...inventory.sort((a, b) => {
@@ -194,6 +228,7 @@ export default function Shop() {
                 <option value="oldest">Oldest</option>
                 <option value="high">Price: high-low</option>
                 <option value="low">Price: low-high</option>
+                {/* <option value="series">Series</option> */}
             </select>
         </div> : <div className="text-xl text-white fixed bottom-0 z-20 w-full bg-edcPurple-80 flex justify-center items-center gap-2 py-2" onClick={() => setShowSortModal(true)} >
             Sort <IoIosArrowUp className="w-8 h-8 border-2 border-black rounded-lg" />

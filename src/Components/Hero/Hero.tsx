@@ -1,27 +1,37 @@
 import { PiLeaf, PiShootingStarLight } from "react-icons/pi";
 import { GiSewingNeedle } from "react-icons/gi";
 import { Link } from "react-router-dom";
+import { IoIosMail } from "react-icons/io";
 
 export default function Hero({ children }: { children: React.ReactNode }) {
+    
     return (
         <>
-        <div className="w-full flex items-center justify-center gap-4 bg-edcPurple-60 text-white">
-            <p className="text-md md:text-2xl p-4 text-center">Browse My Handmade Clothing</p>
+        <div className="w-full min-h-[4rem] py-2 flex items-center justify-center bg-edcPurple-60 text-white">
             <Link to="/shop" 
-            className="p-2 rounded-md 
-            text-center text-lg text-edcPurple-80 
-            w-[6rem] md:w-[10rem] h-[2rem] 
-            flex justify-center items-center
-            bg-white border-2 border-edcYellow-20 hover:bg-edcYellow-20 hover:border-white">
-                Shop
+            className="flex items-center justify-center w-full flex-wrap gap-2 text-lg md:text-2xl ">
+                <div className="flex items-center justify-center gap-4">
+                    Browse My Handmade Clothing
+                    <button className="flex justify-center items-center p-2 rounded-md 
+                        text-center text-lg text-edcPurple-80 
+                        w-[6rem] md:w-[10rem] h-[2rem] 
+                        bg-white border-2 border-edcYellow-40 hover:bg-edcYellow-40 hover:border-white">
+                    Shop
+                    </button>
+                </div>
             </Link>
         </div>
+        <Link to="/emailsignup"
+        className="flex items-center justify-center gap-4 text-xs w-full bg-white text-edcPurple-60 hover:text-white hover:bg-edcPurple-60 hover:cursor-pointer hover:border-t-2 hover:border-double border-t-edcYellow-40">
+            Join My Mailing List
+            <IoIosMail size={30} strokeWidth={1} className="inline" />
+        </Link>
 
         <div
             className="w-full 
             bg-white bg-opacity-80 
             my-10  overflow-hidden
-            border-y-4 border-yellow-400 border-double border-opacity-40
+            border-y-4 border-edcYellow-40 border-double border-opacity-40
             flex flex-col justify-center items-center gap-[1rem]">
 
 
@@ -39,6 +49,9 @@ export default function Hero({ children }: { children: React.ReactNode }) {
             </div>
 
         </div>
+
+
+
 
 
         </>

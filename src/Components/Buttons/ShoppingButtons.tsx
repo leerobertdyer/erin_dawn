@@ -32,7 +32,7 @@ export default function ShoppingButtons({ product, handleDetails }: IShoppingBut
             {handleDetails && <button
                 className="
                             transition:all duration-[10ms]
-                            hover:bg-yellow-500 
+                            hover:bg-edcYellow-40
                             bg-edcPurple-60 text-white px-2 rounded-md w-[100%]"
                 onClick={() => handleDetails(product)}
             >Details</button>}
@@ -41,7 +41,7 @@ export default function ShoppingButtons({ product, handleDetails }: IShoppingBut
                 className={` 
                     ${isInCart
                         ? "bg-rose-600"
-                        : "bg-edcPurple-60 hover:bg-yellow-500"}
+                        : "bg-edcPurple-60 hover:bg-edcYellow-40"}
                     transition:all duration-[10ms]
                     text-white px-2 rounded-md w-[100%]`}
                 onClick={isInCart

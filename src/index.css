@@ -19,3 +19,7 @@ color: rgb(255, 133, 153);
 * {
     transition: all 0.3s;
 }
+
+::selection {
+    background: #e9b8f5;
+  }

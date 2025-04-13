@@ -6,6 +6,8 @@ import { getOrders } from "../../firebase/getFiles";
 import { IoIosCopy } from "react-icons/io";
 import { shipOrder } from "../../firebase/editDoc";
 import NewProductForm from "../Forms/NewProductForm";
+import Frame from "../Frame/Frame";
+import { useNavigate } from "react-router-dom";
 
 export default function AdminPanel() {
     const [allOrders, setAllOrders] = useState([]);
@@ -14,6 +16,7 @@ export default function AdminPanel() {
     const [addressCopied, setAddressCopied] = useState("");
     const [showProductForm, setShowProductForm] = useState(false);
     const currentYear = new Date().getFullYear();
+    const navigate = useNavigate();
 
     useEffect(() => {
         async function fetchCurrentOrders() {
@@ -81,6 +84,23 @@ export default function AdminPanel() {
                 gap-4 mt-4">
                         <AddProductCard addProduct={() => setShowProductForm(true)}/>
                     </div>
+
+                {/* Send Email Campaign */}
+                <div onClick={() => navigate("/newemail")}
+                className="
+                w-full sm:w-[18rem]
+                flex justify-center items-center
+                gap-4 mt-4 bg-white rounded-md">
+                    <Frame additionalClass="h-[27rem] w-full">
+                        <div className="relative flex justify-center items-center w-full h-full py-2 rounded-xl overflow-hidden">
+                            <img src="/images/background.jpg" alt="" className="w-full h-full" />
+                           <p className="absolute top-1/2 -translate-y-1/2 text-white text-sm p-2 bg-black bg-opacity-65 w-full text-center">
+                            New Series || New Market
+                            </p> 
+                        </div>
+                            <button className="px-2 bg-edcPurple-60 rounded-md text-white w-full">Send Email Campaign</button>
+                    </Frame>
+                </div>
 
             </div>
 

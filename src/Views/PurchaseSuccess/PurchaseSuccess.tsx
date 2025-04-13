@@ -77,7 +77,7 @@ export default function PurchaseSuccess() {
     }, [])
 
     async function sendEmailNotification({ customerName, shippingAddressString, itemsSold}: { customerName: string, shippingAddressString: string, itemsSold: string[] }) {
-        const resp = await fetch(`${BACKEND_URL}/send-email`, {
+        const resp = await fetch(`${BACKEND_URL}/send-sale-notification-email`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

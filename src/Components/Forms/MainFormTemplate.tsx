@@ -8,13 +8,14 @@ interface IMainFormTemplate {
     resetState: () => void;
     handleDelete?: (product: IProductInfo, photo: IGeneralPhoto) => void; 
     children: React.ReactNode;
+    bigger?: boolean;
 }
 
-export default function MainFormTemplate({ product, handleClickBack, resetState, handleDelete, children }: IMainFormTemplate) {
+export default function MainFormTemplate({ product, handleClickBack, resetState, handleDelete, children, bigger }: IMainFormTemplate) {
     return (
         <div className="flex flex-col items-center w-full h-screen bg-white fixed z-[1000] overflow-hidden">
             {/* Main content area with scrolling */}
-            <div className="flex-1 overflow-y-auto w-[85vw] md:w-[65vw] pb-[5rem] max-h-[calc(100vh-5rem)]">
+            <div className={`flex-1 overflow-y-auto  pb-[5rem] max-h-[calc(100vh-5rem)] ${bigger ? 'w-[90vw]' : 'w-[85vw] md:w-[65vw]'}`}>
                 <div className="flex flex-col gap-8 w-full justify-center items-center p-4">
                     {children}
                 </div>
@@ -26,7 +27,7 @@ export default function MainFormTemplate({ product, handleClickBack, resetState,
                     <button 
                         type="button"
                         onClick={() => handleClickBack()} 
-                        className="p-2 bg-edcBlue-60 hover:bg-edcBlue-20 hover:border-2 hover:border-edcPurple-80 text-white rounded-md flex justify-around items-center w-24"
+                        className="p-2 bg-white hover:bg-edcPurple-80 hover:text-white border-2 border-edcPurple-80 text-edcPurple-80 rounded-md flex justify-around items-center w-24"
                     >
                         <IoIosArrowBack />
                     </button>
@@ -34,7 +35,7 @@ export default function MainFormTemplate({ product, handleClickBack, resetState,
                     <button 
                         type="button" 
                         onClick={resetState}
-                        className="bg-edcYellow-60 text-black w-24 hover:bg-edcYellow-20 hover:border-2 hover:border-edcPurple-80 rounded-md flex p-2 justify-center items-center"
+                        className="bg-edcPurple-80 text-white w-24 hover:bg-white hover:border-2 hover:border-edcPurple-80 hover:text-black rounded-md flex p-2 justify-center items-center"
                     >
                         <IoIosRefresh />
                     </button>

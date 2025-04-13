@@ -10,6 +10,8 @@ import { ProductManagementProvider } from './Context/ProductMgmtContext';
 import { PhotosProvider } from './Context/PhotosContext';
 import PurchaseSuccess from './Views/PurchaseSuccess/PurchaseSuccess';
 import { UserProvider } from './Context/UserContext';
+import EmailSignupForm from './Components/Forms/EmailSignupForm';
+import NewEmailForm from './Components/Forms/NewEmailForm';
 
 function App() {
   const handleWheel = () => {
@@ -46,6 +48,8 @@ const AppContent = () => {
         <Route path="/cart/cancel" element={<Cart />} />
         <Route path="/about" element={<About />} />
         <Route path="/admin" element={<Admin />} />
+        <Route path="/emailsignup" element={<EmailSignupForm />} />
+        <Route path="/newemail" element={<NewEmailForm />} />
       </Routes>
     </div>
   );
