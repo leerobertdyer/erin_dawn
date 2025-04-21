@@ -1,4 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
+import { useProductManagementContext } from "../../Context/ProductMgmtContext";
 import { IProductInfo } from "../../Interfaces/IProduct";
 import {
   KEEPING_IT_CLEAN,
@@ -20,7 +21,7 @@ export default function ProductDetails({
 }: IProductDetails) {
   const location = useLocation();
   const navigate = useNavigate();
-
+  const { cartProducts, setCartProducts } = useProductManagementContext();
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     params.set("id", product.id);
@@ -29,6 +30,7 @@ export default function ProductDetails({
   }, []);
 
   function handleAddToCartAndNavigate(product: IProductInfo) {
+    setCartProducts([...cartProducts, product]);
     handleAddToCart(product);
     navigate('/shop', { replace: true });
   }
