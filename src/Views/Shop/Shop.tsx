@@ -241,6 +241,7 @@ export default function Shop({mainAppScrollRef}: {mainAppScrollRef: React.RefObj
 
     if (showDetails) {
         return <ProductDetails
+            handleAddToCart={handleShowCartPopup}
             product={productToEdit}
             handleCloseProductDetails={handleCloseProductDetails}
         />
