@@ -8,6 +8,12 @@ Currently selling at [Grandmother Goods](https://www.gmother.com/)
 3 = New Series
 
 # TODO
+- Fix carousel title size
+   - Make it so they never overflow and scroll if too big..
+
+- Update series so that it is a map: {name: string, description: string} then when she selects it fill the description in the form... 
+
+- Check series/category edits....
 
 # Cart Updates
 - Add note about free shipping in US

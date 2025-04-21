@@ -4,11 +4,12 @@ import { IProductInfo } from "../../Interfaces/IProduct";
 
 interface IShoppingButons {
     product: IProductInfo,
-    handleDetails?: (product: IProductInfo) => void
+    setShowCartPopup: (show: boolean) => void
 }
-export default function ShoppingButtons({ product, handleDetails }: IShoppingButons) {
+export default function ShoppingButtons({ product, setShowCartPopup }: IShoppingButons) {
     const { setCartProducts, cartProducts } = useProductManagementContext();
     const [isInCart, setIsInCart] = useState(false)
+
 
     useEffect(() => {
         setIsInCart(cartProducts.some(p => p.id === product.id));
@@ -17,6 +18,7 @@ export default function ShoppingButtons({ product, handleDetails }: IShoppingBut
     function handleAddToCart(product: IProductInfo) {
         const nextProducts = [...cartProducts, product]
         setCartProducts(nextProducts)
+        setShowCartPopup(true);
     }
 
     function handleRemoveFromCart(product: IProductInfo) {
@@ -29,15 +31,7 @@ export default function ShoppingButtons({ product, handleDetails }: IShoppingBut
             <div className="flex justify-around items-center w-full flex-wrap gap-2 bg-white p-0 rounded-md text-edcPurple-80">
                 <p className="font-retro text-2xl">${product.price}<span className="text-xs">.00</span></p>
             </div>
-            {handleDetails && <button
-                className="
-                            transition:all duration-[10ms]
-                            hover:bg-edcYellow-40
-                            bg-edcPurple-60 text-white px-2 rounded-md w-[100%]"
-                onClick={() => handleDetails(product)}
-            >Details</button>}
             <button
-
                 className={` 
                     ${isInCart
                         ? "bg-rose-600"
@@ -48,7 +42,7 @@ export default function ShoppingButtons({ product, handleDetails }: IShoppingBut
                     ? () => handleRemoveFromCart(product)
                     : () => handleAddToCart(product)}
             >{isInCart
-                ? "Remove From Cart"
+                ? "Remove"
                 : "Add to Cart"}
             </button>
         </div>

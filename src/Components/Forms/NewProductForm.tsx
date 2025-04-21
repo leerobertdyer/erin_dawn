@@ -88,7 +88,7 @@ export default function NewProductForm({ onClose }: INewProductForm) {
         });
 
         const fileToUpload = {
-            reference: newCategory.name.replace(/\s/g, "_") + Date.now().toString(),
+            reference: newCategory.name,
             file: resizedFile,
             onProgress
         }

@@ -1,4 +1,5 @@
-import { IoIosAdd, IoIosArrowBack, IoIosArrowForward, IoIosCamera, IoIosClipboard, IoIosEye, IoIosHand, IoIosKey, IoIosTrash } from "react-icons/io";
+import { FaRegEdit } from "react-icons/fa";
+import { IoIosAdd, IoIosArrowBack, IoIosArrowForward, IoIosCamera, IoIosEye, IoIosHand, IoIosKey, IoIosTrash } from "react-icons/io";
 
 interface ICustomAdminButton {
     onclickFunction: () => void;
@@ -25,7 +26,7 @@ export default function AdminButtonWrapper({ onclickFunction, content }: ICustom
             case 'ADD':
                 return { text: 'Add', icon: <IoIosAdd /> };
             case 'EDIT':
-                return { text: 'Edit', icon: <IoIosClipboard /> };
+                return { text: 'Edit', icon: <FaRegEdit /> };
             case 'KEY':
                 return { text: '', icon: <IoIosKey /> };
             case 'RIGHT':
@@ -41,12 +42,12 @@ export default function AdminButtonWrapper({ onclickFunction, content }: ICustom
 
     return (
         <button 
-            className="transition-all duration-[10ms] bg-edcPurple-60 text-white px-2 rounded-md w-full h-[1.5rem]"
+            className="transition-all duration-[10ms] bg-edcPurple-60 text-white text-xs px-2 rounded-md w-fit md:w-full h-[1.5rem]"
             onClick={onclickFunction}
         >
             <div className="flex justify-center items-center gap-2">
-                {text}
-                {icon}
+                <span className={`${content === 'Add Product' ? '' : 'hidden md:block'}`}>{text}</span>
+                <span className="">{icon}</span>
             </div>
         </button>
     );

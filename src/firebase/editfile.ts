@@ -23,7 +23,7 @@ export default async function editFile({ url, title, file, onProgress }: IEditFi
         }
 
         // upload new file
-        const imageUrl = await uploadFile({ reference: title.replace(/ /g, '_'), file, onProgress });
+        const imageUrl = await uploadFile({ reference: title, file, onProgress });
         if (!imageUrl) {
             throw new Error("Issue uploading new file");
         }

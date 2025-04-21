@@ -1,3 +1,4 @@
+import { safeName } from "../firebase/newDoc";
 import uploadFile from "../firebase/uploadFile";
 import { IGeneralPhoto } from "../Interfaces/IPhotos";
 import { NEW_PRODUCT_IMAGE_QUALITY } from "./constants";
@@ -7,7 +8,7 @@ export default async function getProductPhotosToUpload(files: File[], title: str
 
     const filesToUpload: IGeneralPhoto[] = await Promise.all(files.map(async (file, index) => {
         // Create a unique name for each file using index and a unique timestamp
-        const safeName = `${title.replace(/ /g, "_")}_${index}_${Date.now() + index}`;
+        const photoRef = safeName(title) + "_" + new Date().getTime();
         
         // resize incoming photo
         const resizedFile = await resizeFile(file, {
@@ -17,7 +18,7 @@ export default async function getProductPhotosToUpload(files: File[], title: str
             quality: NEW_PRODUCT_IMAGE_QUALITY  // Good balance between quality and file size
         });
         const fileToUpload = {
-            reference: safeName,
+            reference: photoRef,
             file: resizedFile,
             onProgress: onProgress ?? null,
         }

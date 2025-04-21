@@ -1,5 +1,6 @@
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { storage } from "./firebaseConfig";
+import { safeName } from "./newDoc";
 
 interface IUploadFile {
   reference: string;
@@ -10,9 +11,11 @@ interface IUploadFile {
 export default async function uploadFile({ reference, file, onProgress }: IUploadFile): Promise<string> {
   return new Promise((resolve, reject) => {
     try {
-      const storageRef = ref(storage, `photos/${reference}`);
-
-      const uploadTask = uploadBytesResumable(storageRef, file);
+      const safeReference = safeName(reference) + "_" + new Date().getTime();
+      const storageRef = ref(storage, `photos/${safeReference}`);
+      const uploadTask = uploadBytesResumable(storageRef, file, {
+        cacheControl: 'public,max-age=31536000'
+      });
 
       uploadTask.on('state_changed',
         (snapshot) => {

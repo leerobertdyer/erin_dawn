@@ -10,8 +10,6 @@ interface IProductDetails {
     handleCloseProductDetails: () => void
 }
 
-//TODO: Make it so you can view each photo larger
-
 export default function ProductDetails({ product, handleCloseProductDetails }: IProductDetails) {
     const { cartProducts, setCartProducts } = useProductManagementContext();
     const location = useLocation();
@@ -30,8 +28,7 @@ export default function ProductDetails({ product, handleCloseProductDetails }: I
             justify-start items-center lg:items-start gap-4
             w-[95%]  m-auto p-4 border-y-2 mb-4 border-y-black">
                 <div className="w-full lg:w-1/2 max-w-[650px]">
-                    <Carousel
-                        product={product}>
+                    <Carousel product={product} />
                         <div className="flex justify-center w-full p-2 gap-2 text-edcPurple-80">
                             <button onClick={handleCloseProductDetails}
                                 className="p-2 bg-edcPurple-40 rounded-md text-white w-[8rem]">
@@ -42,7 +39,6 @@ export default function ProductDetails({ product, handleCloseProductDetails }: I
                                 Add to Cart
                             </button>
                         </div>
-                    </Carousel>
             </div>
         <div className="flex flex-col justify-between h-full mx-auto max-w-[650px] border-edcPurple-80 border-2 bg-edcBlue-10 items-center rounded-md ">
             <p className="text-3xl p-2 w-full bg-edcPurple-40 rounded-t-sm text-white text-center border-b-2 border-black">"{product.title}"</p>

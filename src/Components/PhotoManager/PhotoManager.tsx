@@ -310,7 +310,7 @@ export default function PhotoManager({ product, handleBack, onSave }: IPhotoMana
     )
 
     return (
-        <div className={`top-0 left-0 z-10 w-screen h-screen py-[4rem] overflow-auto bg-white flex flex-col items-center relative pt-[7rem]`}
+        <div className={`top-0 left-0 z-10 w-screen h-screen overflow-auto bg-white flex flex-col items-center relative pt-[4rem]`}
             style={{
                 backgroundImage: `url('${background}')`,
                 backgroundSize: "cover",
@@ -319,10 +319,16 @@ export default function PhotoManager({ product, handleBack, onSave }: IPhotoMana
             {percent > 0 && <div className="w-full flex justify-center items-center absolute bottom-0">
                 <LoadingBar progress={percent} />
             </div>}
-            <div className="fixed top-0 w-full flex justify-center items-start bg-white h-[6.5rem]">
+            <div className="fixed top-0 w-full flex justify-center items-start bg-white h-fit py-[2rem] z-[50]">
                 <button onClick={handleBack}
-                    className="w-[10rem] mx-auto my-[1rem] bg-edcPurple-60 text-white p-2 rounded-md">Back</button>
+                    className="w-[10rem] mx-auto bg-edcPurple-60 text-white p-2 rounded-md">Back</button>
+                {(files || isUpdatedPhotoState) && <button
+                    className="w-[10rem] m-auto bg-edcYellow-80 p-2 text-edcPurple-80 rounded-md text-center cursor-pointer flex justify-center items-center"
+                    onClick={() => files ? handleSendPhotosToForm() : handleSaveReorderedPhotos()}>
+                    {files ? 'Upload' : 'Save Changes'}
+                </button>}
             </div>
+
             <div className="flex flex-row flex-wrap justify-center items-start gap-4 w-full h-fit mb-8 px-4">
                 {/* Drag and drop for existing photos */}
                 {currentPhotos.map((photo, index) => (
@@ -346,11 +352,11 @@ export default function PhotoManager({ product, handleBack, onSave }: IPhotoMana
                                 : ''
                         }`}
                     >
-                        <Frame additionalClass="w-[10rem] h-[15rem]">
+                        <Frame additionalClass="w-[10rem] h-fit">
                             <img 
                                 src={photo.url} 
                                 id={photo.id} 
-                                className="rounded-md object-cover w-full h-full select-none"
+                                className="rounded-md object-cover w-[7rem] h-[7rem] select-none"
                                 draggable={false}
                                 alt={photo.title || 'Product photo'}
                             />
@@ -399,11 +405,6 @@ export default function PhotoManager({ product, handleBack, onSave }: IPhotoMana
                 />
             </div>
 
-            {(files || isUpdatedPhotoState) && <button
-                className="w-[10rem] m-auto bg-edcYellow-80 p-2 fixed bottom-10 left-0 right-0 text-edcPurple-80 rounded-md text-center cursor-pointer flex justify-center items-center gap-4 border-2 border-white py-4 my-4"
-                onClick={() => files ? handleSendPhotosToForm() : handleSaveReorderedPhotos()}>
-                {files ? 'Upload' : 'Save Changes'}
-            </button>}
         </div>
     )
 }

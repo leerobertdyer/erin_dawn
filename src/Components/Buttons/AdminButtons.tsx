@@ -16,7 +16,7 @@ interface IAdminButtons {
 export default function AdminButtons({ handleEdit, addProduct, addPhotoToSeries, removePhotoFromSeries, onDelete, onKeyChange, moveProductLeft, moveProductRight, hideProduct, hidden }: IAdminButtons) {
 
     return (
-        <div className="flex justify-center items-center w-full p-2 gap-4">
+        <div className="flex justify-center items-center w-full p-2 gap-[.25rem] flex-wrap">
             {hideProduct && <AdminButtonWrapper 
                 onclickFunction={hideProduct} 
                 content={hidden ? "Show" : "Hide"} 

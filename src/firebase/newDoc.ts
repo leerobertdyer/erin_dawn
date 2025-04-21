@@ -6,8 +6,13 @@ import { IGeneralPhoto } from "../Interfaces/IPhotos";
 import { buildPhotoUpdateData } from "./editDoc";
 import { ICategory } from "../Interfaces/ICategory";
 
+function safeName(name: string): string {
+  return name.replace(/\s/g, "_")
+    .replace(/['"`“”‘’]/g, "");
+}
+
 async function addNewProductDoc({ title, description, price, size, dimensions, hidden, series, stripeProductId, stripePriceId, category, photos, sold }: INewProduct): Promise<string | null> {
-  const customDocId = title.replace(/\s/g, "_") + "_" + new Date().getTime();
+  const customDocId = safeName(title) + "_" + new Date().getTime()
   try {
     console.log("Adding document to firestore: ", customDocId);
     let id = '';
@@ -40,7 +45,7 @@ async function addNewProductDoc({ title, description, price, size, dimensions, h
 }
 
 async function addNewPhotoDoc({  url, tags, order, category }: IGeneralPhoto): Promise<string | null> {
-  const customDocId = category.replace(/\s/g, "_") + "_" + new Date().getTime();
+  const customDocId = safeName(category) + "_" + new Date().getTime();
   const photoUpdateData = buildPhotoUpdateData({ url, tags, order, category });
 
   try {
@@ -65,7 +70,7 @@ async function addNewCategory(category: ICategory): Promise<boolean> {
     console.log("Creating doc in category collection with ID:", category.name);
     let success = false;
     try {
-      const safeId = category.name.replace(/\s/g, "_") + "_" + new Date().getTime();
+      const safeId = safeName(category.name) + "_" + new Date().getTime();
       const docRef = doc(db, "category", safeId);
       await setDoc(docRef, {
         name: category.name,
@@ -79,7 +84,6 @@ async function addNewCategory(category: ICategory): Promise<boolean> {
     }
     return success;
 }
-
 
 async function addNewSale({ customerName, shippingAddressString, sessionId, isShipped, totalSales, itemsSold }: IAddNewSale ): Promise<boolean> {
   try {
@@ -100,8 +104,8 @@ async function addNewSale({ customerName, shippingAddressString, sessionId, isSh
       itemsCount: itemsSold?.length || 0
     });
     
-    const safeName = customerName.replace(/\s/g, "_");
-    const customId = safeName + "_" + sessionId;
+    const safeId = customerName.replace(/\s/g, "_");
+    const customId = safeId + "_" + sessionId;
     
     // Create the sale document data
     const saleData = {
@@ -140,4 +144,4 @@ async function editSale({ id }: { id: string }) {
 }
 
 
-export { addNewProductDoc, addNewCategory, addNewSale, editSale, addNewPhotoDoc };
+export { addNewProductDoc, addNewCategory, addNewSale, editSale, addNewPhotoDoc, safeName };

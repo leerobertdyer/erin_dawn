@@ -12,6 +12,7 @@ import PurchaseSuccess from './Views/PurchaseSuccess/PurchaseSuccess';
 import { UserProvider } from './Context/UserContext';
 import EmailSignupForm from './Components/Forms/EmailSignupForm';
 import NewEmailForm from './Components/Forms/NewEmailForm';
+import { useRef } from 'react';
 
 function App() {
   const handleWheel = () => {
@@ -20,8 +21,9 @@ function App() {
     }
   };
 
-  document.addEventListener("wheel", handleWheel);
 
+  document.addEventListener("wheel", handleWheel);
+  
   return ( // Providers and Context
     <UserProvider>
       <ProductManagementProvider>
@@ -36,13 +38,14 @@ function App() {
 }
 
 const AppContent = () => {
+const mainAppScrollRef = useRef<HTMLDivElement>(null);
 
   return ( // Actual App
-    <div className='font-classy w-screen h-screen overflow-auto'>
+    <div ref={mainAppScrollRef} className='font-classy w-screen h-screen overflow-auto'>
       <Nav />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/shop" element={<Shop />} />
+        <Route path="/shop" element={<Shop mainAppScrollRef={mainAppScrollRef} />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/cart/success" element={<PurchaseSuccess />} />
         <Route path="/cart/cancel" element={<Cart />} />
