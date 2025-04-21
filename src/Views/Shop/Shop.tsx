@@ -266,7 +266,7 @@ export default function Shop({mainAppScrollRef}: {mainAppScrollRef: React.RefObj
 
         {showSortModal ? <div className="fixed w-full h-[15rem] bg-edcPurple-80 text-white z-[1000] flex justify-around items-center bottom-0 border-t-2 border-white">
             <div 
-                className="text-3xl hover:cursor-pointer font-retro rotate-[-10deg] border-2 border-edcYellow-40 border-dashed rounded-xl p-8 bg-edcPurple-60"
+                className="md:text-3xl text-lg hover:cursor-pointer font-retro rotate-[-10deg] border-2 border-edcYellow-40 border-dashed rounded-xl p-2 mb-8 md:mb-0 md:p-8 bg-edcPurple-60"
                 onClick={() => handleFilterCategory("upcycled")}>
                     Upcycled</div>
             <div className="flex flex-col justify-center items-center w-fit h-full ">
@@ -291,7 +291,7 @@ export default function Shop({mainAppScrollRef}: {mainAppScrollRef: React.RefObj
                         </div>
             </div>
             <div 
-                className="text-3xl hover:cursor-pointer font-retro rotate-[10deg] border-2 border-edcYellow-40 border-dashed rounded-full p-8 bg-edcPurple-60"
+                className="md:text-3xl text-lg hover:cursor-pointer font-retro rotate-[10deg] border-2 border-edcYellow-40 border-dashed rounded-full p-2 mb-8 md:mb-0 md:p-8 bg-edcPurple-60"
                 onClick={() => handleFilterCategory("handmade")}>
                 Handmade</div>
 
