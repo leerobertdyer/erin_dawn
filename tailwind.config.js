@@ -8,15 +8,23 @@ export const theme = {
     retro: ['RetromaVibesRegular'],
     classy: ['GowunDodum-Regular']
   },
-
   extend: {
+    animation: {
+      'slide-text': 'slide-text 7s linear infinite',
+    },
+    keyframes: {
+      'slide-text': {
+        '0%': { transform: 'translateX(20%)' },
+        '50%': { transform: 'translateX(-50%)' },
+        '100%': { transform: 'translateX(20%)' }
+      }
+    },
     colors: {
       edcPurple: {
         10: '#e9b8f5',
         20: '#d478f5',
         40: '#a947cc',
-        60: '#7a047a',
-        60: '#470247',
+        60: '#7a047a', 
         80: '#2b022b'
       },
       edcBlue: {

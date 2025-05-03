@@ -92,7 +92,7 @@ export default function About() {
                                 <a href="https://www.gmother.com/" target="_blank" className="w-[12rem] text-center text-blue-400">gmothergoods.com</a>
                             </div>
                             <div className="sm:text-[1.2rem] flex flex-col items-center justify-center mt-6">And my husband who built this website:
-                                <a href="https://www.leedyer.com/" target="_blank" className="w-[12rem] text-center text-blue-400">leerobertdyer.com</a>
+                                <a href="https://www.leedyer.com/" target="_blank" className="w-[12rem] text-center text-blue-400">leedyer.com</a>
                             </div>
 
                         </div>

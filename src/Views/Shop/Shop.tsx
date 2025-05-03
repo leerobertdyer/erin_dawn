@@ -16,6 +16,7 @@ import NewProductForm from "../../Components/Forms/NewProductForm";
 import AddProductCard from "../../Components/AddProductCard/AddProductCard";
 import EditProductForm from "../../Components/Forms/EditProductForm";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
+import SlidingTextBox from "../../Components/SlidingTextBox/SlidingTextBox";
 
 export default function Shop({mainAppScrollRef}: {mainAppScrollRef: React.RefObject<HTMLDivElement>}) {
     const { setFilteredInventory, filteredInventory } = useProductManagementContext();
@@ -201,6 +202,7 @@ export default function Shop({mainAppScrollRef}: {mainAppScrollRef: React.RefObj
     function handleCloseProductDetails() {
         setProductToEdit(null)
         setShowDetails(false)
+        navigate('/shop', { replace: true })
     }
 
     function handleAddPhotoToSeries(product: IProductInfo) {
@@ -320,7 +322,9 @@ export default function Shop({mainAppScrollRef}: {mainAppScrollRef: React.RefObj
                         <div className="w-full flex flex-wrap justify-center items-center bg-white bg-opacity-70 p-2 pb-[8rem]">
                         {series.map((product) => (
                             <Frame key={product.id} additionalClass="w-[10rem] md:w-[15rem] h-fit relative m-2">
-                                <p className="text-edcPurple-80 text-2xl text-ellipsis min-w-0 overflow-hidden whitespace-nowrap" style={{ fontSize: 'clamp(.75rem, 5vw, 1.75rem)'}}>{product.title}</p>
+                                <p className={`${product.title.length > 11 ? "text-lg" : "text-2xl"} text-edcPurple-80 w-full text-center`}>
+                                    {product.title}
+                                </p>
                                 <div className="flex flex-col justify-between items-center h-full w-full">
                                     <Carousel product={product} onClick={() => handleShowProductDetails(product)} />
                                     {user && (
