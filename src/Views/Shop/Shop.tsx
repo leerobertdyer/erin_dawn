@@ -16,7 +16,6 @@ import NewProductForm from "../../Components/Forms/NewProductForm";
 import AddProductCard from "../../Components/AddProductCard/AddProductCard";
 import EditProductForm from "../../Components/Forms/EditProductForm";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
-import SlidingTextBox from "../../Components/SlidingTextBox/SlidingTextBox";
 
 export default function Shop({mainAppScrollRef}: {mainAppScrollRef: React.RefObject<HTMLDivElement>}) {
     const { setFilteredInventory, filteredInventory } = useProductManagementContext();
