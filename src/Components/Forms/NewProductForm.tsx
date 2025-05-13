@@ -228,7 +228,7 @@ export default function NewProductForm({ onClose }: INewProductForm) {
                     <CustomInput 
                         label="New Category Name"
                         value={newCategory.name}
-                        onChange={(e) => setNewCategory(prev => ({ ...prev, name: e.target.value }))}
+                        onChange={(e) => setNewCategory(prev => ({ ...prev, name: e.target.value.replace(/['"`“”‘’]/g, "") }))}
                         type="text"
                         placeholder="Enter category name"
                         required
@@ -274,7 +274,7 @@ export default function NewProductForm({ onClose }: INewProductForm) {
                         <CustomInput 
                             label="New Series Name"
                             value={newSeriesName}
-                            onChange={(e) => setNewSeriesName(e.target.value)}
+                            onChange={(e) => setNewSeriesName(e.target.value.replace(/['"`“”‘’]/g, ""))}
                             type="text"
                             placeholder="Enter series name"
                             required
