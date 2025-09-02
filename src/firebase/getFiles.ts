@@ -3,6 +3,7 @@ import { db } from "./firebaseConfig";
 import { IProductInfo } from "../Interfaces/IProduct";
 import shuffleArray from "../util/shuffle";
 import { IGeneralPhoto } from "../Interfaces/IPhotos";
+import { ISeries } from "../Interfaces/ISeries";
 
 interface IGetPhotos {
     tags?: string[],
@@ -35,7 +36,7 @@ export async function getPhotos({ tags, ids, shuffle }: IGetPhotos): Promise<IGe
         };
     }));
 
-    shuffle && shuffleArray(photosData);
+    if (shuffle) shuffleArray(photosData);
     return photosData as IGeneralPhoto[];
 }
 export async function getProducts(): Promise<IProductInfo[]> {
@@ -86,12 +87,24 @@ export async function getAboutText(): Promise<{ long: string, short: string, lon
 
     if (docSnap.exists()) {
         const data = docSnap.data();
-        textObject.long = data.long,
-        textObject.short = data.short,
-        textObject.longHeader = data.longHeader
+        textObject.long = data.long;
+        textObject.short = data.short;
+        textObject.longHeader = data.longHeader;
     }
 
     return textObject;
+}
+
+export async function getSeries(): Promise<DocumentData[]> {
+    const docRef = await getDocs(collection(db, "series"));
+    const series = docRef.docs.map(doc => 
+    {
+        return {
+            id: doc.id,
+            ...doc.data()
+        } as ISeries;
+    });
+    return series;
 }
 
 export async function getOrders(): Promise<DocumentData[]> {

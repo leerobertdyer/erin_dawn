@@ -6,8 +6,9 @@ import { useEffect, useState } from "react";
 import { ICategory } from "../../Interfaces/ICategory";
 import { useNavigate } from "react-router-dom";
 import EditCategoryForm from "../Forms/EditCategoryForm";
-import { IProductInfo } from "../../Interfaces/IProduct";
-
+import { getSeries } from "../../firebase/getFiles";
+import EditSeriesForm from "../Forms/EditSeriesForm";
+import { ISeries } from "../../Interfaces/ISeries";
 
 export default function Main() {
     const { user } = useUserContext();
@@ -18,28 +19,36 @@ export default function Main() {
 
     const [showEditCategoryDialog, setShowEditCategoryDialog] = useState(false);
     const [categoryToEdit, setCategoryToEdit] = useState<ICategory | null>(null);
-    const [series, setSeries] = useState<IProductInfo[]>([]);
+    const [series, setSeries] = useState<ISeries[]>([]);
+    const [showEditSeriesDialog, setShowEditSeriesDialog] = useState(false);
+    const [seriesToEdit, setSeriesToEdit] = useState<ISeries | null>(null);
 
     useEffect(() => {
-        const uniqueSeries = []
-        allProducts.forEach(p => {
-            if (!uniqueSeries.some(s => s.series === p.series)) {
-                if (!p.hidden && !p.sold) {
-                    uniqueSeries.push(p);
-                }
-            }
-        })
+        loadSeries();
+    }, [])
+
+    async function loadSeries() {
+        const uniqueSeries = await getSeries();
         console.log("UNIQUE SERIES", uniqueSeries)
-        setSeries(uniqueSeries);
-    }, [allProducts])
-    function handleEdit(category: ICategory) {
+        setSeries(uniqueSeries as ISeries[]);
+    }
+
+    function handleEditCategories(category: ICategory) {
         setShowEditCategoryDialog(true);
         setCategoryToEdit(category);
     }
 
-    function handleClose() {
+    function handleEditSeries(series: ISeries) {
+        setShowEditSeriesDialog(true);
+        setSeriesToEdit(series);
+    }
+
+    async function handleClose() {
         setShowEditCategoryDialog(false);
+        setShowEditSeriesDialog(false);
+        setSeriesToEdit(null);
         setCategoryToEdit(null);
+        await loadSeries();
     }
 
     function handleCategoryClick(category: string) {
@@ -63,15 +72,17 @@ export default function Main() {
             <h1 className="w-full text-center text-white bg-[#242424] rounded-md bg-opacity-30 text-[2rem] sm:text-[3.5rem] p-0 m-0">Shop by Series</h1>
             <div className="w-full h-fit flex flex-wrap justify-center items-center gap-[1rem]">
             {series.map((s, key) => (
-                <Frame key={key} additionalClass="w-[10rem] m:w-[12rem] h-[13rem] md:h-[14rem] overflow-hidden pb-6" hover={true}>
-                    <div className="h-[8rem] w-[8rem]" onClick={() => handleSeriesClick(s.series)}>
-                        <img src={s.photos[0].url} alt={s.series} className="rounded-md h-full w-full object-cover object-center" />
+                <Frame key={key} additionalClass="w-[14rem] m:w-[16rem] h-[16rem] md:h-[18rem] overflow-hidden pb-6" hover={true}>
+                    <div className="h-[10rem] w-[10rem]" onClick={() => handleSeriesClick(s.name)}>
+                        <img src={s.photos[0].url} alt={s.name} className="rounded-md h-full w-full object-cover object-center" />
                     </div>
-                    <p className="text-center text-sm" >{s.series}</p>
+                    <p className="text-center text-xs md:text-sm lg:text-base" >{s.name}</p>
+                    {user && <AdminButtons handleEdit={() => handleEditSeries(s)} />}
                 </Frame>
             ))}
             </div>
             {showEditCategoryDialog && <EditCategoryForm categoryToEdit={categoryToEdit} onClose={handleClose} />}
+            {showEditSeriesDialog && <EditSeriesForm seriesToEdit={seriesToEdit} onClose={handleClose} />}
             <h2 className="w-full text-center text-white bg-[#242424] rounded-md bg-opacity-30 text-[2rem] sm:text-[3.5rem] p-0 m-0">Shop by Category</h2>
             {allCategories.map((c, key) => (
                 <Frame key={key} additionalClass="w-[87vw] md:w-[40vw] lg:w-[35vw] h-fit max-h-[65rem] max-w-[55rem]" hover={true}>
@@ -79,7 +90,7 @@ export default function Main() {
                         <img src={c.url} alt={c.name} className="rounded-md h-full w-full object-cover object-center" />
                     </div>
                     <button className="text-center text-2xl tracking-[.2rem] font-retro">{c.name}</button>
-                    {user && <AdminButtons handleEdit={() => handleEdit(c)} />}
+                    {user && <AdminButtons handleEdit={() => handleEditCategories(c)} />}
                 </Frame>
             ))}
         </div>

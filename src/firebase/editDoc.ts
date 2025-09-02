@@ -4,6 +4,19 @@ import { IProductInfo } from "../Interfaces/IProduct";
 import { IGeneralPhoto } from "../Interfaces/IPhotos";
 import { ICategory } from "../Interfaces/ICategory";
 import { IHero } from "../Interfaces/IHero";
+import { ISeries } from "../Interfaces/ISeries";
+
+
+async function editSeriesDoc(series: ISeries) {
+    try {
+        const docRef = doc(db, "series", series.id);
+        console.log('editing doc', docRef.path);
+        
+        await updateDoc(docRef, {name: series.name, photos: series.photos});
+    } catch (error) {
+        console.log("Error updating document: ", error);
+    }
+}
 
 async function editProductDoc({ id, title, description, price, series, category, photos, stripeProductId, hidden, stripePriceId, size, dimensions, sold }: IProductInfo): Promise<boolean> {
     try {
@@ -120,4 +133,4 @@ async function shipOrder({ id }: { id: string }) {
     }
 }
 
-export { editProductDoc, updateAboutText, shipOrder, editCategoryDoc, editPhotoDoc, buildPhotoUpdateData, editHeroDoc }
+export { editProductDoc, updateAboutText, shipOrder, editCategoryDoc, editPhotoDoc, buildPhotoUpdateData, editHeroDoc, editSeriesDoc }

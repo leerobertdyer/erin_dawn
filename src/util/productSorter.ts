@@ -7,6 +7,7 @@ type SortType = 'oldest' | 'newest' | 'category' | 'title' | 'series';
  * @param dateValue - Firebase Timestamp object or date string
  * @returns number of milliseconds since epoch
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getDateInMillis(dateValue: any): number {
   if (!dateValue) return 0;
   
@@ -31,11 +32,12 @@ export function getDateInMillis(dateValue: any): number {
 export function sortProducts(products: IProductInfo[], sortBy: SortType = 'newest') {
     return [...products].sort((a, b) => {
         switch (sortBy) {
-            case 'category':
+            case 'category': {
                 // Handle undefined categories
                 const catA = a.category?.toLowerCase() || '';
                 const catB = b.category?.toLowerCase() || '';
                 return catA.localeCompare(catB);
+            }
             case 'title':
                 return a.title.toLowerCase().localeCompare(b.title.toLowerCase());
             case 'series':
