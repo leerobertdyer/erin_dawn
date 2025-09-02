@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { handleFileChange, preventEnterFromSubmitting } from "./formUtil";
 import MainFormTemplate from "./MainFormTemplate";
 import { useProductManagementContext } from "../../Context/ProductMgmtContext";
@@ -11,6 +11,7 @@ import { NEW_PRODUCT_IMAGE_QUALITY } from "../../util/constants";
 import SubmitBtn from "../Buttons/SubmitBtn";
 import { ISeries } from "../../Interfaces/ISeries";
 import { editProductDoc, editSeriesDoc } from "../../firebase/editDoc";
+import { IGeneralPhoto } from "../../Interfaces/IPhotos";
 
 interface ISeriesFormProps {
   seriesToEdit: ISeries;
@@ -23,10 +24,28 @@ export default function EditSeriesForm({
 }: ISeriesFormProps) {
   const { allProducts, setAllProducts } = useProductManagementContext();
 
-  const [background, setBackground] = useState(seriesToEdit?.photos[0].url ?? "");
+  const [background, setBackground] = useState(
+    seriesToEdit?.photos[0].url ?? ""
+  );
   const [series, setSeries] = useState<ISeries>({ ...seriesToEdit });
   const [file, setFile] = useState<File | null>();
   const [progress, setProgress] = useState(0);
+  const [seriesPhotos, setSeriesPhotos] = useState<IGeneralPhoto[]>([]);
+
+  useEffect(() => {
+    function getAllPhotosForSeries() {
+      const photos = allProducts
+        .filter((p) => p.series === seriesToEdit.name)
+        .map((p) => p.photos);
+      setSeriesPhotos(photos.flat());
+    }
+    getAllPhotosForSeries();
+  }, [allProducts, seriesToEdit.name]);
+
+ function selectNewPhoto(photo: IGeneralPhoto) {
+    setBackground(photo.url);
+    setSeries({ ...series, photos: [photo] });
+ }
 
   function onProgress(percent: number) {
     setProgress(percent);
@@ -71,7 +90,7 @@ export default function EditSeriesForm({
       if (p.series === seriesToEdit.name) {
         await editProductDoc({
           ...p,
-          series: updatedSeries.name
+          series: updatedSeries.name,
         });
       }
     }
@@ -85,7 +104,6 @@ export default function EditSeriesForm({
       )
     );
 
-
     onClose();
   }
 
@@ -96,17 +114,15 @@ export default function EditSeriesForm({
   }
 
   return (
-    <MainFormTemplate
-      handleClickBack={onClose}
-      resetState={resetState}
-    >
-      <div className="fixed inset-0 flex flex-col items-center h-screen bg-gray-50 overflow-y-auto">
+    <MainFormTemplate handleClickBack={onClose} resetState={resetState}>
+      <div className="fixed inset-0 flex flex-col items-center h-screen bg-gray-50 overflow-y-auto pb-[10rem]">
         <h2 className="text-2xl p-2 text-center bg-white sticky top-0 z-10 mb-4 w-full">
           Editing {series.name}
         </h2>
 
         <form
-          onSubmit={handleSubmit} onKeyDown={preventEnterFromSubmitting}
+          onSubmit={handleSubmit}
+          onKeyDown={preventEnterFromSubmitting}
           className="bg-white flex flex-col justify-center m-auto items-center w-[85vw] md:w-[65vw] h-fit border-2 border-black rounded-md p-4 mt-4 gap-[4rem]"
           style={{
             backgroundImage: `url(${background})`,
@@ -114,32 +130,46 @@ export default function EditSeriesForm({
             backgroundPosition: "center",
           }}
         >
-            
-            <CustomInput
-              type="text"
-              label="Series Name"
-              placeholder="Series Name"
-              value={series.name}
-              onChange={(e) =>
-                setSeries({ ...series, name: e.target.value })
-              }
-            />
-            <label
-              htmlFor="file"
-              className="p-4 bg-edcPurple-60 text-white cursor-pointer rounded-md flex justify-center gap-4"
-            >
-              Upload Image <IoIosCamera />
-            </label>
-            <input
-              type="file"
-              id="file"
-              placeholder="Product Image"
-              className="hidden"
-              onChange={(e) => handleFileChange(e, setFile, setBackground)}
-            />
-            <p className="text-center w-full m-auto py-1 px-2 rounded-md text-xs text-gray-400 bg-white">
-              {file ? file.name : "No File Selected"}
-            </p>
+          <CustomInput
+            type="text"
+            label="Series Name"
+            placeholder="Series Name"
+            value={series.name}
+            onChange={(e) => setSeries({ ...series, name: e.target.value })}
+          />
+          <label
+            htmlFor="file"
+            className="p-4 bg-edcPurple-60 text-white cursor-pointer rounded-md flex justify-center gap-4"
+          >
+            Upload Image <IoIosCamera />
+          </label>
+          <input
+            type="file"
+            id="file"
+            placeholder="Product Image"
+            className="hidden"
+            onChange={(e) => handleFileChange(e, setFile, setBackground)}
+          />
+          <p className="text-center w-full m-auto py-1 px-2 rounded-md text-xs text-gray-400 bg-white">
+            {file ? file.name : "No File Selected"}
+          </p>
+          {seriesPhotos.length > 0 && (
+            <div className="flex flex-wrap justify-center items-center gap-2">
+              {seriesPhotos.map((photo, index) => (
+                <div
+                  key={index}
+                  className="flex flex-col items-center gap-2 hover:cursor-pointer hover:scale-105 rounded-md border-2 border-white height-[10rem] width-[10rem]"
+                  onClick={() => selectNewPhoto(photo)}
+                >
+                  <img
+                    src={photo.url}
+                    alt={photo.title}
+                    className="w-full h-[10rem] object-cover"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
 
           <SubmitBtn progress={progress} />
 
