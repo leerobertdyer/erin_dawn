@@ -3,8 +3,8 @@ import { ICategory } from "../../Interfaces/ICategory";
 import CustomInput from "../CustomInput/CustomInput";
 import { IoIosCamera } from "react-icons/io";
 import uploadFile from "../../firebase/uploadFile";
-import { addNewProductDoc, addNewCategory } from "../../firebase/newDoc";
-import { editCategoryDoc } from "../../firebase/editDoc";
+import { addNewProductDoc, addNewCategory, safeName } from "../../firebase/newDoc";
+import { addNewSeries, editCategoryDoc } from "../../firebase/editDoc";
 import { createStripeProduct } from "../../Stripe/newStripe";
 import LoadingBar from "../LoadingBar/LoadingBar";
 import { handleMultipleFileChange, preventEnterFromSubmitting } from "./formUtil";
@@ -161,6 +161,14 @@ export default function NewProductForm({ onClose }: INewProductForm) {
 
         const newProductId = await addNewProductDoc(newProduct);
         if (!newProductId) throw new Error("Failed to create product");
+
+        if (isAddingNewSeries) {
+            await addNewSeries({
+                id: safeName(newSeriesName),
+                name: newSeriesName,
+                photos: photosUploaded
+            })
+        }
 
         setAllProducts([...allProducts, { ...newProduct, id: newProductId }]);
         onClose();

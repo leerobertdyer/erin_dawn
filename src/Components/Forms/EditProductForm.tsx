@@ -4,8 +4,8 @@ import { preventEnterFromSubmitting } from "./formUtil";
 import MainFormTemplate from "./MainFormTemplate";
 import CustomInput from "../CustomInput/CustomInput";
 import WarningDialogue from "../WarningDialogue/WarningDialogue";
-import { editProductDoc, editCategoryDoc } from "../../firebase/editDoc";
-import { addNewCategory } from "../../firebase/newDoc";
+import { editProductDoc, editCategoryDoc, addNewSeries } from "../../firebase/editDoc";
+import { addNewCategory, safeName } from "../../firebase/newDoc";
 import { BACKEND_URL } from "../../util/constants";
 import PhotoManager from "../PhotoManager/PhotoManager";
 import { IProductInfo } from "../../Interfaces/IProduct";
@@ -108,6 +108,14 @@ export default function EditProductForm({ onClose, product }: IEditProductFormPr
         if (!productToEdit) {
             setIsSubmitting(false);
             return;
+        }
+
+        if (isNewSeries) {
+            await addNewSeries({
+                id: safeName(series),
+                name: series,
+                photos: productToEdit.photos
+            })
         }
 
         if (isNewCategory) await handleAddCategory({

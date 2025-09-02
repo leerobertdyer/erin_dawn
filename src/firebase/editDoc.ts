@@ -1,4 +1,4 @@
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "./firebaseConfig";
 import { IProductInfo } from "../Interfaces/IProduct";
 import { IGeneralPhoto } from "../Interfaces/IPhotos";
@@ -6,6 +6,16 @@ import { ICategory } from "../Interfaces/ICategory";
 import { IHero } from "../Interfaces/IHero";
 import { ISeries } from "../Interfaces/ISeries";
 
+async function addNewSeries(series: ISeries) {
+try {
+    const docRef = doc(db, "series", series.id);
+    console.log('adding doc', docRef.path);
+    
+    await setDoc(docRef, {name: series.name, photos: series.photos});
+} catch (error) {
+    console.log("Error updating document: ", error);
+}
+}
 
 async function editSeriesDoc(series: ISeries) {
     try {
@@ -133,4 +143,4 @@ async function shipOrder({ id }: { id: string }) {
     }
 }
 
-export { editProductDoc, updateAboutText, shipOrder, editCategoryDoc, editPhotoDoc, buildPhotoUpdateData, editHeroDoc, editSeriesDoc }
+export { editProductDoc, updateAboutText, shipOrder, editCategoryDoc, editPhotoDoc, buildPhotoUpdateData, editHeroDoc, editSeriesDoc, addNewSeries }
