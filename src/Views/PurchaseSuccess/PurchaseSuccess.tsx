@@ -62,7 +62,7 @@ export default function PurchaseSuccess() {
                 const itemsSold = data.metadata.items.split(',');
                 const shippingAddressString = `${shippingAddress.line1}, ${shippingAddress.line2 ? shippingAddress.line2 + ' ' : ''}${shippingAddress.city}, ${shippingAddress.state} ${shippingAddress.postal_code} ${shippingAddress.country}`;
                 await addNewSale({ customerName, shippingAddressString, sessionId, isShipped: false, grandTotal, itemsSold });
-                await sendSalesEmailNotifications({ customerName, shippingAddressString, itemsSold});
+                await sendSalesEmailNotifications({ customerName, customerEmail, shippingAddressString, itemsSold});
             }
 
         }
