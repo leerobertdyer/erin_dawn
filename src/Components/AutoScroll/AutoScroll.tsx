@@ -29,7 +29,7 @@ export default function AutoScroll({ children, speed = 10 }: AutoScrollProps) {
                     setIsScrollingRight(true);
                 }
 
-            } console.log(container.scrollLeft);
+            }
             requestAnimationFrame(scroll);
         };
 

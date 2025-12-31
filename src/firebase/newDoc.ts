@@ -85,7 +85,7 @@ async function addNewCategory(category: ICategory): Promise<boolean> {
     return success;
 }
 
-async function addNewSale({ customerName, shippingAddressString, sessionId, isShipped, totalSales, itemsSold }: IAddNewSale ): Promise<boolean> {
+async function addNewSale({ customerName, shippingAddressString, sessionId, isShipped, grandTotal, itemsSold }: IAddNewSale ): Promise<boolean> {
   try {
     // Validate required fields
     if (!sessionId) {
@@ -100,7 +100,7 @@ async function addNewSale({ customerName, shippingAddressString, sessionId, isSh
     console.log("Adding sale to firestore with data:", {
       sessionId,
       customerName,
-      totalSales,
+      grandTotal,
       itemsCount: itemsSold?.length || 0
     });
     
@@ -114,7 +114,7 @@ async function addNewSale({ customerName, shippingAddressString, sessionId, isSh
       shippingAddressString,
       sessionId,
       isShipped,
-      totalSales,
+      grandTotal,
       itemsSold,
     };
     

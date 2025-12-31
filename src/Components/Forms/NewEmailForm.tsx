@@ -23,7 +23,6 @@ export default function NewEmailForm() {
     useEffect(() => {
         if (!allProducts) return;
         const uniqueSeries = Array.from(new Set(allProducts.map(p => p.series)));
-        console.log(uniqueSeries)
         setAllSeriesNames(uniqueSeries);
     }, [allProducts]);
 
@@ -67,7 +66,7 @@ export default function NewEmailForm() {
     }
 
     async function handleSubmit() {
-        const resp = await fetch(`${BACKEND_URL}/send-new-series-email`, {
+        const resp = await fetch(`${BACKEND_URL}/edc-api/send-new-series-email`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

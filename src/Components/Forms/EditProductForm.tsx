@@ -83,7 +83,7 @@ export default function EditProductForm({ onClose, product }: IEditProductFormPr
             description: description,
             newPrice: price,
         }
-        const editProductEndpoint = `${BACKEND_URL}/edit-product`
+        const editProductEndpoint = `${BACKEND_URL}/edc-api/edit-product`
         console.log("sending fetch to : ", editProductEndpoint)
         const resp = await fetch(editProductEndpoint, {
             method: 'PUT',
@@ -96,7 +96,7 @@ export default function EditProductForm({ onClose, product }: IEditProductFormPr
             const { stripeProductId, stripePriceId } = await resp.json()
             return { stripeProductId, stripePriceId }
         } else {
-            console.log("Error editing Stripe Product/Price: ", resp)
+            console.error("Error editing Stripe Product/Price: ", resp)
             throw new Error("Error editing stripe product and price")
         }
     }

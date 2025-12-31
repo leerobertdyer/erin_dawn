@@ -88,7 +88,6 @@ export default function PhotoManager({ product, handleBack, onSave }: IPhotoMana
     };
 
     const handlePhotoDragEnd = (e: React.DragEvent<HTMLDivElement>) => {
-        console.log('Drag end');
         e.stopPropagation();
         setDragOverIndex(null);
         setDraggedPhoto(null);

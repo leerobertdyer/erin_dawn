@@ -53,7 +53,7 @@ export default function Shop({mainAppScrollRef}: {mainAppScrollRef: React.RefObj
                 setFilteredInventory(filteredProducts);
             }
         }
-    }, [selectedCategory])
+    }, [selectedCategory, allProducts, setFilteredInventory])
 
 
     // effect to handle url params

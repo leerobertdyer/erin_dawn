@@ -26,3 +26,6 @@ dist-ssr
 
 cors.json
 fixFirebaseFiles.ts
+
+.DS_Store
+*/.DS_Store

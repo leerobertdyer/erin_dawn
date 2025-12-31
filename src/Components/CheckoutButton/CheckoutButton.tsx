@@ -9,7 +9,7 @@ const PUB_KEY = import.meta.env.VITE_ENV === "development"
 
 const stripePromise = loadStripe(PUB_KEY);
 
-const checkoutEndpoint = `${BACKEND_URL}/create-checkout-session`;
+const checkoutEndpoint = `${BACKEND_URL}/edc-api/create-checkout-session`;
 
 export default function CheckoutButton({ salesItems }: { salesItems: ICheckoutItem[] }) {
     const [loading, setLoading] = useState(false);

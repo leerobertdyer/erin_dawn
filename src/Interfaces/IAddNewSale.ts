@@ -3,6 +3,6 @@ export default interface IAddNewSale {
     shippingAddressString: string;
     sessionId: string;
     isShipped: boolean;
-    totalSales: number;
+    grandTotal: number;
     itemsSold: string[]; 
 }

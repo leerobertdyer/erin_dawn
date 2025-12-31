@@ -40,7 +40,7 @@ export default function AdminPanel() {
         await signOut(auth).then(() => {
             console.log("User signed out")
         }).catch((error) => {
-            console.log("Error signing out: ", error)
+            console.error("Error signing out: ", error)
         })
     }
 
@@ -113,7 +113,7 @@ export default function AdminPanel() {
                         const itemDate = item.createdAt?.toDate?.() || new Date(item.createdAt);
                         const itemYear = itemDate.getFullYear();
                         if (itemYear === currentYear) {
-                            return acc + item.totalSales;
+                            return acc + item.grandTotal;
                         }
                         return acc;
                     }, 0)}</p>
@@ -121,7 +121,7 @@ export default function AdminPanel() {
                     {unshippedOrders.map((order: any) => {
                         return (
                             <div key={order.sessionId} className="bg-white flex flex-col items-center justify-center gap-2 p-2 text-center border-2 border-black rounded-md">
-                                <p>TOTAL SALE: ${order.totalSales}</p>
+                                <p>TOTAL SALE: ${order.grandTotal}</p>
                                 <p>CUSTOMER NAME: {order.customerName}</p>
 
                                 <p className="

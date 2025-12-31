@@ -50,17 +50,17 @@ export default function PurchaseSuccess() {
     useEffect(() => {
         // Fetch session details using the session ID
         async function getSessionDetails() {
-            const resp = await fetch(`${BACKEND_URL}/checkout-session/${sessionId}`);
+            const resp = await fetch(`${BACKEND_URL}/edc-api/checkout-session/${sessionId}`);
             if (resp) console.log('resp.status:', resp.status);
             const data = await resp.json();
             if (data) {
-                // console.log(data)
-                const shippingAddress = data.shipping_details.address
-                const customerName = data.shipping_details.name;
-                const totalSales = Number(data.metadata.saleTotal);
+                console.log(data)
+                const shippingAddress = data.customer_details.address
+                const customerName = data.customer_details.name;
+                const grandTotal = Number(data.metadata.saleTotal);
                 const itemsSold = data.metadata.items.split(',');
                 const shippingAddressString = `${shippingAddress.line1}, ${shippingAddress.line2 ? shippingAddress.line2 + ' ' : ''}${shippingAddress.city}, ${shippingAddress.state} ${shippingAddress.postal_code} ${shippingAddress.country}`;
-                await addNewSale({ customerName, shippingAddressString, sessionId, isShipped: false, totalSales, itemsSold });
+                await addNewSale({ customerName, shippingAddressString, sessionId, isShipped: false, grandTotal, itemsSold });
                 await sendEmailNotification({ customerName, shippingAddressString, itemsSold});
             }
 
@@ -77,7 +77,7 @@ export default function PurchaseSuccess() {
     }, [])
 
     async function sendEmailNotification({ customerName, shippingAddressString, itemsSold}: { customerName: string, shippingAddressString: string, itemsSold: string[] }) {
-        const resp = await fetch(`${BACKEND_URL}/send-sale-notification-email`, {
+        const resp = await fetch(`${BACKEND_URL}/edc-api/send-sale-notification-email`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

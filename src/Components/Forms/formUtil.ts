@@ -7,7 +7,7 @@ function handleFileChange(e: React.ChangeEvent<HTMLInputElement>, setFile: React
             setBackground(fileURL);
         }
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 }
 

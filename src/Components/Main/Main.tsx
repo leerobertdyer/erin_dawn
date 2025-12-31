@@ -29,7 +29,6 @@ export default function Main() {
 
     async function loadSeries() {
         const uniqueSeries = await getSeries();
-        console.log("UNIQUE SERIES", uniqueSeries)
         setSeries(uniqueSeries as ISeries[]);
     }
 
@@ -55,7 +54,6 @@ export default function Main() {
         const filteredProducts = allProducts.filter(p => p.category === category);
         setFilteredInventory(filteredProducts);
         const urlWithParams = '/shop?category=' + encodeURIComponent(category);
-        console.log(urlWithParams)
         navigate(urlWithParams);
     }
 
@@ -63,7 +61,6 @@ export default function Main() {
         const filteredProducts = allProducts.filter(p => p.series === series && !p.hidden && !p.sold);
         setFilteredInventory(filteredProducts);
         const urlWithParams = '/shop?series=' + encodeURIComponent(series);
-        console.log(urlWithParams)
         navigate(urlWithParams);
     }
 
