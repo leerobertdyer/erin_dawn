@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { auth } from "../../firebase/firebaseConfig";
-import { setPersistence, signInWithEmailAndPassword, browserLocalPersistence } from "@firebase/auth";
+import { setPersistence, signInWithEmailAndPassword, browserLocalPersistence } from "firebase/auth";
 import AdminPanel from "../../Components/AdminPanel/AdminPanel";
 import { useUserContext } from "../../Context/UserContext";
 
