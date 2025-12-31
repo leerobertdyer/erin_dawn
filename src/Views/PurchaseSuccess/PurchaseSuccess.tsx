@@ -55,13 +55,14 @@ export default function PurchaseSuccess() {
             const data = await resp.json();
             if (data) {
                 console.log(data)
-                const shippingAddress = data.customer_details.address
+                const shippingAddress = data.customer_details.address;
                 const customerName = data.customer_details.name;
+                const customerEmail = data.customer_details.email;
                 const grandTotal = Number(data.metadata.saleTotal);
                 const itemsSold = data.metadata.items.split(',');
                 const shippingAddressString = `${shippingAddress.line1}, ${shippingAddress.line2 ? shippingAddress.line2 + ' ' : ''}${shippingAddress.city}, ${shippingAddress.state} ${shippingAddress.postal_code} ${shippingAddress.country}`;
                 await addNewSale({ customerName, shippingAddressString, sessionId, isShipped: false, grandTotal, itemsSold });
-                await sendEmailNotification({ customerName, shippingAddressString, itemsSold});
+                await sendSalesEmailNotifications({ customerName, shippingAddressString, itemsSold});
             }
 
         }
@@ -76,13 +77,13 @@ export default function PurchaseSuccess() {
         }, 4000);
     }, [])
 
-    async function sendEmailNotification({ customerName, shippingAddressString, itemsSold}: { customerName: string, shippingAddressString: string, itemsSold: string[] }) {
+    async function sendSalesEmailNotifications({ customerName, customerEmail, shippingAddressString, itemsSold}: { customerName: string, customerEmail: string, shippingAddressString: string, itemsSold: string[] }) {
         const resp = await fetch(`${BACKEND_URL}/edc-api/send-sale-notification-email`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ customerName, shippingAddressString, itemsSold }),
+            body: JSON.stringify({ customerName, customerEmail, shippingAddressString, itemsSold }),
         });
         if (resp) console.log('resp.status:', resp.status);
     }
