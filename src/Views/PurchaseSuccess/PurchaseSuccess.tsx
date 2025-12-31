@@ -17,6 +17,7 @@ export default function PurchaseSuccess() {
 
     const { cartProducts, setCartProducts, allProducts, setAllProducts } = useProductManagementContext();
     const [inventoryPhotos, setInventoryPhotos] = useState<IProductInfo[]>([]);
+    const [soldPhotoLinks, setSoldPhotoLinks] = useState<string[]>()
 
     const [showConffeeti, setShowConfetti] = useState(true);
 
@@ -31,6 +32,7 @@ export default function PurchaseSuccess() {
                     ...cartItem,
                     sold: true
                 });
+                setSoldPhotoLinks((prev) => [...prev, cartItem.photos[0].url])
                 if (!success) {
                     console.error(`Failed to mark ${cartItem.title} as sold`);
                 }
@@ -62,7 +64,7 @@ export default function PurchaseSuccess() {
                 const itemsSold = data.metadata.items.split(',');
                 const shippingAddressString = `${shippingAddress.line1}, ${shippingAddress.line2 ? shippingAddress.line2 + ' ' : ''}${shippingAddress.city}, ${shippingAddress.state} ${shippingAddress.postal_code} ${shippingAddress.country}`;
                 await addNewSale({ customerName, shippingAddressString, sessionId, isShipped: false, grandTotal, itemsSold });
-                await sendSalesEmailNotifications({ customerName, customerEmail, shippingAddressString, itemsSold});
+                await sendSalesEmailNotifications({ customerName, customerEmail, shippingAddressString, itemsSold, soldPhotoLinks});
             }
 
         }
@@ -77,13 +79,13 @@ export default function PurchaseSuccess() {
         }, 4000);
     }, [])
 
-    async function sendSalesEmailNotifications({ customerName, customerEmail, shippingAddressString, itemsSold}: { customerName: string, customerEmail: string, shippingAddressString: string, itemsSold: string[] }) {
+    async function sendSalesEmailNotifications({ customerName, customerEmail, shippingAddressString, itemsSold}: { customerName: string, customerEmail: string, shippingAddressString: string, itemsSold: string[], soldPhotoLinks: string[] }) {
         const resp = await fetch(`${BACKEND_URL}/edc-api/send-sale-notification-email`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ customerName, customerEmail, shippingAddressString, itemsSold }),
+            body: JSON.stringify({ customerName, customerEmail, shippingAddressString, itemsSold, soldPhotoLinks }),
         });
         if (resp) console.log('resp.status:', resp.status);
     }
