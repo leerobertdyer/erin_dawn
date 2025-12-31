@@ -1,4 +1,4 @@
-import { collection, deleteDoc, doc, getDocs, query, where } from "firebase/firestore";
+import { deleteDoc, doc } from "firebase/firestore";
 import { db } from "./firebaseConfig";
 
 export async function removePhotoDoc({ id }: { id: string }): Promise<boolean> {
