@@ -224,6 +224,7 @@ export default function Shop({
     navigate("/shop", { replace: true });
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   function handleShowProductDetails(product: IProductInfo) {
     setProductToEdit(product);
     setShowDetails(true);
