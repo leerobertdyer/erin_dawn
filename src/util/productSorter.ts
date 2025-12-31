@@ -7,7 +7,6 @@ type SortType = 'oldest' | 'newest' | 'category' | 'title' | 'series';
  * @param dateValue - Firebase Timestamp object or date string
  * @returns number of milliseconds since epoch
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getDateInMillis(dateValue: any): number {
   if (!dateValue) return 0;
   

@@ -35,4 +35,5 @@ const UserContext = createContext<UserContextType>(undefined);
     return context;
 }
 
+/* eslint-disable react-refresh/only-export-components */
 export { UserProvider, useUserContext };

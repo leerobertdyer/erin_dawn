@@ -33,6 +33,7 @@ export function PhotosProvider({ children }: { children: ReactNode }) {
     );
 }
 
+/* eslint-disable react-refresh/only-export-components */
 export function usePhotosContext() {
     return useContext(PhotosContext);
 }

@@ -10,7 +10,7 @@ export function Home() {
     const { setIsEditing } = useProductManagementContext();
     useEffect(() => {
         setIsEditing(false)
-    }, [])
+    }, [setIsEditing])
 
     return (
         <>

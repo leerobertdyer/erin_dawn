@@ -33,7 +33,7 @@ export default function NewEmailForm() {
             Array.isArray(product.photos) ? product.photos : [product.photos]
         );
         setAllSeriesPhotos(flattenedPhotos);
-    }, [seriesToEdit]);
+    }, [seriesToEdit, allProducts]);
 
     function resetState() {
         setSeriesToEdit("");

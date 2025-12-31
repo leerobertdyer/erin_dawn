@@ -27,7 +27,7 @@ export default function ProductDetails({
     params.set("id", product.id);
     const newUrl = `${location.pathname}?${params.toString()}`;
     navigate(newUrl);
-  }, []);
+  }, [location.pathname, location.search, product.id, navigate]);
 
   function handleAddToCartAndNavigate(product: IProductInfo) {
     setCartProducts([...cartProducts, product]);

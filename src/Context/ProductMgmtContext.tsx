@@ -60,6 +60,7 @@ export function ProductManagementProvider({ children }: { children: ReactNode })
     );
 }
 
+/* eslint-disable react-refresh/only-export-components */
 export function useProductManagementContext() {
     return useContext(ProductManagementContext);
 }

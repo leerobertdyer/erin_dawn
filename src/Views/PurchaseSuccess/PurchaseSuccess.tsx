@@ -45,7 +45,7 @@ export default function PurchaseSuccess() {
             setCartProducts([]);
         }
         if (cartProducts.length > 0 && allProducts.length > 0) handleSoldItems();
-    }, [cartProducts, allProducts]);
+    }, [cartProducts, allProducts, setAllProducts, setCartProducts]);
 
     useEffect(() => {
         // Fetch session details using the session ID
