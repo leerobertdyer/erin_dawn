@@ -7,6 +7,7 @@ import {
 } from "../../util/constants";
 import Carousel from "../Carousel/Carousel";
 import { useEffect } from "react";
+import { viewItem_GA, addToCart_GA } from "../../util/analytics";
 
 interface IProductDetails {
   product: IProductInfo;
@@ -29,8 +30,13 @@ export default function ProductDetails({
     navigate(newUrl);
   }, [location.pathname, location.search, product.id, navigate]);
 
+  useEffect(() => {
+    viewItem_GA({ id: product.id, title: product.title, price: product.price });
+  }, [product.id, product.title, product.price]);
+
   function handleAddToCartAndNavigate(product: IProductInfo) {
     setCartProducts([...cartProducts, product]);
+    addToCart_GA({ id: product.id, title: product.title, price: product.price });
     handleAddToCart(product);
     navigate('/shop', { replace: true });
   }

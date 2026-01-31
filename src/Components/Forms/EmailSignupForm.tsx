@@ -4,6 +4,7 @@ import CustomInput from "../CustomInput/CustomInput";
 import { useState } from "react";
 import SubmitBtn from "../Buttons/SubmitBtn";
 import { BACKEND_URL } from "../../util/constants";
+import { signUp_GA } from "../../util/analytics";
 
 export default function EmailSignupForm() {
   const navigate = useNavigate();
@@ -26,9 +27,9 @@ export default function EmailSignupForm() {
     if (!resp.ok) {
         alert("Failed to sign up. Please email lee.dyer.dev@gmail.com to sign up.");
         return;
-    } else {
-        navigate("/");
     }
+    signUp_GA();
+    navigate("/");
 
   }
 

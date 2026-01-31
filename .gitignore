@@ -29,3 +29,5 @@ fixFirebaseFiles.ts
 
 .DS_Store
 */.DS_Store
+
+docs/

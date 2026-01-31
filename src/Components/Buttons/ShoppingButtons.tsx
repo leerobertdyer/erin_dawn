@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useProductManagementContext } from "../../Context/ProductMgmtContext";
 import { IProductInfo } from "../../Interfaces/IProduct";
+import { addToCart_GA } from "../../util/analytics";
 
 interface IShoppingButons {
     product: IProductInfo,
@@ -18,6 +19,7 @@ export default function ShoppingButtons({ product, setShowCartPopup }: IShopping
     function handleAddToCart(product: IProductInfo) {
         const nextProducts = [...cartProducts, product]
         setCartProducts(nextProducts)
+        addToCart_GA({ id: product.id, title: product.title, price: product.price });
         setShowCartPopup(true);
     }
 

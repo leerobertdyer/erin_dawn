@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import Nav from './Components/Nav/Nav';
 import './App.css';
 import Shop from './Views/Shop/Shop';
@@ -12,7 +12,8 @@ import PurchaseSuccess from './Views/PurchaseSuccess/PurchaseSuccess';
 import { UserProvider } from './Context/UserContext';
 import EmailSignupForm from './Components/Forms/EmailSignupForm';
 import NewEmailForm from './Components/Forms/NewEmailForm';
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
+import { pageView_GA } from './util/analytics';
 
 function App() {
   const handleWheel = () => {
@@ -38,7 +39,13 @@ function App() {
 }
 
 const AppContent = () => {
-const mainAppScrollRef = useRef<HTMLDivElement>(null);
+  const mainAppScrollRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
+
+  useEffect(() => {
+    const path = location.pathname + location.search;
+    pageView_GA(path);
+  }, [location.pathname, location.search]);
 
   return ( // Actual App
     <div ref={mainAppScrollRef} className='font-classy w-screen h-screen overflow-auto'>

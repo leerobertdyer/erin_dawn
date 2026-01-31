@@ -5,6 +5,7 @@ import { editProductDoc } from "../../firebase/editDoc";
 import { useEffect, useState } from "react";
 import { BACKEND_URL } from "../../util/constants";
 import { addNewSale } from "../../firebase/newDoc";
+import { purchase_GA } from "../../util/analytics";
 import { IoIosClose } from "react-icons/io";
 import { useWindowSize } from 'react-use'
 import ReactConfetti from "react-confetti";
@@ -24,6 +25,19 @@ export default function PurchaseSuccess() {
     useEffect(() => {
         // On page load, if there are items in cart, mark them as sold
         async function handleSoldItems() {
+            if (sessionId) {
+                const value = cartProducts.reduce((sum, p) => sum + p.price, 0);
+                purchase_GA({
+                    transactionId: sessionId,
+                    value,
+                    items: cartProducts.map((p) => ({
+                        item_id: p.id,
+                        item_name: p.title,
+                        price: p.price,
+                        quantity: 1,
+                    })),
+                });
+            }
             const allProductsToUpdate = [...cartProducts];
 
             for (const cartItem of allProductsToUpdate) {
@@ -47,7 +61,7 @@ export default function PurchaseSuccess() {
             setCartProducts([]);
         }
         if (cartProducts.length > 0 && allProducts.length > 0) handleSoldItems();
-    }, [cartProducts, allProducts, setAllProducts, setCartProducts]);
+    }, [cartProducts, allProducts, setAllProducts, setCartProducts, sessionId]);
 
     useEffect(() => {
         // Fetch session details using the session ID
