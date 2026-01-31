@@ -42,7 +42,7 @@ export default function About() {
                     <div className="w-full h-full flex flex-col sm:flex-row items-center justify-between gap-2">
                         <div className="overflow-hidden w-[15rem] h-[15rem] rounded-lg flex-shrink-0
                             sm:w-[22rem] sm:h-[22rem]">
-                            <img src="images/erinCat.jpg" alt="Erin Campbell" className="object-contain object-center" />
+                            <img src="images/erinCat.jpg" alt="Erin Campbell with cat" className="object-contain object-center" loading="lazy" />
                         </div>
 
                         {isEditingAbout

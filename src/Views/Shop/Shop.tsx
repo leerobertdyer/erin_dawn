@@ -16,6 +16,7 @@ import NewProductForm from "../../Components/Forms/NewProductForm";
 import AddProductCard from "../../Components/AddProductCard/AddProductCard";
 import EditProductForm from "../../Components/Forms/EditProductForm";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
+import { setPageSeo } from "../../util/seo";
 
 export default function Shop({mainAppScrollRef}: {mainAppScrollRef: React.RefObject<HTMLDivElement>}) {
     const { setFilteredInventory, filteredInventory } = useProductManagementContext();
@@ -55,6 +56,15 @@ export default function Shop({mainAppScrollRef}: {mainAppScrollRef: React.RefObj
         }
     }, [allProducts, selectedCategory, setFilteredInventory])
 
+
+    // Update document title for product detail view (SEO)
+    useEffect(() => {
+        if (productToEdit) {
+            setPageSeo(location.pathname, productToEdit.title);
+        } else {
+            setPageSeo(location.pathname);
+        }
+    }, [location.pathname, productToEdit]);
 
     // effect to handle url params
     useEffect(() => {
@@ -307,7 +317,7 @@ export default function Shop({mainAppScrollRef}: {mainAppScrollRef: React.RefObj
         }
 
         <div className="w-full min-h-screen flex flex-col items-center">
-            
+            {!showDetails && <h1 className="text-white text-2xl md:text-3xl font-bold text-center py-4 drop-shadow-lg w-full">Shop</h1>}
             {showProductForm && <NewProductForm onClose={() => setShowProductForm(false)} />}
             {showEditProductForm && <EditProductForm onClose={() => setShowEditProductForm(false)} product={productToEdit} />}
 

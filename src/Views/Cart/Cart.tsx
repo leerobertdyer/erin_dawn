@@ -15,6 +15,7 @@ export default function Cart() {
         relative"
       style={{ backgroundImage: "url(images/background.jpg)" }}
     >
+      <h1 className="text-white text-2xl md:text-3xl font-bold text-center py-4 drop-shadow-lg">Your cart</h1>
       <div className="flex flex-col items-center justify-center gap-4 w-[13rem]">
         <div className="w-full h-fit bg-white p-2 border-2 border-black rounded-md text-center">
           <p>

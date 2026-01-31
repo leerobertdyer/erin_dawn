@@ -62,9 +62,9 @@ export default function ProductDetails({
         <Carousel product={product} />
       </div>
       <div className="w-fit  lg:w-1/2 flex flex-col justify-between mt-4 h-full  border-edcPurple-80 border-4 items-center rounded-md ">
-        <p className="text-3xl p-2 w-full rounded-t-sm text-black text-center border-b-4 border-black">
+        <h1 className="text-3xl p-2 w-full rounded-t-sm text-black text-center border-b-4 border-black font-semibold">
           "{product.title}"
-        </p>
+        </h1>
         <p className="text-xl p-4 w-full text-center">
           ${product.price}
           <span className="text-xs">.00</span>

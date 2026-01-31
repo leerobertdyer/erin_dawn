@@ -124,7 +124,7 @@ export default function PurchaseSuccess() {
                     {inventoryPhotos.map((product: IProductInfo) => {
                         return (
                             <div className="w-[10rem] h-[10rem] border-white border-2 overflow-hidden relative" key={product.id}>
-                                <img className="w-full h-full object-cover object-center" src={product.photos[0].url} alt={product.title} />
+                                <img className="w-full h-full object-cover object-center" src={product.photos[0].url} alt={product.title} loading="lazy" />
                                 <div className="absolute bottom-0 w-full">
                                 </div>
                             </div>

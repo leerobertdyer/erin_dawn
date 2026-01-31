@@ -14,6 +14,7 @@ import EmailSignupForm from './Components/Forms/EmailSignupForm';
 import NewEmailForm from './Components/Forms/NewEmailForm';
 import { useRef, useEffect } from 'react';
 import { pageView_GA } from './util/analytics';
+import { setPageSeo } from './util/seo';
 
 function App() {
   const handleWheel = () => {
@@ -45,6 +46,7 @@ const AppContent = () => {
   useEffect(() => {
     const path = location.pathname + location.search;
     pageView_GA(path);
+    setPageSeo(location.pathname);
   }, [location.pathname, location.search]);
 
   return ( // Actual App

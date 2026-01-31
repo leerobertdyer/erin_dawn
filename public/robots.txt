@@ -1,0 +1,11 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Admin and form pages — optional: disallow if you don't want them indexed
+Disallow: /admin
+Disallow: /emailsignup
+Disallow: /newemail
+
+# Sitemap (replace with your production URL if different)
+Sitemap: https://www.erindawncampbell.com/sitemap.xml

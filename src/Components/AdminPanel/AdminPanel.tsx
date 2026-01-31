@@ -93,7 +93,7 @@ export default function AdminPanel() {
                 gap-4 mt-4 bg-white rounded-md">
                     <Frame additionalClass="h-[27rem] w-full">
                         <div className="relative flex justify-center items-center w-full h-full py-2 rounded-xl overflow-hidden">
-                            <img src="/images/background.jpg" alt="" className="w-full h-full" />
+                            <img src="/images/background.jpg" alt="Decorative background" className="w-full h-full" />
                            <p className="absolute top-1/2 -translate-y-1/2 text-white text-sm p-2 bg-black bg-opacity-65 w-full text-center">
                             New Series || New Market
                             </p> 

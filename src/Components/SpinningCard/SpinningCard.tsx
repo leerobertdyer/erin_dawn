@@ -30,8 +30,9 @@ export default function SpinningCard({ photo }: { photo: IGeneralPhoto }) {
           <div className="absolute w-full h-full [backface-visibility:hidden]">
             <img
               src={photo.url}
-              alt="Card"
+              alt={photo.title ?? "Product image"}
               className="rounded-md h-full w-full object-cover object-center"
+              loading="lazy"
               onLoad={() => spinCard(photo)}
             />
           </div>
@@ -40,8 +41,9 @@ export default function SpinningCard({ photo }: { photo: IGeneralPhoto }) {
           <div className="w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)] relative">
             <img
               src="/images/card.jpg"
-              alt="Card"
+              alt="Decorative card"
               className="rounded-md h-full w-full object-cover object-center"
+              loading="lazy"
             />
 
           </div>

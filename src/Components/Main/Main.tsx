@@ -71,7 +71,7 @@ export default function Main() {
             {series.map((s, key) => (
                 <Frame key={key} additionalClass="w-[14rem] m:w-[16rem] h-[16rem] md:h-[18rem] overflow-hidden pb-6" hover={true}>
                     <div className="h-[10rem] w-[10rem]" onClick={() => handleSeriesClick(s.name)}>
-                        <img src={s.photos[0].url} alt={s.name} className="rounded-md h-full w-full object-cover object-center" />
+                        <img src={s.photos[0].url} alt={s.name} className="rounded-md h-full w-full object-cover object-center" loading="lazy" />
                     </div>
                     <p className="text-center text-xs md:text-sm lg:text-base" >{s.name}</p>
                     {user && <AdminButtons handleEdit={() => handleEditSeries(s)} />}
@@ -84,7 +84,7 @@ export default function Main() {
             {allCategories.map((c, key) => (
                 <Frame key={key} additionalClass="w-[87vw] md:w-[40vw] lg:w-[35vw] h-fit max-h-[65rem] max-w-[55rem]" hover={true}>
                     <div className="h-[70vh] w-full" onClick={() => handleCategoryClick(c.name)}>
-                        <img src={c.url} alt={c.name} className="rounded-md h-full w-full object-cover object-center" />
+                        <img src={c.url} alt={c.name} className="rounded-md h-full w-full object-cover object-center" loading="lazy" />
                     </div>
                     <button className="text-center text-2xl tracking-[.2rem] font-retro">{c.name}</button>
                     {user && <AdminButtons handleEdit={() => handleEditCategories(c)} />}

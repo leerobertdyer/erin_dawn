@@ -15,7 +15,7 @@ export default function CartItem({ item }: ICartItem) {
         style={{ backgroundImage: `url(${item.photos[0].url})` }}>
             <p className="bg-white border-2 border-black px-2 rounded-md font-retro rotate-6 text-2xl ">${Number(item.price).toFixed(2)}</p>
             <div className="flex flex-col items-center justify-center gap-4">
-                <h1 className="bg-white border-2 border-black p-2 rounded-md text-wrap w-full text-center">"{item.title}"</h1>
+                <p className="bg-white border-2 border-black p-2 rounded-md text-wrap w-full text-center font-semibold text-lg">"{item.title}"</p>
                 <button className="bg-rose-600 text-white p-1 rounded-md"
                 onClick={() => setCartProducts(cartProducts.filter(product => product.id !== item.id))}>Remove</button>
             </div>
