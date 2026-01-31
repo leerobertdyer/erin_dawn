@@ -120,7 +120,7 @@ export default function PurchaseSuccess() {
                         border-2 border-white"><IoIosClose size={80} /></Link>
                 </div>
                 {inventoryPhotos.length > 0 && <div className="flex flex-row justify-center items-center w-screen p-2 bg-edcBlue-40 bg-opacity-45 overflow-auto flex-wrap">
-                    <p className="w-full p-2 text-center">Here are a few other items in stock:</p>
+                    <p className="w-full p-2 text-center">More handmade and vintage pieces you might like:</p>
                     {inventoryPhotos.map((product: IProductInfo) => {
                         return (
                             <div className="w-[10rem] h-[10rem] border-white border-2 overflow-hidden relative" key={product.id}>

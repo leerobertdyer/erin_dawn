@@ -9,19 +9,25 @@ export default function Cart() {
     <div
       className="
         w-screen h-fit min-h-screen
-        p-[2rem]
         flex flex-col items-center justify-start
         gap-4 bg-cover bg-center bg-no-repeat bg-fixed
         relative"
       style={{ backgroundImage: "url(images/background.jpg)" }}
     >
-      <h1 className="text-white text-2xl md:text-3xl font-bold text-center py-4 drop-shadow-lg">Your cart</h1>
+      <div className="w-full text-center py-4 bg-edcPurple-80 bg-opacity-35">
+        <h1 className="text-white text-2xl md:text-3xl font-bold text-center py-2 drop-shadow-lg">
+          Your cart
+        </h1>
+        <p className="text-white/90 text-sm text-center drop-shadow ">
+          Handmade & vintage clothing by Erin Dawn Campbell — Charlotte, NC
+        </p>
+      </div>
       <div className="flex flex-col items-center justify-center gap-4 w-[13rem]">
         <div className="w-full h-fit bg-white p-2 border-2 border-black rounded-md text-center">
           <p>
             Total: $
             {Number(
-              cartProducts.reduce((acc, product) => acc + product.price, 0)
+              cartProducts.reduce((acc, product) => acc + product.price, 0),
             ).toFixed(2)}
           </p>
         </div>

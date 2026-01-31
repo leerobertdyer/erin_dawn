@@ -10,8 +10,8 @@ export default function Hero({ children }: { children: React.ReactNode }) {
         <div className="w-full min-h-[4rem] py-2 flex items-center justify-center bg-edcPurple-60 text-white">
             <Link to="/shop" 
             className="flex items-center justify-center w-full flex-wrap gap-2 text-lg md:text-2xl ">
-                <div className="flex items-center justify-center gap-4">
-                    Browse My Handmade Clothing
+                <div className="flex items-center justify-center gap-4 text-[1rem]">
+                    Handmade From Vintage Fabrics
                     <button className="flex justify-center items-center p-2 rounded-md 
                         text-center text-lg text-edcPurple-80 
                         w-[6rem] md:w-[10rem] h-[2rem] 

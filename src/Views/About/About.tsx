@@ -38,6 +38,9 @@ export default function About() {
                 <div className="w-[85%] bg-[#272727] bg-opacity-90 rounded-md p-8 flex flex-col justify-evenly items-center gap-2">
 
                     <h1 className="text-[1.5rem] md:text-[4rem] font-bold">Erin Dawn Campbell</h1>
+                    <p className="text-pink-200 text-sm md:text-base text-center max-w-xl">
+                        Local clothing designer in Charlotte, NC — handmade & vintage clothing, one-of-a-kind dresses, custom made pieces. Sustainable fashion and handmade to order in Charlotte, North Carolina.
+                    </p>
 
                     <div className="w-full h-full flex flex-col sm:flex-row items-center justify-between gap-2">
                         <div className="overflow-hidden w-[15rem] h-[15rem] rounded-lg flex-shrink-0

@@ -49,7 +49,7 @@ export default function EmailSignupForm() {
          </div>
 
          <div className="bg-white rounded-md p-2 m-2 w-[90%] text-center">
-            <h2 className="text-xs sm:text-lg md:text-2xl">Be the first to know about new series, sales, and more!</h2>
+            <h2 className="text-xs sm:text-lg md:text-2xl">Be the first to know about new handmade, vintage inspired pieces, sales, and more!</h2>
          </div>
 
          <form onSubmit={handleSubmit} 

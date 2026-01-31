@@ -6,39 +6,39 @@ const siteName = "Erin Dawn Campbell";
 
 export const routeSeo: Record<string, { title: string; description: string }> = {
   "/": {
-    title: `Handmade & Vintage Clothing | ${siteName}`,
+    title: `Handmade & Vintage Clothing | Charlotte NC | ${siteName}`,
     description:
-      "Handmade and vintage clothing by Erin Dawn Campbell, Charlotte NC. Custom clothing, one-of-a-kind dresses, sustainable fashion.",
+      "Handmade and vintage clothing in Charlotte, NC. Custom clothing, one-of-a-kind dresses, sustainable fashion. Independent clothing designer — handmade to order and vintage inspired pieces.",
   },
   "/shop": {
-    title: `Shop | Handmade Dresses & Custom Clothing | ${siteName}`,
+    title: `Shop | Handmade Dresses & Custom Clothing Charlotte | ${siteName}`,
     description:
-      "Shop handmade and vintage clothing. One-of-a-kind dresses, custom clothing Charlotte NC, embellished vintage and handmade designs.",
+      "Shop handmade and vintage clothing in North Carolina. One-of-a-kind dresses, custom made clothing Charlotte NC, embellished vintage and unique handmade designs.",
   },
   "/about": {
-    title: `About | ${siteName}`,
+    title: `About | Independent Clothing Designer Charlotte | ${siteName}`,
     description:
-      "About Erin Dawn Campbell — independent clothing designer in Charlotte, NC. Handmade and vintage clothing, custom pieces.",
+      "About Erin Dawn Campbell — local clothing designer in Charlotte, NC. Handmade and vintage clothing, custom pieces, one-of-a-kind dresses. Sustainable fashion and bespoke clothing.",
   },
   "/cart": {
     title: `Your Cart | ${siteName}`,
-    description: "Your shopping cart. Handmade and vintage clothing by Erin Dawn Campbell.",
+    description: "Your cart — handmade and vintage clothing by Erin Dawn Campbell, Charlotte NC.",
   },
   "/cart/success": {
     title: `Thank You | ${siteName}`,
-    description: "Thank you for your order. Handmade and vintage clothing by Erin Dawn Campbell.",
+    description: "Thank you for your order. Your handmade piece from Erin Dawn Campbell, Charlotte NC, is on its way.",
   },
   "/cart/cancel": {
     title: `Your Cart | ${siteName}`,
-    description: "Your shopping cart. Handmade and vintage clothing by Erin Dawn Campbell.",
+    description: "Your cart — handmade and vintage clothing by Erin Dawn Campbell, Charlotte NC.",
   },
   "/emailsignup": {
     title: `Join the Mailing List | ${siteName}`,
-    description: "Join the mailing list for updates on new handmade and vintage clothing.",
+    description: "Join the mailing list for new handmade dresses, vintage inspired pieces, and custom clothing updates from Charlotte, NC.",
   },
   "/newemail": {
     title: `New Email | ${siteName}`,
-    description: "Erin Dawn Campbell.",
+    description: "Erin Dawn Campbell — handmade & vintage clothing, Charlotte NC.",
   },
   "/admin": {
     title: `Admin | ${siteName}`,
@@ -47,9 +47,9 @@ export const routeSeo: Record<string, { title: string; description: string }> = 
 };
 
 const defaultSeo = {
-  title: `Handmade & Vintage Clothing | ${siteName}`,
+  title: `Handmade & Vintage Clothing | Charlotte NC | ${siteName}`,
   description:
-    "Handmade and vintage clothing by Erin Dawn Campbell, Charlotte NC. Custom clothing, one-of-a-kind dresses.",
+    "Handmade and vintage clothing by Erin Dawn Campbell, Charlotte NC. Custom clothing, one-of-a-kind dresses, sustainable fashion.",
 };
 
 /**
@@ -67,8 +67,8 @@ export function getSeoForPath(pathname: string): { title: string; description: s
 export function setPageSeo(pathname: string, productTitle?: string): void {
   const { title, description } = productTitle
     ? {
-        title: `${productTitle} | Shop | ${siteName}`,
-        description: `${productTitle} — handmade and vintage clothing by Erin Dawn Campbell.`,
+        title: `${productTitle} | Shop Handmade & Vintage | ${siteName}`,
+        description: `${productTitle} — handmade and vintage clothing, Charlotte NC. One-of-a-kind piece by Erin Dawn Campbell.`,
       }
     : getSeoForPath(pathname);
 

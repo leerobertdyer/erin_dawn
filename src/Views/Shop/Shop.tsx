@@ -317,7 +317,12 @@ export default function Shop({mainAppScrollRef}: {mainAppScrollRef: React.RefObj
         }
 
         <div className="w-full min-h-screen flex flex-col items-center">
-            {!showDetails && <h1 className="text-white text-2xl md:text-3xl font-bold text-center py-4 drop-shadow-lg w-full">Shop</h1>}
+            {!showDetails && (
+                <div className="w-full text-center py-4 bg-edcPurple-80 bg-opacity-35">
+                    <h1 className="text-white text-2xl md:text-3xl font-bold drop-shadow-lg">Shop</h1>
+                    <p className="text-white/90 text-sm md:text-base drop-shadow ">Handmade & vintage clothing — one-of-a-kind dresses, custom made clothing Charlotte NC</p>
+                </div>
+            )}
             {showProductForm && <NewProductForm onClose={() => setShowProductForm(false)} />}
             {showEditProductForm && <EditProductForm onClose={() => setShowEditProductForm(false)} product={productToEdit} />}
 

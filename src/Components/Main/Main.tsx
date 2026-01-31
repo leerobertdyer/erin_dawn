@@ -67,6 +67,7 @@ export default function Main() {
     return (
         <div className="w-full h-fit bg-white bg-opacity-80 py-8 px-4 flex-wrap border-y-4 border-yellow-400 border-double border-opacity-40 flex flex-col sm:flex-row justify-center items-center gap-[2rem]">
             <h1 className="w-full text-center text-white bg-[#242424] rounded-md bg-opacity-30 text-[2rem] sm:text-[3.5rem] p-0 m-0">Shop by Series</h1>
+            <p className="text-[#242424] text-center text-sm md:text-base -mt-2">Unique handmade clothing from vintage fabrics — Charlotte, North Carolina</p>
             <div className="w-full h-fit flex flex-wrap justify-center items-center gap-[1rem]">
             {series.map((s, key) => (
                 <Frame key={key} additionalClass="w-[14rem] m:w-[16rem] h-[16rem] md:h-[18rem] overflow-hidden pb-6" hover={true}>
