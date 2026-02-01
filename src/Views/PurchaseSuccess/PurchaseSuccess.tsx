@@ -66,7 +66,7 @@ export default function PurchaseSuccess() {
     useEffect(() => {
         // Fetch session details using the session ID
         async function getSessionDetails() {
-            const resp = await fetch(`${BACKEND_URL}/edc-api/checkout-session/${sessionId}`);
+            const resp = await fetch(`${BACKEND_URL}/edc/checkout-session/${sessionId}`);
             if (resp) console.log('resp.status:', resp.status);
             const data = await resp.json();
             if (data) {
@@ -94,7 +94,7 @@ export default function PurchaseSuccess() {
     }, [])
 
     async function sendSalesEmailNotifications({ customerName, customerEmail, shippingAddressString, itemsSold}: { customerName: string, customerEmail: string, shippingAddressString: string, itemsSold: string[], soldPhotoLinks: string[] }) {
-        const resp = await fetch(`${BACKEND_URL}/edc-api/send-sale-notification-email`, {
+        const resp = await fetch(`${BACKEND_URL}/edc/send-sale-notification-email`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

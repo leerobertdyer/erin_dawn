@@ -16,7 +16,7 @@ export default function EmailSignupForm() {
     e.preventDefault();
     if (!email) return;
     
-    const resp = await fetch(`${BACKEND_URL}/edc-api/email-signup`, {
+    const resp = await fetch(`${BACKEND_URL}/edc/email-signup`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

@@ -10,4 +10,4 @@ Disallow: /newemail
 # Sitemaps (static pages + product pages from backend)
 Sitemap: https://www.erindawncampbell.com/sitemap.xml
 # Product pages — if your API is on a different host, use that host instead of www.erindawncampbell.com
-Sitemap: https://www.erindawncampbell.com/edc-api/sitemap-products.xml
+Sitemap: https://www.erindawncampbell.com/edc/sitemap-products.xml

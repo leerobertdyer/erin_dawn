@@ -66,7 +66,7 @@ export default function NewEmailForm() {
     }
 
     async function handleSubmit() {
-        const resp = await fetch(`${BACKEND_URL}/edc-api/send-new-series-email`, {
+        const resp = await fetch(`${BACKEND_URL}/edc/send-new-series-email`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

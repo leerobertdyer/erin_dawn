@@ -100,7 +100,7 @@ export default function EditProductForm({
       description: description,
       newPrice: price,
     };
-    const editProductEndpoint = `${BACKEND_URL}/edc-api/edit-product`;
+    const editProductEndpoint = `${BACKEND_URL}/edc/edit-product`;
     console.log("sending fetch to : ", editProductEndpoint);
     const resp = await fetch(editProductEndpoint, {
       method: "PUT",

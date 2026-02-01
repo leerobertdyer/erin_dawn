@@ -6,7 +6,7 @@ async function createStripeProduct(title: string, description: string, price: nu
         description: description,
         price: price,
     }
-    const createProductEndpoint = `${BACKEND_URL}/edc-api/create-product`
+    const createProductEndpoint = `${BACKEND_URL}/edc/create-product`
     console.log("sending fetch to : ", createProductEndpoint)
     const resp = await fetch(createProductEndpoint, {
         method: 'POST',
@@ -32,7 +32,7 @@ async function editStripeProduct(stripeProductId: string, name: string, descript
         description,
         newPrice,
     }
-    const editProductEndpoint = `${BACKEND_URL}/edc-api/edit-product`
+    const editProductEndpoint = `${BACKEND_URL}/edc/edit-product`
     console.log("sending fetch to : ", editProductEndpoint)
     const resp = await fetch(editProductEndpoint, {
         method: 'PUT',
