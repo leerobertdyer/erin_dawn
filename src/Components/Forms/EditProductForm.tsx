@@ -374,7 +374,7 @@ export default function EditProductForm({
               ))}
             </select>
 
-            {series === newSeriesSelector && (
+            {(isNewSeries || series === "--NEW SERIES--") && (
               <CustomInput
                 type="text"
                 label="Series"
@@ -382,7 +382,6 @@ export default function EditProductForm({
                 value={newSeriesName}
                 onChange={(e) => {
                   setNewSeriesName(e.target.value);
-                  setSeries(e.target.value); // This ensures `series` holds the real name on submit
                 }}
               />
             )}
