@@ -75,29 +75,33 @@ export default function Main() {
         {allCategories.map((c, key) => (
           <div
             key={key}
-            className="w-[42vw] md:w-[40vw] lg:w-[35vw] max-h-[65rem] max-w-[55rem] cursor-pointer
+            className="w-[42vw] md:w-[40vw] lg:w-[35vw] max-h-[20rem] md:max-h-[60rem] max-w-[55rem] cursor-pointer
             flex flex-col items-center"
           >
             <div
               className="h-[70vh] w-full border-2 border-[#242424] rounded-lg relative"
               onClick={() => handleCategoryClick(c.name)}
             >
-              <button className="text-center text-lg md:text-2xl tracking-[.2rem] font-retro w-full absolute top-0 left-0 text-edcPurple-80 bg-[#FFFFFF70]">
+              <div className="text-center text-lg md:text-2xl tracking-[.2rem] font-retro w-full absolute top-0 left-0 text-edcPurple-80 bg-[#FFFFFF70]">
                 {c.name.toLowerCase().includes("vintage")
                   ? "EMBELLISHED"
                   : c.name.toLowerCase().includes("handmade")
                     ? "HAND MADE"
                     : ""}
-              </button>
+              </div>
               <img
                 src={c.url}
                 alt={c.name}
                 className="rounded-md h-full w-full object-cover object-center"
                 loading="lazy"
               />
-              <button className="text-center text-lg md:text-2xl tracking-[.2rem] font-retro w-full absolute bottom-0 left-0 text-edcPurple-80 bg-[#FFFFFF70]">
-                {c.name.toLowerCase().includes("vintage") ? "VINTAGE" : c.name.toLowerCase().includes("handmade") ?  "DESIGNS" : c.name}
-              </button>
+              <div className="text-center text-lg md:text-2xl tracking-[.2rem] font-retro w-full absolute bottom-0 left-0 text-edcPurple-80 bg-[#FFFFFF70]">
+                {c.name.toLowerCase().includes("vintage")
+                  ? "VINTAGE"
+                  : c.name.toLowerCase().includes("handmade")
+                    ? "DESIGNS"
+                    : c.name}
+              </div>
             </div>
             {user && (
               <AdminButtons handleEdit={() => handleEditCategories(c)} />
