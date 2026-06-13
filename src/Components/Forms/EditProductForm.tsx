@@ -81,7 +81,7 @@ export default function EditProductForm({
       setNewSeriesName("");
     }
 
-    if (categoryName === newCategorySelector.name) setIsNewCategory(true);
+    if (categoryName === newCategorySelector.name) setIsNewCategory(true); else setIsNewCategory(false);
     //eslint-disable-next-line
   }, [categoryName, allCategories]);
 
@@ -131,7 +131,7 @@ export default function EditProductForm({
     e.preventDefault();
     setIsSubmitting(true);
 
-    const resolvedSeries = isNewSeries ? newSeriesName : series; // <-- add this
+    const resolvedSeries =  newSeriesName ? newSeriesName : series;
 
     if (!productToEdit) {
       setIsSubmitting(false);
