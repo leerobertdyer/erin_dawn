@@ -91,15 +91,19 @@ export default function EditProductForm({
     setAllCategories([...allCategories, c]);
   }
 
-  async function handleEditCategory(c: ICategory) {
-    if (!isNewSeries) return;
-    const currentCategory = allCategories.find((cat) => cat.name === c.name);
+  async function handleEditCategory(categoryName: string, newSeries: string) {
+    const currentCategory = allCategories.find((cat) => cat.name === categoryName);
     if (!currentCategory) return;
     const updatedCategory = {
       ...currentCategory,
-      series: [...currentCategory.series, series],
+      series: [...currentCategory.series, newSeries],
     };
     await editCategoryDoc(updatedCategory);
+    setAllCategories(
+      allCategories.map((c) =>
+        c.name === categoryName ? updatedCategory : c
+      )
+    );
   }
   async function editStripeProduct() {
     const stripeProduct = {
@@ -131,17 +135,22 @@ export default function EditProductForm({
     e.preventDefault();
     setIsSubmitting(true);
 
-    const resolvedSeries =  newSeriesName ? newSeriesName : series;
+    const seriesToUse = isNewSeries ? newSeriesName.trim() : series;
 
     if (!productToEdit) {
       setIsSubmitting(false);
       return;
     }
 
+    if (isNewSeries && !seriesToUse) {
+      setIsSubmitting(false);
+      return;
+    }
+
     if (isNewSeries) {
       await addNewSeries({
-        id: safeName(newSeriesName),
-        name: newSeriesName,
+        id: safeName(seriesToUse),
+        name: seriesToUse,
         photos: productToEdit.photos,
       });
     }
@@ -149,16 +158,12 @@ export default function EditProductForm({
     if (isNewCategory)
       await handleAddCategory({
         name: categoryName,
-        series: [resolvedSeries],
+        series: [seriesToUse],
         url: productToEdit.photos[0].url,
       });
 
     if (isNewSeries && !isNewCategory)
-      await handleEditCategory({
-        name: categoryName,
-        series: [resolvedSeries],
-        url: productToEdit.photos[0].url,
-      });
+      await handleEditCategory(categoryName, seriesToUse);
 
     const { stripeProductId, stripePriceId } = await editStripeProduct();
 
@@ -174,7 +179,7 @@ export default function EditProductForm({
       stripePriceId,
       sold,
       category: categoryName,
-      series,
+      series: seriesToUse,
       hidden,
     };
 
@@ -185,25 +190,6 @@ export default function EditProductForm({
     });
 
     setAllProducts(nextProducts);
-    // Update local category list dynamically so UI updates seamlessly
-    if (isNewCategory) {
-      setAllCategories([
-        ...allCategories,
-        {
-          name: categoryName,
-          series: [series],
-          url: productToEdit.photos[0].url,
-        },
-      ]);
-    } else if (isNewSeries) {
-      setAllCategories(
-        allCategories.map((cat) =>
-          cat.name === categoryName
-            ? { ...cat, series: [...cat.series, series] }
-            : cat,
-        ),
-      );
-    }
     onClose();
   }
 
@@ -362,11 +348,11 @@ export default function EditProductForm({
                 setSeries(val);
                 if (val === newSeriesSelector) {
                   setIsNewSeries(true);
+                  setNewSeriesName("");
                 } else {
                   setIsNewSeries(false);
                   setNewSeriesName("");
                 }
-                console.log("After select", {series, isNewSeries, newSeriesName, isNewCategory, categoryName})
               }}
               value={series}
             >
@@ -383,11 +369,11 @@ export default function EditProductForm({
                 label="Series"
                 placeholder="Series"
                 value={newSeriesName}
-                onChange={(e) => {
-                  setNewSeriesName(e.target.value);
-                console.log("After input", {series, isNewSeries, newSeriesName, isNewCategory, categoryName, value: e.target.value})
-
-                }}
+                onChange={(e) =>
+                  setNewSeriesName(
+                    e.target.value.replace(/['"`""'']/g, "")
+                  )
+                }
               />
             )}
 
