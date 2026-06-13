@@ -366,6 +366,7 @@ export default function EditProductForm({
                   setIsNewSeries(false);
                   setNewSeriesName("");
                 }
+                console.log("After select", {series, isNewSeries, newSeriesName, isNewCategory, categoryName})
               }}
               value={series}
             >
@@ -384,6 +385,8 @@ export default function EditProductForm({
                 value={newSeriesName}
                 onChange={(e) => {
                   setNewSeriesName(e.target.value);
+                console.log("After input", {series, isNewSeries, newSeriesName, isNewCategory, categoryName, value: e.target.value})
+
                 }}
               />
             )}
