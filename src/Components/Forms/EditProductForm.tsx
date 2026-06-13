@@ -63,7 +63,7 @@ export default function EditProductForm({
       url: "",
     };
     const currentCategory = allCategories.find(
-      (cat) => cat.name === categoryName
+      (cat) => cat.name === categoryName,
     );
     console.log(currentCategory, allCategories, categoryName);
     setAllCurrentCategories([...allCategories, newCategorySelector]);
@@ -346,7 +346,10 @@ export default function EditProductForm({
                 label="Series"
                 placeholder="Series"
                 value={newSeriesName}
-                onChange={(e) => setNewSeriesName(e.target.value)}
+                onChange={(e) => {
+                  setIsNewSeries(true);
+                  setNewSeriesName(e.target.value);
+                }}
               />
             )}
 
