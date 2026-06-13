@@ -309,7 +309,8 @@ export default function PhotoManager({ product, handleBack, onSave }: IPhotoMana
     )
 
     return (
-        <div className={`top-0 left-0 z-10 w-screen h-screen overflow-auto bg-white flex flex-col items-center relative pt-[4rem]`}
+        <div
+            className="fixed inset-0 z-[1000] overflow-auto bg-white flex flex-col items-center pt-[4rem]"
             style={{
                 backgroundImage: `url('${background}')`,
                 backgroundSize: "cover",
