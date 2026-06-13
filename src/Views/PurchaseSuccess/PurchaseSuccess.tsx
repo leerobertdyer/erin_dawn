@@ -85,7 +85,7 @@ export default function PurchaseSuccess() {
         if (sessionId) {
             getSessionDetails();
         }
-    }, [sessionId]);
+    }, [sessionId, sendSalesEmailNotifications, soldPhotoLinks]);
 
     useEffect(() => {
         setTimeout(() => {
