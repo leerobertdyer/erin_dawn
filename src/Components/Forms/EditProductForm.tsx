@@ -10,6 +10,7 @@ import {
   addNewSeries,
 } from "../../firebase/editDoc";
 import { addNewCategory, safeName } from "../../firebase/newDoc";
+import { getSeries } from "../../firebase/getFiles";
 import { BACKEND_URL } from "../../util/constants";
 import PhotoManager from "../PhotoManager/PhotoManager";
 import { IProductInfo } from "../../Interfaces/IProduct";
@@ -51,10 +52,20 @@ export default function EditProductForm({
   const [allSeries, setAllSeries] = useState([]);
   const [allCurrentCategories, setAllCurrentCategories] = useState([]);
   const [newSeriesName, setNewSeriesName] = useState("");
-  const [isNewSeries, setIsNewSeries] = useState(false);
+  const [isNewSeries, setIsNewSeries] = useState(
+    product.series === "--NEW SERIES--",
+  );
   const [isNewCategory, setIsNewCategory] = useState(false);
+  const [knownSeriesNames, setKnownSeriesNames] = useState<string[]>([]);
 
   const newSeriesSelector = "--NEW SERIES--";
+  const isPlaceholderSeries = (name: string) => name === newSeriesSelector;
+
+  useEffect(() => {
+    getSeries().then((seriesDocs) =>
+      setKnownSeriesNames(seriesDocs.map((s) => s.name)),
+    );
+  }, []);
 
   useEffect(() => {
     const newCategorySelector: ICategory = {
@@ -68,22 +79,36 @@ export default function EditProductForm({
     );
     setAllCurrentCategories([...allCategories, newCategorySelector]);
 
-    const updatedSeriesList = currentCategory?.series
-      ? [...currentCategory.series, newSeriesSelector]
-      : [newSeriesSelector];
+    const mergedSeries = [
+      ...new Set([
+        ...(currentCategory?.series ?? []),
+        ...knownSeriesNames,
+        ...(product.series && !isPlaceholderSeries(product.series)
+          ? [product.series]
+          : []),
+      ]),
+    ].filter((name) => !isPlaceholderSeries(name));
 
-    setAllSeries(updatedSeriesList);
+    setAllSeries([...mergedSeries, newSeriesSelector]);
 
-    // If the currently selected series isn't in the new category options, reset it
-    if (!updatedSeriesList.includes(series)) {
+    if (
+      series &&
+      !isPlaceholderSeries(series) &&
+      !mergedSeries.includes(series)
+    ) {
       setSeries("");
       setIsNewSeries(false);
       setNewSeriesName("");
     }
 
-    if (categoryName === newCategorySelector.name) setIsNewCategory(true); else setIsNewCategory(false);
+    if (isPlaceholderSeries(product.series) || isPlaceholderSeries(series)) {
+      setIsNewSeries(true);
+    }
+
+    if (categoryName === newCategorySelector.name) setIsNewCategory(true);
+    else setIsNewCategory(false);
     //eslint-disable-next-line
-  }, [categoryName, allCategories]);
+  }, [categoryName, allCategories, knownSeriesNames, product.series]);
 
   async function handleAddCategory(c: ICategory) {
     if (!isNewCategory) return;
@@ -93,7 +118,7 @@ export default function EditProductForm({
 
   async function handleEditCategory(categoryName: string, newSeries: string) {
     const currentCategory = allCategories.find((cat) => cat.name === categoryName);
-    if (!currentCategory) return;
+    if (!currentCategory || currentCategory.series.includes(newSeries)) return;
     const updatedCategory = {
       ...currentCategory,
       series: [...currentCategory.series, newSeries],
@@ -104,6 +129,11 @@ export default function EditProductForm({
         c.name === categoryName ? updatedCategory : c
       )
     );
+  }
+
+  async function syncCategorySeries(categoryName: string, seriesName: string) {
+    if (!seriesName || isPlaceholderSeries(seriesName)) return;
+    await handleEditCategory(categoryName, seriesName);
   }
   async function editStripeProduct() {
     const stripeProduct = {
@@ -135,19 +165,21 @@ export default function EditProductForm({
     e.preventDefault();
     setIsSubmitting(true);
 
-    const seriesToUse = isNewSeries ? newSeriesName.trim() : series;
+    const resolvingPlaceholder =
+      isNewSeries || isPlaceholderSeries(series);
+    const seriesToUse = resolvingPlaceholder ? newSeriesName.trim() : series;
 
     if (!productToEdit) {
       setIsSubmitting(false);
       return;
     }
 
-    if (isNewSeries && !seriesToUse) {
+    if (resolvingPlaceholder && !seriesToUse) {
       setIsSubmitting(false);
       return;
     }
 
-    if (isNewSeries) {
+    if (resolvingPlaceholder) {
       await addNewSeries({
         id: safeName(seriesToUse),
         name: seriesToUse,
@@ -162,8 +194,7 @@ export default function EditProductForm({
         url: productToEdit.photos[0].url,
       });
 
-    if (isNewSeries && !isNewCategory)
-      await handleEditCategory(categoryName, seriesToUse);
+    if (!isNewCategory) await syncCategorySeries(categoryName, seriesToUse);
 
     const { stripeProductId, stripePriceId } = await editStripeProduct();
 
@@ -363,7 +394,7 @@ export default function EditProductForm({
               ))}
             </select>
 
-            {(isNewSeries || series === "--NEW SERIES--") && (
+            {(isNewSeries || isPlaceholderSeries(series)) && (
               <CustomInput
                 type="text"
                 label="Series"
