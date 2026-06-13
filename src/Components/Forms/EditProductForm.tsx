@@ -62,19 +62,27 @@ export default function EditProductForm({
       series: [newSeriesSelector],
       url: "",
     };
+
     const currentCategory = allCategories.find(
       (cat) => cat.name === categoryName,
     );
-    console.log(currentCategory, allCategories, categoryName);
     setAllCurrentCategories([...allCategories, newCategorySelector]);
-    const allSeries = currentCategory?.series
+
+    const updatedSeriesList = currentCategory?.series
       ? [...currentCategory.series, newSeriesSelector]
       : [newSeriesSelector];
-    setAllSeries(allSeries ?? [newSeriesSelector]);
-    // Reset series state when category changes
-    setIsNewSeries(false);
-    setNewSeriesName("");
+
+    setAllSeries(updatedSeriesList);
+
+    // If the currently selected series isn't in the new category options, reset it
+    if (!updatedSeriesList.includes(series)) {
+      setSeries("");
+      setIsNewSeries(false);
+      setNewSeriesName("");
+    }
+
     if (categoryName === newCategorySelector.name) setIsNewCategory(true);
+    //eslint-disable-next-line
   }, [categoryName, allCategories]);
 
   async function handleAddCategory(c: ICategory) {
@@ -130,8 +138,8 @@ export default function EditProductForm({
 
     if (isNewSeries) {
       await addNewSeries({
-        id: safeName(series),
-        name: series,
+        id: safeName(newSeriesName),
+        name: newSeriesName,
         photos: productToEdit.photos,
       });
     }
@@ -175,8 +183,25 @@ export default function EditProductForm({
     });
 
     setAllProducts(nextProducts);
-    // if isNewCategory, add new category to allCategories
-    // if isNewSeries !isNewCategory editCategoryDoc
+    // Update local category list dynamically so UI updates seamlessly
+    if (isNewCategory) {
+      setAllCategories([
+        ...allCategories,
+        {
+          name: categoryName,
+          series: [series],
+          url: productToEdit.photos[0].url,
+        },
+      ]);
+    } else if (isNewSeries) {
+      setAllCategories(
+        allCategories.map((cat) =>
+          cat.name === categoryName
+            ? { ...cat, series: [...cat.series, series] }
+            : cat,
+        ),
+      );
+    }
     onClose();
   }
 
@@ -330,7 +355,16 @@ export default function EditProductForm({
             {/* Series */}
             <select
               className="border-2 border-black rounded-md p-2 w-full"
-              onChange={(e) => setSeries(e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value;
+                setSeries(val);
+                if (val === newSeriesSelector) {
+                  setIsNewSeries(true);
+                } else {
+                  setIsNewSeries(false);
+                  setNewSeriesName("");
+                }
+              }}
               value={series}
             >
               {allSeries.map((series) => (
@@ -347,8 +381,8 @@ export default function EditProductForm({
                 placeholder="Series"
                 value={newSeriesName}
                 onChange={(e) => {
-                  setIsNewSeries(true);
                   setNewSeriesName(e.target.value);
+                  setSeries(e.target.value); // This ensures `series` holds the real name on submit
                 }}
               />
             )}
