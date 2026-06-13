@@ -364,7 +364,7 @@ export default function EditProductForm({
               onChange={(e) => setCategoryName(e.target.value)}
               value={categoryName}
             >
-              {allCurrentCategories.map((category) => (
+              {allCurrentCategories.sort((a, b) => a.name.localeCompare(b.name)).map((category) => (
                 <option key={category.name} value={category.name}>
                   {category.name}
                 </option>
@@ -387,7 +387,7 @@ export default function EditProductForm({
               }}
               value={series}
             >
-              {allSeries.map((series) => (
+              {allSeries.sort((a, b) => a.name.localeCompare(b.name)).map((series) => (
                 <option key={series} value={series}>
                   {series}
                 </option>
