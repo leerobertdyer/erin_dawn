@@ -39,6 +39,7 @@ export default function Shop({mainAppScrollRef}: {mainAppScrollRef: React.RefObj
     const [selectedCategory, setSelectedCategory] = useState('Select a category')
     const [groupedInventory, setGroupedInventory] = useState<IProductInfo[][]>([])
     const [showCartPopup, setShowCartPopup] = useState(false)
+    const [collapsedSeries, setCollapsedSeries] = useState<Record<string, boolean>>({})
 
     // effect to handle categories
     useEffect(() => {
@@ -148,6 +149,19 @@ export default function Shop({mainAppScrollRef}: {mainAppScrollRef: React.RefObj
 
         setGroupedInventory(sortedSeries);
     }, [inventory]);
+
+    useEffect(() => {
+        setCollapsedSeries((prev) => {
+            const next: Record<string, boolean> = {};
+            groupedInventory.forEach((series) => {
+                const seriesName = series[0]?.series;
+                if (seriesName) {
+                    next[seriesName] = prev[seriesName] ?? false;
+                }
+            });
+            return next;
+        });
+    }, [groupedInventory]);
 
 
     function sortInventory(method: string) {
@@ -266,6 +280,13 @@ export default function Shop({mainAppScrollRef}: {mainAppScrollRef: React.RefObj
         setProductAddedName(product.title)
     }
 
+    function toggleSeries(seriesName: string) {
+        setCollapsedSeries((prev) => ({
+            ...prev,
+            [seriesName]: !prev[seriesName],
+        }));
+    }
+
     if (showDetails) {
         return <ProductDetails
             handleAddToCart={handleShowCartPopup}
@@ -346,9 +367,25 @@ export default function Shop({mainAppScrollRef}: {mainAppScrollRef: React.RefObj
                     <AddProductCard addProduct={() => setShowProductForm(true)} />
                 </div>}
 
-                {groupedInventory.map((series) => (
-                    <div key={series[0].series} className="w-screen text-white flex flex-wrap justify-center items-center">
-                        <p className="text-white bg-edcPurple-80 text-2xl w-full text-center">{series[0].series}</p>
+                {groupedInventory.map((series) => {
+                    const seriesName = series[0].series;
+                    const isCollapsed = collapsedSeries[seriesName] ?? false;
+
+                    return (
+                    <div key={seriesName} className="w-screen text-white flex flex-wrap justify-center items-center">
+                        <button
+                            type="button"
+                            onClick={() => toggleSeries(seriesName)}
+                            className="text-white bg-edcPurple-80 text-2xl w-full text-center flex justify-center items-center gap-2 py-1"
+                        >
+                            {seriesName}
+                            {isCollapsed ? (
+                                <IoIosArrowDown className="w-6 h-6" />
+                            ) : (
+                                <IoIosArrowUp className="w-6 h-6" />
+                            )}
+                        </button>
+                        {!isCollapsed && (
                         <div className="w-full flex flex-wrap justify-center items-center bg-white bg-opacity-70 p-2 pb-[8rem]">
                         {series.map((product) => (
                             <Frame key={product.id} additionalClass="w-[10rem] md:w-[15rem] h-fit relative m-2">
@@ -373,8 +410,9 @@ export default function Shop({mainAppScrollRef}: {mainAppScrollRef: React.RefObj
                             </Frame>
                         ))}
                         </div>
+                        )}
                     </div>
-                ))}
+                )})}
             </div>
         </div>
     </div>
