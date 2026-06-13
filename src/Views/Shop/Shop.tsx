@@ -10,7 +10,7 @@ import { useProductManagementContext } from "../../Context/ProductMgmtContext";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useUserContext } from "../../Context/UserContext";
 import { editProductDoc } from "../../firebase/editDoc";
-import { sortProducts, getDateInMillis } from "../../util/productSorter";
+import { sortProducts, getDateInMillis, isProductVisibleInShop } from "../../util/productSorter";
 import { IGeneralPhoto } from "../../Interfaces/IPhotos";
 import NewProductForm from "../../Components/Forms/NewProductForm";
 import AddProductCard from "../../Components/AddProductCard/AddProductCard";
@@ -21,6 +21,7 @@ import { setPageSeo } from "../../util/seo";
 export default function Shop({mainAppScrollRef}: {mainAppScrollRef: React.RefObject<HTMLDivElement>}) {
     const { setFilteredInventory, filteredInventory } = useProductManagementContext();
     const { user } = useUserContext();
+    const isAdmin = !!user;
     const location = useLocation();
     const navigate = useNavigate();
     const { allProducts, setAllProducts } = useProductManagementContext();
@@ -43,18 +44,26 @@ export default function Shop({mainAppScrollRef}: {mainAppScrollRef: React.RefObj
     useEffect(() => {
         if (selectedCategory === "handmade") {
             console.log("Handmade Designs selected")
-            const filteredProducts = allProducts.filter(p => p.category === "Handmade Designs" && !p.sold && !p.hidden);
+            const filteredProducts = allProducts.filter(
+                (p) =>
+                    p.category === "Handmade Designs" &&
+                    isProductVisibleInShop(p, isAdmin),
+            );
             if (filteredProducts.length > 0) {
                 setFilteredInventory(filteredProducts);
             }
         } else if (selectedCategory === "upcycled") {
             console.log("Embellished Vintage selected")
-            const filteredProducts = allProducts.filter(p => p.category === "Embellished Vintage" && !p.sold && !p.hidden);
+            const filteredProducts = allProducts.filter(
+                (p) =>
+                    p.category === "Embellished Vintage" &&
+                    isProductVisibleInShop(p, isAdmin),
+            );
             if (filteredProducts.length > 0) {
                 setFilteredInventory(filteredProducts);
             }
         }
-    }, [allProducts, selectedCategory, setFilteredInventory])
+    }, [allProducts, selectedCategory, setFilteredInventory, isAdmin])
 
 
     // Update document title for product detail view (SEO)
@@ -75,31 +84,36 @@ export default function Shop({mainAppScrollRef}: {mainAppScrollRef: React.RefObj
     
         if (productId) {
             const product = allProducts.find(p => p.id === productId);
-            if (product) {
+            if (product && isProductVisibleInShop(product, isAdmin)) {
                 handleShowProductDetails(product);
             } else {
                 setShowDetails(false);
+                setProductToEdit(null);
             }
         } else if (series) {
             setIsFiltered(true);
-            const filtered = allProducts.filter(p => p.series === series && !p.hidden && !p.sold);
+            const filtered = allProducts.filter(
+                (p) => p.series === series && isProductVisibleInShop(p, isAdmin),
+            );
             setFilteredInventory(filtered);
             setShowDetails(false);
         } else if (category) {
             setIsFiltered(true);
-            const filtered = allProducts.filter(p => p.category === category && !p.sold);
+            const filtered = allProducts.filter(
+                (p) => p.category === category && isProductVisibleInShop(p, isAdmin),
+            );
             setFilteredInventory(filtered);
             setShowDetails(false);
         } else {
             setIsFiltered(false);
             setShowDetails(false);
-            const filtered = allProducts.filter(p =>
-                (!p.hidden || (user && p.hidden)) && !p.sold
+            const filtered = allProducts.filter((p) =>
+                isProductVisibleInShop(p, isAdmin),
             );
             setFilteredInventory(sortProducts(filtered, 'newest'));
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [location.search, allProducts, user]);
+    }, [location.search, allProducts, isAdmin]);
     
 
     // effect to handle sorting
@@ -190,8 +204,8 @@ export default function Shop({mainAppScrollRef}: {mainAppScrollRef: React.RefObj
     function handleClearFilter() {
         setIsFiltered(false)
         setShowSortModal(false)
-        const allVisibleProducts = allProducts.filter(p =>
-            (!p.hidden || (user && p.hidden)) && !p.sold
+        const allVisibleProducts = allProducts.filter((p) =>
+            isProductVisibleInShop(p, isAdmin),
         );
         setFilteredInventory(allVisibleProducts);
         setSortBy('newest')

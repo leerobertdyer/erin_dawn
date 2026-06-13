@@ -9,6 +9,7 @@ import EditCategoryForm from "../Forms/EditCategoryForm";
 import { getSeries } from "../../firebase/getFiles";
 import EditSeriesForm from "../Forms/EditSeriesForm";
 import { ISeries } from "../../Interfaces/ISeries";
+import { isProductVisibleInShop } from "../../util/productSorter";
 
 export default function Main() {
   const { user } = useUserContext();
@@ -51,7 +52,9 @@ export default function Main() {
   }
 
   function handleCategoryClick(category: string) {
-    const filteredProducts = allProducts.filter((p) => p.category === category);
+    const filteredProducts = allProducts.filter(
+      (p) => p.category === category && isProductVisibleInShop(p, !!user),
+    );
     setFilteredInventory(filteredProducts);
     const urlWithParams = "/shop?category=" + encodeURIComponent(category);
     navigate(urlWithParams);
@@ -59,7 +62,7 @@ export default function Main() {
 
   function handleSeriesClick(series: string) {
     const filteredProducts = allProducts.filter(
-      (p) => p.series === series && !p.hidden && !p.sold,
+      (p) => p.series === series && isProductVisibleInShop(p, !!user),
     );
     setFilteredInventory(filteredProducts);
     const urlWithParams = "/shop?series=" + encodeURIComponent(series);

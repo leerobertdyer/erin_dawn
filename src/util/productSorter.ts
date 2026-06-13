@@ -28,6 +28,16 @@ export function getDateInMillis(dateValue: any): number {
   return 0;
 }
 
+/** Sold products are hidden from everyone; hidden products only visible to admin. */
+export function isProductVisibleInShop(
+  product: IProductInfo,
+  isAdmin: boolean,
+): boolean {
+  if (product.sold) return false;
+  if (product.hidden && !isAdmin) return false;
+  return true;
+}
+
 export function sortProducts(products: IProductInfo[], sortBy: SortType = 'newest') {
     return [...products].sort((a, b) => {
         switch (sortBy) {
