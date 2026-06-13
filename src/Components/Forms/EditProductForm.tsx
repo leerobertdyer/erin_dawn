@@ -131,6 +131,8 @@ export default function EditProductForm({
     e.preventDefault();
     setIsSubmitting(true);
 
+    const resolvedSeries = isNewSeries ? newSeriesName : series; // <-- add this
+
     if (!productToEdit) {
       setIsSubmitting(false);
       return;
@@ -147,14 +149,14 @@ export default function EditProductForm({
     if (isNewCategory)
       await handleAddCategory({
         name: categoryName,
-        series: [series],
+        series: [resolvedSeries],
         url: productToEdit.photos[0].url,
       });
 
     if (isNewSeries && !isNewCategory)
       await handleEditCategory({
         name: categoryName,
-        series: [series],
+        series: [resolvedSeries],
         url: productToEdit.photos[0].url,
       });
 
