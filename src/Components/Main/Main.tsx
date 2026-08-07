@@ -118,28 +118,24 @@ export default function Main() {
       <div>
         <div className="w-full h-fit flex flex-wrap justify-center items-center gap-[1rem]">
           {series.map((s, key) => (
-            <Frame
+            <div
               key={key}
-              additionalClass="w-[14rem] m:w-[16rem] h-[16rem] md:h-[18rem] overflow-hidden pb-6"
-              hover={true}
+              className="h-[10rem] w-[10rem] border-0 rounded-md flex flex-col justify-around items-center gap-4 bg-white"
+              onClick={() => handleSeriesClick(s.name)}
             >
-              <div
-                className="h-[10rem] w-[10rem]"
-                onClick={() => handleSeriesClick(s.name)}
-              >
+              <div className="w-[50%] h-[50%]">
                 <img
                   src={s.photos[0].url}
                   alt={s.name}
-                  className="rounded-md h-full w-full object-cover object-center"
+                  className="rounded-md"
                   loading="lazy"
                 />
               </div>
-
-              <p className="text-center text-xs md:text-sm lg:text-base">
+              <p className="text-center text-xs md:text-sm lg:text-base bg-white w-full p-2  h-fit">
                 {s.name}
               </p>
               {user && <AdminButtons handleEdit={() => handleEditSeries(s)} />}
-            </Frame>
+            </div>
           ))}
         </div>
       </div>

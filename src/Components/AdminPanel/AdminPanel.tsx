@@ -73,21 +73,11 @@ export default function AdminPanel() {
       )}
       <div
         className="
-            flex flex-col sm:flex-row gap-4 flex-wrap
-            justify-start items-center sm:justify-around w-[80%] h-fit m-auto 
-            p-[2rem] max-w-[60rem] border-4 border-black mb-8"
+            flex gap-4 flex-wrap
+            justify-start items-center sm:justify-around w-full h-fit 
+            p-[2rem]  mb-8"
       >
-        {/* Logout */}
-        <div className="flex flex-col items-center justify-center w-full">
-          <div className="relative bg-[url('/images/catMad.jpg')] bg-cover bg-center bg-no-repeat w-[20rem] h-[20rem] rounded-md mt-4">
-            <button
-              onClick={logout}
-              className="absolute bottom-2 right-2 p-2 bg-rose-600 rounded-md text-white min-w-[8rem]"
-            >
-              Log Out
-            </button>
-          </div>
-        </div>
+
 
         {/* Add New Product */}
         <div
@@ -97,6 +87,17 @@ export default function AdminPanel() {
                 gap-4 mt-4"
         >
           <AddProductCard addProduct={() => setShowProductForm(true)} />
+        </div>
+                {/* Logout */}
+        <div className="flex flex-col items-center justify-center w-full md:w-[25rem]">
+          <div className="relative bg-[url('/images/catMad.jpg')] bg-cover bg-center bg-no-repeat w-full h-[20rem] md:w-[25rem] md:h-[25rem] rounded-md mt-4">
+            <button
+              onClick={logout}
+              className="absolute bottom-2 right-2 p-2 bg-rose-600 rounded-md text-white min-w-[8rem]"
+            >
+              Log Out
+            </button>
+          </div>
         </div>
 
         {/* Send Email Campaign */}
