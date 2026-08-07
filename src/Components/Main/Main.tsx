@@ -130,7 +130,7 @@ export default function Main() {
                     loading="lazy"
                   />
                 </div>
-                <p className="text-center text-xs md:text-sm lg:text-base bg-white w-full p-2  h-[2rem] overflow-hidden">
+                <p className="text-center text-xs md:text-sm lg:text-base bg-white w-full p-2  h-[2rem] truncate">
                   {s.name}
                 </p>
               </div>
