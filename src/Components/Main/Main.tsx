@@ -1,4 +1,3 @@
-import Frame from "../Frame/Frame";
 import AdminButtons from "../Buttons/AdminButtons";
 import { useProductManagementContext } from "../../Context/ProductMgmtContext";
 import { useUserContext } from "../../Context/UserContext";
