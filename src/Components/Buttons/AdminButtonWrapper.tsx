@@ -42,11 +42,11 @@ export default function AdminButtonWrapper({ onclickFunction, content }: ICustom
 
     return (
         <button 
-            className="transition-all duration-[10ms] bg-edcPurple-60 text-white text-xs px-2 rounded-md w-fit md:w-full h-[1.5rem]"
+            className="transition-all duration-[10ms] bg-edcPurple-60 text-white text-xs px-2 rounded-md w-full md:w-full h-[1.5rem]"
             onClick={onclickFunction}
         >
             <div className="flex justify-center items-center gap-2">
-                <span className={`${content === 'Add Product' ? '' : 'hidden md:block'}`}>{text}</span>
+                <span className={`${content === 'Add Product' ? '' : 'md:block'}`}>{text}</span>
                 <span className="">{icon}</span>
             </div>
         </button>

@@ -118,23 +118,28 @@ export default function Main() {
       <div>
         <div className="w-full h-fit flex flex-wrap justify-center items-center gap-[1rem]">
           {series.map((s, key) => (
-            <div
-              key={key}
-              className="h-[10rem] w-[10rem] border-0 rounded-md flex flex-col justify-around items-center gap-4 bg-white"
-              onClick={() => handleSeriesClick(s.name)}
-            >
-              <div className="w-[50%] h-[50%]">
-                <img
-                  src={s.photos[0].url}
-                  alt={s.name}
-                  className="rounded-md"
-                  loading="lazy"
-                />
+            <div key={key} className="flex flex-col items-between">
+              <div
+                className="h-[10rem] w-[10rem] border-0 rounded-md flex flex-col justify-around items-center gap-4 bg-white"
+                onClick={() => handleSeriesClick(s.name)}
+              >
+                <div className="w-[50%] h-[50%]">
+                  <img
+                    src={s.photos[0].url}
+                    alt={s.name}
+                    className="rounded-md"
+                    loading="lazy"
+                  />
+                </div>
+                <p className="text-center text-xs md:text-sm lg:text-base bg-white w-full p-2  h-[2rem] overflow-hidden">
+                  {s.name}
+                </p>
               </div>
-              <p className="text-center text-xs md:text-sm lg:text-base bg-white w-full p-2  h-fit">
-                {s.name}
-              </p>
-              {user && <AdminButtons handleEdit={() => handleEditSeries(s)} />}
+              {user && (
+                <div className="w-[10rem] m-auto">
+                  <AdminButtons handleEdit={() => handleEditSeries(s)} />
+                </div>
+              )}
             </div>
           ))}
         </div>
