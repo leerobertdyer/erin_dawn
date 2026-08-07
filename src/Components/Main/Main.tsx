@@ -79,7 +79,7 @@ export default function Main() {
             flex flex-col items-center"
           >
             <div
-              className="h-[70vh] w-full border-2 border-[#242424] rounded-lg relative"
+              className="h-[70vh] max-h-[20rem] md:max-h-[35rem] w-full border-2 border-[#242424] rounded-lg relative"
               onClick={() => handleCategoryClick(c.name)}
             >
               <div className="text-center text-lg md:text-2xl tracking-[.2rem] font-retro w-full absolute top-0 left-0 text-edcPurple-80 bg-[#FFFFFF70]">
